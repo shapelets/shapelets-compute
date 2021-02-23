@@ -1,0 +1,3 @@
+[submodule "modules/ext_scamp/scamp"]
+	path = modules/ext_scamp/scamp
+	url = https://github.com/shapelets/SCAMP
