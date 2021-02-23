@@ -2,3 +2,4 @@
 .pytest_cache/
 build/
 external/
+cmake/_mac_af.pkg
