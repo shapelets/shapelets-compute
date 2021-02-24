@@ -652,7 +652,7 @@ ALGOSAPI af::array numberCrossingM(const af::array &tss, int m);
  *
  * @return af::array The number of peaks for each time series.
  */
-ALGOSAPI af::array numberCwtPeaks(const af::array &tss, int maxW);
+//ALGOSAPI af::array numberCwtPeaks(const af::array &tss, int maxW);
 
 /**
  * @brief Calculates the number of peaks of at least support \f$n\f$ in the time series \f$tss\f$. A peak of support

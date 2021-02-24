@@ -252,120 +252,120 @@ af::array localMaximals(const af::array &tss) {
     return result;
 }
 
-std::vector<LineTuple> identifyRidgeLines(const af::array &cwt_tss, const algos::array::Array<float> &maxDistances,
-                                          float gapThresh) {
-    std::vector<LineTuple> outLines;
+// std::vector<LineTuple> identifyRidgeLines(const af::array &cwt_tss, const algos::array::Array<float> &maxDistances,
+//                                           float gapThresh) {
+//     std::vector<LineTuple> outLines;
 
-    // Gets all local maximals
-    af::array maximals = localMaximals(cwt_tss);
-    algos::array::Array<int> relativeMaximals(maximals);
+//     // Gets all local maximals
+//     af::array maximals = localMaximals(cwt_tss);
+//     algos::array::Array<int> relativeMaximals(maximals);
 
-    // Gets all rows which contains at least one maximal
-    std::vector<int> rowsWithMaximal = algos::array::getRowsWithMaximals(relativeMaximals);
-    if (rowsWithMaximal.empty()) {
-        return outLines;
-    }
+//     // Gets all rows which contains at least one maximal
+//     std::vector<int> rowsWithMaximal = algos::array::getRowsWithMaximals(relativeMaximals);
+//     if (rowsWithMaximal.empty()) {
+//         return outLines;
+//     }
 
-    // Gets the last row with a maximal
-    auto startRow = rowsWithMaximal.back();
+//     // Gets the last row with a maximal
+//     auto startRow = rowsWithMaximal.back();
 
-    // Setting the first Ridge Lines (rows, cols, gap number)
-    std::vector<int> lastRowCols = algos::array::getIndexMaxColumns(relativeMaximals.getRow(startRow));
-    std::vector<CWTTuple> ridgeLines;
+//     // Setting the first Ridge Lines (rows, cols, gap number)
+//     std::vector<int> lastRowCols = algos::array::getIndexMaxColumns(relativeMaximals.getRow(startRow));
+//     std::vector<CWTTuple> ridgeLines;
 
-    for (auto c : lastRowCols) {
-        std::vector<int> rows;
-        rows.push_back(startRow);
-        std::vector<int> cols;
-        cols.push_back(c);
-        CWTTuple newRidge = std::make_tuple(rows, cols, 0);
-        ridgeLines.push_back(newRidge);
-    }
+//     for (auto c : lastRowCols) {
+//         std::vector<int> rows;
+//         rows.push_back(startRow);
+//         std::vector<int> cols;
+//         cols.push_back(c);
+//         CWTTuple newRidge = std::make_tuple(rows, cols, 0);
+//         ridgeLines.push_back(newRidge);
+//     }
 
-    // For storing the final lines
-    std::vector<CWTTuple> finalLines;
+//     // For storing the final lines
+//     std::vector<CWTTuple> finalLines;
 
-    // Generate a range for rows
-    std::vector<int> rows;
-    for (int i = startRow - 1; i > -1; i--) {
-        rows.push_back(i);
-    }
-    // Generate a range for cols
-    std::vector<int> cols;
-    for (int i = 0; i < cwt_tss.dims(1); i++) {
-        cols.push_back(i);
-    }
+//     // Generate a range for rows
+//     std::vector<int> rows;
+//     for (int i = startRow - 1; i > -1; i--) {
+//         rows.push_back(i);
+//     }
+//     // Generate a range for cols
+//     std::vector<int> cols;
+//     for (int i = 0; i < cwt_tss.dims(1); i++) {
+//         cols.push_back(i);
+//     }
 
-    for (const int &row : rows) {
-        std::vector<int> thisMaxCols = algos::array::getIndexMaxColumns(relativeMaximals.getRow(row));
+//     for (const int &row : rows) {
+//         std::vector<int> thisMaxCols = algos::array::getIndexMaxColumns(relativeMaximals.getRow(row));
 
-        // Increment the gap number of each line
-        for (auto &line : ridgeLines) {
-            std::get<2>(line) = std::get<2>(line) + 1;
-        }
+//         // Increment the gap number of each line
+//         for (auto &line : ridgeLines) {
+//             std::get<2>(line) = std::get<2>(line) + 1;
+//         }
 
-        // We store the last col for each line in prevRidgeCols
-        std::vector<int> prevRidgeCols;
-        for (auto &line : ridgeLines) {
-            prevRidgeCols.push_back(std::get<1>(line).back());
-        }
+//         // We store the last col for each line in prevRidgeCols
+//         std::vector<int> prevRidgeCols;
+//         for (auto &line : ridgeLines) {
+//             prevRidgeCols.push_back(std::get<1>(line).back());
+//         }
 
-        // Look through every relative maximum found at current row, attempt to connect them with
-        // existing ridge lines.
-        for (int col : thisMaxCols) {
-            CWTTuple *line = nullptr;
-            bool filled = false;
-            // If there is a previous ridge line within
-            // the max_distance to connect to, do so.
-            // Otherwise start a new one.
-            if (!prevRidgeCols.empty()) {
-                std::vector<int> diffs = subsValueToVector(col, prevRidgeCols);
-                int closest = indexMinValue(diffs);
-                if (diffs[closest] <= maxDistances.getRow(row).front()) {
-                    line = &ridgeLines[closest];
-                    filled = true;
-                }
-            }
-            if (filled) {
-                // Found a point close enough, extend current ridge line
-                std::vector<int> rows2 = std::get<0>(*line);
-                rows2.push_back(row);
-                std::get<0>(*line) = rows2;
+//         // Look through every relative maximum found at current row, attempt to connect them with
+//         // existing ridge lines.
+//         for (int col : thisMaxCols) {
+//             CWTTuple *line = nullptr;
+//             bool filled = false;
+//             // If there is a previous ridge line within
+//             // the max_distance to connect to, do so.
+//             // Otherwise start a new one.
+//             if (!prevRidgeCols.empty()) {
+//                 std::vector<int> diffs = subsValueToVector(col, prevRidgeCols);
+//                 int closest = indexMinValue(diffs);
+//                 if (diffs[closest] <= maxDistances.getRow(row).front()) {
+//                     line = &ridgeLines[closest];
+//                     filled = true;
+//                 }
+//             }
+//             if (filled) {
+//                 // Found a point close enough, extend current ridge line
+//                 std::vector<int> rows2 = std::get<0>(*line);
+//                 rows2.push_back(row);
+//                 std::get<0>(*line) = rows2;
 
-                std::vector<int> cols2 = std::get<1>(*line);
-                cols2.push_back(col);
-                std::get<1>(*line) = cols2;
+//                 std::vector<int> cols2 = std::get<1>(*line);
+//                 cols2.push_back(col);
+//                 std::get<1>(*line) = cols2;
 
-                std::get<2>(*line) = 0;
-            } else {
-                std::vector<int> rows2;
-                rows2.push_back(row);
-                std::vector<int> cols2;
-                cols2.push_back(col);
-                CWTTuple newLine = std::make_tuple(rows2, cols2, 0);
-                ridgeLines.push_back(newLine);
-            }
-        }
+//                 std::get<2>(*line) = 0;
+//             } else {
+//                 std::vector<int> rows2;
+//                 rows2.push_back(row);
+//                 std::vector<int> cols2;
+//                 cols2.push_back(col);
+//                 CWTTuple newLine = std::make_tuple(rows2, cols2, 0);
+//                 ridgeLines.push_back(newLine);
+//             }
+//         }
 
-        // Remove the ridgeLines with a gap_number too high
-        for (int ind = static_cast<int>(ridgeLines.size()) - 1; ind > -1; ind--) {
-            CWTTuple ridge = ridgeLines[ind];
-            if (std::get<2>(ridge) > gapThresh) {
-                finalLines.push_back(ridge);
-                ridgeLines.erase(ridgeLines.begin() + ind);
-            }
-        }
-    }
+//         // Remove the ridgeLines with a gap_number too high
+//         for (int ind = static_cast<int>(ridgeLines.size()) - 1; ind > -1; ind--) {
+//             CWTTuple ridge = ridgeLines[ind];
+//             if (std::get<2>(ridge) > gapThresh) {
+//                 finalLines.push_back(ridge);
+//                 ridgeLines.erase(ridgeLines.begin() + ind);
+//             }
+//         }
+//     }
 
-    finalLines.insert(finalLines.end(), ridgeLines.begin(), ridgeLines.end());
+//     finalLines.insert(finalLines.end(), ridgeLines.begin(), ridgeLines.end());
 
-    for (auto line : finalLines) {
-        auto l = std::make_tuple(std::get<0>(line), std::get<1>(line));
-        outLines.push_back(l);
-    }
+//     for (auto line : finalLines) {
+//         auto l = std::make_tuple(std::get<0>(line), std::get<1>(line));
+//         outLines.push_back(l);
+//     }
 
-    return outLines;
-}
+//     return outLines;
+// }
 
 float scoreAtPercentile(std::vector<float> row, int start, int end, float noisePerc) {
     std::vector<float> target;
@@ -388,43 +388,43 @@ float scoreAtPercentile(std::vector<float> row, int start, int end, float noiseP
     return 0.0f;
 }
 
-std::vector<LineTuple> filterFunction(const std::vector<LineTuple> &ridgeLines, std::vector<float> noises,
-                                      const algos::array::Array<float> &cwt, int minSnr, int minLength) {
-    std::vector<LineTuple> res;
+// std::vector<LineTuple> filterFunction(const std::vector<LineTuple> &ridgeLines, std::vector<float> noises,
+//                                       const algos::array::Array<float> &cwt, int minSnr, int minLength) {
+//     std::vector<LineTuple> res;
 
-    for (auto line : ridgeLines) {
-        if (static_cast<int>(std::get<0>(line).size()) >= minLength) {
-            float snr = std::abs(cwt.getElement(std::get<0>(line).front(), std::get<1>(line).front()) /
-                                 noises[std::get<1>(line).front()]);
-            if (snr >= minSnr) {
-                res.push_back(line);
-            }
-        }
-    }
-    return res;
-}
+//     for (auto line : ridgeLines) {
+//         if (static_cast<int>(std::get<0>(line).size()) >= minLength) {
+//             float snr = std::abs(cwt.getElement(std::get<0>(line).front(), std::get<1>(line).front()) /
+//                                  noises[std::get<1>(line).front()]);
+//             if (snr >= minSnr) {
+//                 res.push_back(line);
+//             }
+//         }
+//     }
+//     return res;
+// }
 
-std::vector<LineTuple> filterRidgeLines(const af::array &cwtDat, const std::vector<LineTuple> &ridgeLines, int minSnr,
-                                        float noisePerc) {
-    int numPoints = static_cast<int>(cwtDat.dims(1));
-    int minLength = static_cast<int>(std::ceil(cwtDat.dims(0) / 4.0));
-    int windowSize = static_cast<int>(std::ceil(numPoints / 20.0));
-    int hfWindow = windowSize / 2;
-    int odd = windowSize % 2;
+// std::vector<LineTuple> filterRidgeLines(const af::array &cwtDat, const std::vector<LineTuple> &ridgeLines, int minSnr,
+//                                         float noisePerc) {
+//     int numPoints = static_cast<int>(cwtDat.dims(1));
+//     int minLength = static_cast<int>(std::ceil(cwtDat.dims(0) / 4.0));
+//     int windowSize = static_cast<int>(std::ceil(numPoints / 20.0));
+//     int hfWindow = windowSize / 2;
+//     int odd = windowSize % 2;
 
-    algos::array::Array<float> cwtValues(cwtDat);
+//     algos::array::Array<float> cwtValues(cwtDat);
 
-    std::vector<float> rowOne = cwtValues.getRow(0);
-    std::vector<float> noises(rowOne.size());
+//     std::vector<float> rowOne = cwtValues.getRow(0);
+//     std::vector<float> noises(rowOne.size());
 
-    for (int i = 0; i < static_cast<int>(rowOne.size()); i++) {
-        int windowStart = std::max(i - hfWindow, 0);
-        int windowEnd = std::min(i + hfWindow + odd, numPoints);
-        noises[i] = scoreAtPercentile(rowOne, windowStart, windowEnd, noisePerc);
-    }
+//     for (int i = 0; i < static_cast<int>(rowOne.size()); i++) {
+//         int windowStart = std::max(i - hfWindow, 0);
+//         int windowEnd = std::min(i + hfWindow + odd, numPoints);
+//         noises[i] = scoreAtPercentile(rowOne, windowStart, windowEnd, noisePerc);
+//     }
 
-    return filterFunction(ridgeLines, noises, cwtValues, minSnr, minLength);
-}
+//     return filterFunction(ridgeLines, noises, cwtValues, minSnr, minLength);
+// }
 
 af::array cidCeInternal(const af::array &tss) {
     auto n = tss.dims(0);
@@ -1007,33 +1007,33 @@ af::array algos::features::numberCrossingM(const af::array &tss, int m) {
     return af::sum(af::abs(af::diff1(tss > m)), 0).as(tss.type());
 }
 
-af::array algos::features::numberCwtPeaks(const af::array &tss, int maxW) {
-    af::array out = af::constant(0, 1, tss.dims(1), tss.type());
+// af::array algos::features::numberCwtPeaks(const af::array &tss, int maxW) {
+//     af::array out = af::constant(0, 1, tss.dims(1), tss.type());
 
-    af::array widths = (af::range(af::dim4(maxW)) + 1).as(af::dtype::s32);
-    float gapThresh = 1;
-    af::array max_distances = widths / 4.0;
-    algos::array::Array<float> maxDistances(max_distances);
+//     af::array widths = (af::range(af::dim4(maxW)) + 1).as(af::dtype::s32);
+//     float gapThresh = 1;
+//     af::array max_distances = widths / 4.0;
+//     algos::array::Array<float> maxDistances(max_distances);
 
-    // Computing one timeseries at a time, due to divergencies in the algorithm
-    for (int i = 0; i < tss.dims(1); i++) {
-        af::array cwt_tss = cwt(tss(af::span, i), widths);
+//     // Computing one timeseries at a time, due to divergencies in the algorithm
+//     for (int i = 0; i < tss.dims(1); i++) {
+//         af::array cwt_tss = cwt(tss(af::span, i), widths);
 
-        std::vector<LineTuple> ridgeLines = identifyRidgeLines(cwt_tss, maxDistances, gapThresh);
+//         std::vector<LineTuple> ridgeLines = identifyRidgeLines(cwt_tss, maxDistances, gapThresh);
 
-        std::vector<LineTuple> filtered = filterRidgeLines(cwt_tss, ridgeLines, 1, 10);
+//         std::vector<LineTuple> filtered = filterRidgeLines(cwt_tss, ridgeLines, 1, 10);
 
-        std::vector<int> maxLoc;
-        for (auto line : filtered) {
-            maxLoc.push_back(std::get<1>(line).front());
-        }
+//         std::vector<int> maxLoc;
+//         for (auto line : filtered) {
+//             maxLoc.push_back(std::get<1>(line).front());
+//         }
 
-        std::sort(maxLoc.begin(), maxLoc.end());
-        out(0, i) = maxLoc.size();
-    }
+//         std::sort(maxLoc.begin(), maxLoc.end());
+//         out(0, i) = maxLoc.size();
+//     }
 
-    return out;
-}
+//     return out;
+// }
 
 af::array algos::features::numberPeaks(af::array tss, int n) {
     auto length = tss.dims(0);
