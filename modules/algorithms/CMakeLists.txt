@@ -114,12 +114,10 @@ set(ALGOLIB_INC "${ALGOLIB_BASE_DIR}/include")
 add_compile_definitions(BUILDING_ALGOS)
 
 # Sources to add to compilation
-set(ALGOLIB_SOURCES ${ALGOLIB_SRC}/array.cpp
-                    ${ALGOLIB_SRC}/clustering.cpp
+set(ALGOLIB_SOURCES ${ALGOLIB_SRC}/clustering.cpp
                     ${ALGOLIB_SRC}/dimensionality.cpp
                     ${ALGOLIB_SRC}/distances.cpp
                     ${ALGOLIB_SRC}/features.cpp
-                    ${ALGOLIB_SRC}/library.cpp
                     ${ALGOLIB_SRC}/libraryInternal.cpp
                     ${ALGOLIB_SRC}/linalg.cpp
                     ${ALGOLIB_SRC}/matrix.cpp
@@ -129,17 +127,14 @@ set(ALGOLIB_SOURCES ${ALGOLIB_SRC}/array.cpp
                     ${ALGOLIB_SRC}/regression.cpp
                     ${ALGOLIB_SRC}/regularization.cpp
                     ${ALGOLIB_SRC}/statistics.cpp
-                    ${ALGOLIB_SRC}/util.cpp
-                    ${ALGOLIB_SRC}/version.cpp)
+                    ${ALGOLIB_SRC}/util.cpp)
 
 # Headers to add to compilation
-set(ALGOLIB_HEADERS ${ALGOLIB_INC}/algos/array.h
-                    ${ALGOLIB_INC}/algos/clustering.h
+set(ALGOLIB_HEADERS ${ALGOLIB_INC}/algos/clustering.h
                     ${ALGOLIB_INC}/algos/defines.h
                     ${ALGOLIB_INC}/algos/dimensionality.h
                     ${ALGOLIB_INC}/algos/distances.h
                     ${ALGOLIB_INC}/algos/features.h
-                    ${ALGOLIB_INC}/algos/library.h
                     ${ALGOLIB_INC}/algos/linalg.h
                     ${ALGOLIB_INC}/algos/matrix.h
                     ${ALGOLIB_INC}/algos/normalization.h
@@ -148,7 +143,6 @@ set(ALGOLIB_HEADERS ${ALGOLIB_INC}/algos/array.h
                     ${ALGOLIB_INC}/algos/regularization.h
                     ${ALGOLIB_INC}/algos/statistics.h
                     ${ALGOLIB_INC}/algos/utils.h
-                    ${ALGOLIB_INC}/algos/version.h
                     ${ALGOLIB_INC}/algos/internal/libraryInternal.h
                     ${ALGOLIB_INC}/algos/internal/matrixInternal.h
                     ${ALGOLIB_INC}/algos/internal/scopedHostPtr.h

@@ -1,4 +1,3 @@
-#include <algos/array.h>
 #include <algos/filters.h>
 #include <boost/math/special_functions/factorials.hpp>
 

@@ -1,4 +1,3 @@
-#include <algos/array.h>
 #include <algos/features.h>
 #include <algos/normalization.h>
 #include <algos/polynomial.h>

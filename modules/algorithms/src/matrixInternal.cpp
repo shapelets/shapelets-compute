@@ -4,7 +4,6 @@
 #include <scamp/src/common.h>
 #include <scamp/src/scamp_exception.h>
 #include <algos/internal/vectorUtil.h>
-#include <algos/library.h>
 #include <algos/normalization.h>
 
 #include <algorithm>
