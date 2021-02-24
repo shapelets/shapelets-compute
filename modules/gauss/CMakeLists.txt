@@ -172,10 +172,10 @@ set(GAUSSLIB_HEADERS ${GAUSSLIB_INC}/gauss/clustering.h
 add_library(gauss ${GAUSSLIB_HEADERS} ${GAUSSLIB_SOURCES})
 
 target_include_directories(gauss
-    PRIVATE   
-        ${ArrayFire_INCLUDE_DIRS}
-    PUBLIC
+    PRIVATE
         ${PROJECT_SOURCE_DIR}/external
+    PUBLIC
+        ${ArrayFire_INCLUDE_DIRS}
         ${GAUSSLIB_INC}
         ${GAUSSLIB_INC}/internal)
 

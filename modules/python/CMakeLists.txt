@@ -27,6 +27,7 @@ pybind11_add_module(PYTHONBINDINGS ${PYTHONBINDINGS_CODE})
 # VERSION ${VERSION_SHORT} cannot be applied since the output is a dynamic library.
 set_target_properties(PYTHONBINDINGS
     PROPERTIES
+#        CXX_VISIBILITY_PRESET hidden
         OUTPUT_NAME "shapelets")
 
 ## Declare include directories
