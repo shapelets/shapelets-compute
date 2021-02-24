@@ -14,8 +14,31 @@ include(LocalArrayFire)
 include(AutoVcpkg)
 vcpkg_install(pybind11 gtest eigen3 benchmark boost spdlog)
 
-# Release build by default
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+# Options
+option(SOLO_ENABLE_COVERAGE "This flag anables Code Coverage of the code" OFF)
+
+# Set the build type
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE "Release" 
+      CACHE STRING "Build configuration 'Release' or 'Debug'." FORCE)
+ENDIF()
+
+# Avoid conflicts with min and max functions
+IF(WIN32)
+    ADD_DEFINITIONS(-DNOMINMAX)
+ENDIF()
+
+#global settings
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    # Turn compiler warnings up to 11
+    string(REGEX REPLACE "[-/]W[1-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -pedantic -Wno-gnu-zero-variadic-macro-arguments -Wint-conversion -Wshorten-64-to-32")
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -pedantic")
 endif()
 
+
+add_subdirectory(modules/algorithms)
