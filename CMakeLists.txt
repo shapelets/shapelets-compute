@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9.6)
 
-project(ShapeletsSolo)
+####
+# START: Pre-Project Setup
+####
 
 # Load from environment variables
 list(APPEND CMAKE_MODULE_PATH $ENV{CMAKE_MODULE_PATH})
@@ -8,19 +10,36 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{CMAKE_PREFIX_PATH})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Installs a local copy of array fire if not present in the system.
-include(LocalArrayFire) 
+include(LocalArrayFire)
 
 # VCPKG to install dependencies
 include(AutoVcpkg)
 vcpkg_install(pybind11 gtest eigen3 benchmark boost spdlog)
 
+####
+# END: Pre-Project Setup
+####
+
+
+project(ShapeletsSolo)
+
 # Options
 option(SOLO_ENABLE_COVERAGE "This flag anables Code Coverage of the code" OFF)
+
+# Using C++ 11
+SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON) # Required
+SET(CMAKE_CXX_EXTENSIONS ON) # with compiler extensions like gnu++11
 
 # Set the build type
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE "Release" 
       CACHE STRING "Build configuration 'Release' or 'Debug'." FORCE)
+ENDIF()
+
+# In debug mode, avoid any optimisations
+IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+    SET(CMAKE_CXX_FLAGS "-g -O0")
 ENDIF()
 
 # Avoid conflicts with min and max functions
@@ -41,4 +60,5 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 
-add_subdirectory(modules/algorithms)
+add_subdirectory(modules/gauss)
+add_subdirectory(modules/python)
