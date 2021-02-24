@@ -1,9 +1,3 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include "algos/internal/matrixInternal.h"
 
 #include <scamp/src/SCAMP.h>
@@ -23,7 +17,7 @@
 #include <utility>
 
 namespace {
-using namespace khiva::matrix::internal;
+using namespace algos::matrix::internal;
 
 constexpr double EPSILON = 1e-8;
 
@@ -140,7 +134,7 @@ void runScamp(SCAMP::SCAMPArgs &args) {
     // When using GPUs do not use CPU workers as they are much slower currently
     // and can cause unnecessary latency
     int numWorkersCPU = 0;
-    if (khiva::library::getBackend() == khiva::library::Backend::KHIVA_BACKEND_CPU) {
+    if (algos::library::getBackend() == algos::library::Backend::KHIVA_BACKEND_CPU) {
         devices.clear();
         numWorkersCPU = std::thread::hardware_concurrency();
     }
@@ -196,7 +190,7 @@ std::pair<std::vector<unsigned int>, std::vector<unsigned int>> buildFlattenedWi
 
 }  // namespace
 
-namespace khiva {
+namespace algos {
 namespace matrix {
 namespace internal {
 
@@ -383,7 +377,7 @@ af::array generateMask(long m, long numRows, long row, long numColumns, long col
 void massWithMask(af::array q, const af::array &t, const af::array &a, const af::array &mean_t,
                   const af::array &sigma_t, const af::array &mask, af::array &distances) {
     // Normalizing the query sequence. q can contain query sequences from multiple series
-    q = khiva::normalization::znorm(q, EPSILON);
+    q = algos::normalization::znorm(q, EPSILON);
 
     // Sliding dot product of the subsequence q of all the query time series against all the reference time series
     // contained in t
@@ -402,7 +396,7 @@ void massWithMask(af::array q, const af::array &t, const af::array &a, const af:
 void mass(af::array q, const af::array &t, const af::array &a, const af::array &mean_t, const af::array &sigma_t,
           af::array &distances) {
     // Normalizing the query sequence. q can contain query sequences from multiple series
-    q = khiva::normalization::znorm(q, EPSILON);
+    q = algos::normalization::znorm(q, EPSILON);
 
     // Sliding dot product of the subsequence q of all the query time series against all the reference time series
     // contained in t
@@ -428,10 +422,10 @@ void scamp(af::array tss, long m, af::array &profile, af::array &index) {
 
     tss = tss.as(f64);
     for (dim_t tssIdx = 0; tssIdx < tss.dims(1); ++tssIdx) {
-        auto vect = khiva::vectorutil::get<double>(tss(af::span, tssIdx));
+        auto vect = algos::vectorutil::get<double>(tss(af::span, tssIdx));
         auto res = ::scamp(std::move(vect), m);
-        profile(af::span, tssIdx) = khiva::vectorutil::createArray<double>(res.first);
-        index(af::span, tssIdx) = khiva::vectorutil::createArray<unsigned int>(res.second);
+        profile(af::span, tssIdx) = algos::vectorutil::createArray<double>(res.first);
+        index(af::span, tssIdx) = algos::vectorutil::createArray<unsigned int>(res.second);
     }
 }
 
@@ -448,11 +442,11 @@ void scamp(af::array ta, af::array tb, long m, af::array &profile, af::array &in
 
     for (dim_t tbIdx = 0; tbIdx < tb.dims(1); ++tbIdx) {
         for (dim_t taIdx = 0; taIdx < ta.dims(1); ++taIdx) {
-            auto vectA = khiva::vectorutil::get<double>(ta(af::span, taIdx));
-            auto vectB = khiva::vectorutil::get<double>(tb(af::span, tbIdx));
+            auto vectA = algos::vectorutil::get<double>(ta(af::span, taIdx));
+            auto vectB = algos::vectorutil::get<double>(tb(af::span, tbIdx));
             auto res = ::scamp(std::move(vectB), std::move(vectA), m);
-            profile(af::span, taIdx, tbIdx) = khiva::vectorutil::createArray<double>(res.first);
-            index(af::span, taIdx, tbIdx) = khiva::vectorutil::createArray<unsigned int>(res.second);
+            profile(af::span, taIdx, tbIdx) = algos::vectorutil::createArray<double>(res.first);
+            index(af::span, taIdx, tbIdx) = algos::vectorutil::createArray<unsigned int>(res.second);
         }
     }
 }
@@ -481,12 +475,12 @@ void scampLR(af::array tss, long m, af::array &profileLeft, af::array &indexLeft
     auto typeBefore = tss.type();
     tss = tss.as(f64);
     for (dim_t tssIdx = 0; tssIdx < tss.dims(1); ++tssIdx) {
-        auto vect = khiva::vectorutil::get<double>(tss(af::span, tssIdx));
+        auto vect = algos::vectorutil::get<double>(tss(af::span, tssIdx));
         auto res = ::scampLR(std::move(vect), m);
-        profileLeft(af::span, tssIdx) = khiva::vectorutil::createArray<double>(res.first.first);
-        indexLeft(af::span, tssIdx) = khiva::vectorutil::createArray<unsigned int>(res.first.second);
-        profileRight(af::span, tssIdx) = khiva::vectorutil::createArray<double>(res.second.first);
-        indexRight(af::span, tssIdx) = khiva::vectorutil::createArray<unsigned int>(res.second.second);
+        profileLeft(af::span, tssIdx) = algos::vectorutil::createArray<double>(res.first.first);
+        indexLeft(af::span, tssIdx) = algos::vectorutil::createArray<unsigned int>(res.first.second);
+        profileRight(af::span, tssIdx) = algos::vectorutil::createArray<double>(res.second.first);
+        indexRight(af::span, tssIdx) = algos::vectorutil::createArray<unsigned int>(res.second.second);
     }
 
     auto invalidIndex = tss.dims(0);
@@ -530,15 +524,15 @@ void getChains(af::array tss, long m, af::array &chains) {
 
     tss = tss.as(f64);
     for (dim_t tssIdx = 0; tssIdx < tss.dims(1); ++tssIdx) {
-        auto vect = khiva::vectorutil::get<double>(tss(af::span, tssIdx));
+        auto vect = algos::vectorutil::get<double>(tss(af::span, tssIdx));
         auto res = ::scampLR(std::move(vect), m);
         auto currArrChains = extractAllChains(res.first.second, res.second.second);
         sortChains(currArrChains);
         auto flattenedIndexesPair = buildFlattenedWithIndexes(currArrChains);
         chains(af::seq(flattenedIndexesPair.first.size()), 0, tssIdx) =
-            khiva::vectorutil::createArray<unsigned int>(flattenedIndexesPair.first);
+            algos::vectorutil::createArray<unsigned int>(flattenedIndexesPair.first);
         chains(af::seq(flattenedIndexesPair.second.size()), 1, tssIdx) =
-            khiva::vectorutil::createArray<unsigned int>(flattenedIndexesPair.second);
+            algos::vectorutil::createArray<unsigned int>(flattenedIndexesPair.second);
     }
 }
 
@@ -553,7 +547,7 @@ void stomp_batched(const af::array &ta, af::array tb, long m, long batch_size, a
     index = af::array(0, af::dtype::u32);
 
     // Computing the mean and standard deviation of all the reference time series contained in ta
-    khiva::matrix::internal::meanStdev(ta, aux, m, mean, stdev);
+    algos::matrix::internal::meanStdev(ta, aux, m, mean, stdev);
 
     // The chunk size cannot be greater than the length of the input time series tb minus m + 1
     long chunkSize = std::min(nb - m + 1, batch_size);
@@ -583,7 +577,7 @@ void stomp_batched(const af::array &ta, af::array tb, long m, long batch_size, a
             af::array pidx;
 
             // Compute the distance and index profiles using Mueens algorithm for similarity search
-            khiva::matrix::internal::mass(input(af::span, idx, af::span, af::span), ta, aux, mean, stdev, distances);
+            algos::matrix::internal::mass(input(af::span, idx, af::span, af::span), ta, aux, mean, stdev, distances);
 
             // Get minimium distance and index
             getMinDistance(distances, minDistance, pidx);
@@ -657,7 +651,7 @@ void stomp_batched_two_levels(af::array ta, af::array tb, long m, long batch_siz
             af::array mean;
             af::array stdev;
             // Computing the mean and standard deviation of all the reference time series contained in taChunk
-            khiva::matrix::internal::meanStdev(taChunk, aux, m, mean, stdev);
+            algos::matrix::internal::meanStdev(taChunk, aux, m, mean, stdev);
             // For all the subsequences in input for the given batch
             gfor(af::seq idx, iterationSizeB) {
                 af::array distancesTmp;
@@ -665,7 +659,7 @@ void stomp_batched_two_levels(af::array ta, af::array tb, long m, long batch_siz
                 af::array pidxTmp;
 
                 // Compute the distance and index profiles using Mueens algorithm for similarity search
-                khiva::matrix::internal::mass(input(af::span, idx, af::span, af::span), taChunk, aux, mean, stdev,
+                algos::matrix::internal::mass(input(af::span, idx, af::span, af::span), taChunk, aux, mean, stdev,
                                               distancesTmp);
 
                 getMinDistance(distancesTmp, minDistanceTmp, pidxTmp);
@@ -733,7 +727,7 @@ void stomp_parallel(const af::array &ta, af::array tb, long m, af::array &profil
     af::array stdev;
 
     // Computing the mean and standard deviation of all the reference time series contained in ta
-    khiva::matrix::internal::meanStdev(ta, aux, m, mean, stdev);
+    algos::matrix::internal::meanStdev(ta, aux, m, mean, stdev);
 
     // If the iteration size has changed, resize input array
     af::array input = af::array(m, nb - m + 1, tb.dims(1), tb.type());
@@ -747,7 +741,7 @@ void stomp_parallel(const af::array &ta, af::array tb, long m, af::array &profil
     gfor(af::seq idx, nb - m + 1) {
         af::array distances;
         // Compute the distance and index profiles using Mueens algorithm for similarity search
-        khiva::matrix::internal::mass(input(af::span, idx, af::span, af::span), ta, aux, mean, stdev, distances);
+        algos::matrix::internal::mass(input(af::span, idx, af::span, af::span), ta, aux, mean, stdev, distances);
 
         getMinDistance(distances, profile, index);
     }
@@ -811,7 +805,7 @@ void stomp_batched_two_levels(af::array t, long m, long batch_size_b, long batch
             af::array mean;
             af::array stdev;
             // Computing the mean and standard deviation of all the reference time series contained in taChunk
-            khiva::matrix::internal::meanStdev(tChunk, aux, m, mean, stdev);
+            algos::matrix::internal::meanStdev(tChunk, aux, m, mean, stdev);
             // For all the subsequences in input for the given batch
             gfor(af::seq idx, iterationSizeB) {
                 af::array distancesTmp;
@@ -819,10 +813,10 @@ void stomp_batched_two_levels(af::array t, long m, long batch_size_b, long batch
                 af::array pidxTmp;
 
                 // Calculating the mask required to filter the trivial matches
-                auto mask = khiva::matrix::internal::generateMask(m, iterationSizeB, i, iterationSizeA - m + 1, start,
+                auto mask = algos::matrix::internal::generateMask(m, iterationSizeB, i, iterationSizeA - m + 1, start,
                                                                   nTimeSeries);
                 // Compute the distance and index profiles using Mueens algorithm for similarity search
-                khiva::matrix::internal::massWithMask(input(af::span, idx, af::span, af::span), tChunk, aux, mean,
+                algos::matrix::internal::massWithMask(input(af::span, idx, af::span, af::span), tChunk, aux, mean,
                                                       stdev, mask, distancesTmp);
 
                 getMinDistance(distancesTmp, minDistanceTmp, pidxTmp);
@@ -890,7 +884,7 @@ void stomp_parallel(af::array t, long m, af::array &profile, af::array &index) {
     af::array stdev;
 
     // Computing the mean and standard deviation of all the reference time series contained in ta
-    khiva::matrix::internal::meanStdev(t, aux, m, mean, stdev);
+    algos::matrix::internal::meanStdev(t, aux, m, mean, stdev);
 
     // If the iteration size has changed, resize input array
     af::array input = af::array(m, n - m + 1, nTimeSeries, t.type());
@@ -901,13 +895,13 @@ void stomp_parallel(af::array t, long m, af::array &profile, af::array &index) {
     }
 
     // Calculating the mask required to filter the trivial matches
-    auto mask = khiva::matrix::internal::generateMask(m, n - m + 1, 0, n - m + 1, 0, nTimeSeries);
+    auto mask = algos::matrix::internal::generateMask(m, n - m + 1, 0, n - m + 1, 0, nTimeSeries);
 
     // For all the subsequences of tb
     gfor(af::seq idx, n - m + 1) {
         af::array distances;
         // Compute the distance and index profiles using Mueens algorithm for similarity search
-        khiva::matrix::internal::massWithMask(input(af::span, idx, af::span, af::span), t, aux, mean, stdev, mask,
+        algos::matrix::internal::massWithMask(input(af::span, idx, af::span, af::span), t, aux, mean, stdev, mask,
                                               distances);
 
         getMinDistance(distances, profile, index);
@@ -1015,4 +1009,4 @@ void findBestN(const af::array &profile, const af::array &index, long m, long n,
 
 }  // namespace internal
 }  // namespace matrix
-}  // namespace khiva
+}  // namespace algos

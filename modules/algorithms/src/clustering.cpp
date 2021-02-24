@@ -1,8 +1,3 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <arrayfire.h>
 #include <algos/clustering.h>
 #include <algos/internal/scopedHostPtr.h>
@@ -117,7 +112,7 @@ af::array generateUniformLabels(int nTimeSeries, int k) {
  * @return          The accumulated change ratio between iterations.
  */
 float computeError(const af::array &means, const af::array &newMeans) {
-    auto error = khiva::utils::makeScopedHostPtr(
+    auto error = algos::utils::makeScopedHostPtr(
         af::sum(af::sqrt(af::sum(af::pow(means - newMeans, 2), 0))).as(af::dtype::f32).host<float>());
     return error[0];
 }
@@ -154,7 +149,7 @@ af::array getFirstEigenVector(const af::array &m) {
     af::array eigenVectors;
 
     if (m.type() == af::dtype::f64) {
-        auto matHost = khiva::utils::makeScopedHostPtr(m.host<double>());
+        auto matHost = algos::utils::makeScopedHostPtr(m.host<double>());
         Eigen::MatrixXd mat = Eigen::Map<Eigen::MatrixXd>(matHost.get(), m.dims(0), m.dims(1));
 
         // Compute Eigen Values.
@@ -167,7 +162,7 @@ af::array getFirstEigenVector(const af::array &m) {
         Eigen::MatrixXd reEIVectors = solution.eigenvectors().real();
         eigenVectors = af::array(m.dims(0), m.dims(1), reEIVectors.data());
     } else if (m.type() == af::dtype::f32) {
-        auto matHost = khiva::utils::makeScopedHostPtr(m.host<float>());
+        auto matHost = algos::utils::makeScopedHostPtr(m.host<float>());
         Eigen::MatrixXf mat = Eigen::Map<Eigen::MatrixXf>(matHost.get(), m.dims(0), m.dims(1));
 
         // Compute Eigen Values.
@@ -277,7 +272,7 @@ af::array shapeExtraction(const af::array &tss, const af::array &centroid) {
         shiftedTSS(af::span, i) = shiftedTSi;
     }
 
-    shiftedTSS = khiva::normalization::znorm(shiftedTSS);
+    shiftedTSS = algos::normalization::znorm(shiftedTSS);
     af::array s = af::matmul(shiftedTSS, shiftedTSS.T());
     af::array q =
         af::identity(nelements, nelements) - (af::constant(1.0, nelements, nelements, tss.type()) / nelements);
@@ -289,8 +284,8 @@ af::array shapeExtraction(const af::array &tss, const af::array &centroid) {
     af::array findDistance2 = af::sqrt(af::sum(af::pow((shiftedTSS(af::span, 0) + first), 2)));
 
     af::array condition = findDistance1 >= findDistance2;
-    first = af::select(af::tile(condition, first.dims(0), 1), khiva::normalization::znorm(first * (-1)),
-                       khiva::normalization::znorm(first));
+    first = af::select(af::tile(condition, first.dims(0), 1), algos::normalization::znorm(first * (-1)),
+                       algos::normalization::znorm(first));
 
     return first;
 }
@@ -338,7 +333,7 @@ af::array assignmentStep(const af::array &tss, const af::array &centroids, af::a
 }
 }  // namespace
 
-void khiva::clustering::kMeans(const af::array &tss, int k, af::array &centroids, af::array &labels, float tolerance,
+void algos::clustering::kMeans(const af::array &tss, int k, af::array &centroids, af::array &labels, float tolerance,
                                int maxIterations) {
     float error = std::numeric_limits<float>::max();
 
@@ -373,7 +368,7 @@ void khiva::clustering::kMeans(const af::array &tss, int k, af::array &centroids
     }
 }
 
-void khiva::clustering::kShape(const af::array &tss, int k, af::array &centroids, af::array &labels, float tolerance,
+void algos::clustering::kShape(const af::array &tss, int k, af::array &centroids, af::array &labels, float tolerance,
                                int maxIterations) {
     auto nTimeseries = static_cast<unsigned int>(tss.dims(1));
     auto nElements = static_cast<unsigned int>(tss.dims(0));
@@ -386,7 +381,7 @@ void khiva::clustering::kShape(const af::array &tss, int k, af::array &centroids
         labels = generateUniformLabels(nTimeseries, k);
     }
 
-    af::array normTSS = khiva::normalization::znorm(tss);
+    af::array normTSS = algos::normalization::znorm(tss);
     af::array distances = af::constant(0, nTimeseries, k, tss.type());
     af::array newCentroids;
 

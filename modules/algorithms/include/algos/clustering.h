@@ -1,18 +1,12 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_CLUSTERING_H
-#define KHIVA_CORE_CLUSTERING_H
+#ifndef ALGOS_CORE_CLUSTERING_H
+#define ALGOS_CORE_CLUSTERING_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
 #include <vector>
 
-namespace khiva {
+namespace algos {
 namespace clustering {
 
 /**
@@ -29,7 +23,7 @@ namespace clustering {
  * @param tolerance The error tolerance to stop the computation of the centroids.
  * @param maxIterations The maximum number of iterations allowed.
  */
-KHIVAAPI void kMeans(const af::array &tss, int k, af::array &centroids, af::array &labels,
+ALGOSAPI void kMeans(const af::array &tss, int k, af::array &centroids, af::array &labels,
                      float tolerance = 0.0000000001, int maxIterations = 100);
 
 /**
@@ -46,10 +40,10 @@ KHIVAAPI void kMeans(const af::array &tss, int k, af::array &centroids, af::arra
  * @param tolerance The error tolerance to stop the computation of the centroids.
  * @param maxIterations The maximum number of iterations allowed.
  */
-KHIVAAPI void kShape(const af::array &tss, int k, af::array &centroids, af::array &labels,
+ALGOSAPI void kShape(const af::array &tss, int k, af::array &centroids, af::array &labels,
                      float tolerance = 0.0000000001, int maxIterations = 100);
 
 }  // namespace clustering
-}  // namespace khiva
+}  // namespace algos
 
 #endif

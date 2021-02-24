@@ -111,7 +111,7 @@ set(ALGOLIB_SRC "${ALGOLIB_BASE_DIR}/src")
 # Define include directory
 set(ALGOLIB_INC "${ALGOLIB_BASE_DIR}/include")
 
-add_compile_definitions(BUILDING_KHIVA)
+add_compile_definitions(BUILDING_ALGOS)
 
 # Sources to add to compilation
 set(ALGOLIB_SOURCES ${ALGOLIB_SRC}/array.cpp
@@ -158,7 +158,7 @@ set(ALGOLIB_HEADERS ${ALGOLIB_INC}/algos/array.h
 set(ALGOLIB algorithms)
 
 # The output is a static library
-add_library(${ALGOLIB} SHARED ${ALGOLIB_HEADERS} ${ALGOLIB_SOURCES})
+add_library(${ALGOLIB} ${ALGOLIB_HEADERS} ${ALGOLIB_SOURCES})
 
 target_include_directories(${ALGOLIB} 
     PRIVATE   
@@ -186,6 +186,6 @@ set_target_properties(${ALGOLIB}
         PUBLIC_HEADER "${ALGOLIB_INC}/algos.h")
         
 # export(EXPORT Khiva
-#        NAMESPACE Khiva::
+#        NAMESPACE algos::
 #        FILE cmake/KhivaTargets.cmake)        
 

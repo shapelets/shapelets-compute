@@ -1,12 +1,6 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include <algos/regularization.h>
 
-af::array khiva::regularization::groupBy(const af::array &in, AggregationFuncDimT aggregationFunction, int nColumnsKey,
+af::array algos::regularization::groupBy(const af::array &in, AggregationFuncDimT aggregationFunction, int nColumnsKey,
                                          int nColumnsValue) {
     auto n = in.dims(0);
 
@@ -30,7 +24,7 @@ af::array khiva::regularization::groupBy(const af::array &in, AggregationFuncDim
     return values;
 }
 
-af::array khiva::regularization::groupBy(const af::array &in, AggregationFuncBoolDimT aggregationFunction,
+af::array algos::regularization::groupBy(const af::array &in, AggregationFuncBoolDimT aggregationFunction,
                                          int nColumnsKey, int nColumnsValue) {
     auto n = in.dims(0);
 
@@ -54,7 +48,7 @@ af::array khiva::regularization::groupBy(const af::array &in, AggregationFuncBoo
     return values;
 }
 
-af::array khiva::regularization::groupBy(const af::array &in, AggregationFuncInt aggregationFunction, int nColumnsKey,
+af::array algos::regularization::groupBy(const af::array &in, AggregationFuncInt aggregationFunction, int nColumnsKey,
                                          int nColumnsValue) {
     auto n = in.dims(0);
 

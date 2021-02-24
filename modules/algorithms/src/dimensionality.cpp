@@ -1,9 +1,3 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include <algos/dimensionality.h>
 #include <algos/internal/scopedHostPtr.h>
 
@@ -19,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-using namespace khiva::dimensionality;
+using namespace algos::dimensionality;
 
 namespace {
 
@@ -138,7 +132,7 @@ af::array PAA_CPU(const af::array &a, int bins) {
 
     // For each column
     for (int i = 0; i < a.dims(1); i++) {
-        auto column = khiva::utils::makeScopedHostPtr(a.col(i).host<T>());
+        auto column = algos::utils::makeScopedHostPtr(a.col(i).host<T>());
         T start = 0.0;
         T end = elemPerBin - 1;
 
@@ -228,7 +222,7 @@ void recomputeAreaNeighbor(std::map<int64_t, VisvalingamSummaryPoint>::iterator 
 
 }  // namespace
 
-std::vector<Point> khiva::dimensionality::PAA(const std::vector<Point> &points, int bins) {
+std::vector<Point> algos::dimensionality::PAA(const std::vector<Point> &points, int bins) {
     float xrange = points.back().first - points.front().first;    
     float width_bin = xrange / bins;
     float reduction = bins / xrange;
@@ -252,7 +246,7 @@ std::vector<Point> khiva::dimensionality::PAA(const std::vector<Point> &points, 
     return result;
 }
 
-af::array khiva::dimensionality::PAA(const af::array &a, int bins) {
+af::array algos::dimensionality::PAA(const af::array &a, int bins) {
     // Resulting array
     af::array result;
 
@@ -276,7 +270,7 @@ af::array khiva::dimensionality::PAA(const af::array &a, int bins) {
     return result;
 }
 
-af::array khiva::dimensionality::PIP(const af::array &ts, int numberIPs) {
+af::array algos::dimensionality::PIP(const af::array &ts, int numberIPs) {
     if (ts.dims(1) != 2) {
         throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");
     }
@@ -290,8 +284,8 @@ af::array khiva::dimensionality::PIP(const af::array &ts, int numberIPs) {
     }
 
     // Extracting info from af::array
-    auto h_x = khiva::utils::makeScopedHostPtr(ts.col(0).host<float>());
-    auto h_y = khiva::utils::makeScopedHostPtr(ts.col(1).host<float>());
+    auto h_x = algos::utils::makeScopedHostPtr(ts.col(0).host<float>());
+    auto h_y = algos::utils::makeScopedHostPtr(ts.col(1).host<float>());
 
     // Converting c-arrays to vector of points
     std::vector<Point> points;
@@ -347,7 +341,7 @@ af::array khiva::dimensionality::PIP(const af::array &ts, int numberIPs) {
     return res;
 }
 
-std::vector<Point> khiva::dimensionality::PLABottomUp(const std::vector<Point> &ts, float maxError) {
+std::vector<Point> algos::dimensionality::PLABottomUp(const std::vector<Point> &ts, float maxError) {
     std::vector<Segment> segments;
     segments.reserve(ts.size());
 
@@ -394,13 +388,13 @@ std::vector<Point> khiva::dimensionality::PLABottomUp(const std::vector<Point> &
     return result;
 }
 
-af::array khiva::dimensionality::PLABottomUp(const af::array &ts, float maxError) {
+af::array algos::dimensionality::PLABottomUp(const af::array &ts, float maxError) {
     if (ts.dims(1) != 2) {
         throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");
     }
     // Extracting info from af::array
-    auto h_x = khiva::utils::makeScopedHostPtr(ts.col(0).host<float>());
-    auto h_y = khiva::utils::makeScopedHostPtr(ts.col(1).host<float>());
+    auto h_x = algos::utils::makeScopedHostPtr(ts.col(0).host<float>());
+    auto h_y = algos::utils::makeScopedHostPtr(ts.col(1).host<float>());
 
     std::vector<Point> points;
     points.reserve(ts.dims(0));
@@ -430,7 +424,7 @@ af::array khiva::dimensionality::PLABottomUp(const af::array &ts, float maxError
     return res;
 }
 
-std::vector<Point> khiva::dimensionality::PLASlidingWindow(const std::vector<Point> &ts, float maxError) {
+std::vector<Point> algos::dimensionality::PLASlidingWindow(const std::vector<Point> &ts, float maxError) {
     std::vector<Segment> segments;
 
     size_t anchor = 0;
@@ -463,13 +457,13 @@ std::vector<Point> khiva::dimensionality::PLASlidingWindow(const std::vector<Poi
     return result;
 }
 
-af::array khiva::dimensionality::PLASlidingWindow(const af::array &ts, float maxError) {
+af::array algos::dimensionality::PLASlidingWindow(const af::array &ts, float maxError) {
     if (ts.dims(1) != 2) {
         throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");
     }
     // Extracting info from af::array
-    auto h_x = khiva::utils::makeScopedHostPtr(ts.col(0).host<float>());
-    auto h_y = khiva::utils::makeScopedHostPtr(ts.col(1).host<float>());
+    auto h_x = algos::utils::makeScopedHostPtr(ts.col(0).host<float>());
+    auto h_y = algos::utils::makeScopedHostPtr(ts.col(1).host<float>());
 
     std::vector<Point> points;
     points.reserve(ts.dims(0));
@@ -498,7 +492,7 @@ af::array khiva::dimensionality::PLASlidingWindow(const af::array &ts, float max
     return res;
 }
 
-std::vector<Point> khiva::dimensionality::ramerDouglasPeucker(const std::vector<Point> &pointList, double epsilon) {
+std::vector<Point> algos::dimensionality::ramerDouglasPeucker(const std::vector<Point> &pointList, double epsilon) {
     std::vector<Point> out;
 
     if (pointList.size() < 2) throw std::invalid_argument("Not enough points to simplify ...");
@@ -536,13 +530,13 @@ std::vector<Point> khiva::dimensionality::ramerDouglasPeucker(const std::vector<
     return out;
 }
 
-af::array khiva::dimensionality::ramerDouglasPeucker(const af::array &pointList, double epsilon) {
+af::array algos::dimensionality::ramerDouglasPeucker(const af::array &pointList, double epsilon) {
     if (pointList.dims(1) != 2) {
         throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");
     }
 
-    auto x = khiva::utils::makeScopedHostPtr(pointList.col(0).host<float>());
-    auto y = khiva::utils::makeScopedHostPtr(pointList.col(1).host<float>());
+    auto x = algos::utils::makeScopedHostPtr(pointList.col(0).host<float>());
+    auto y = algos::utils::makeScopedHostPtr(pointList.col(1).host<float>());
 
     std::vector<Point> points;
     points.reserve(pointList.dims(0));
@@ -569,7 +563,7 @@ af::array khiva::dimensionality::ramerDouglasPeucker(const af::array &pointList,
     return af::join(1, ox, oy);
 }
 
-af::array khiva::dimensionality::SAX(const af::array &a, int alphabet_size) {
+af::array algos::dimensionality::SAX(const af::array &a, int alphabet_size) {
     if (a.dims(1) != 2) {
         throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");
     }
@@ -589,7 +583,7 @@ af::array khiva::dimensionality::SAX(const af::array &a, int alphabet_size) {
         if (std_value > 0) {
             std::vector<float> breakingPoints = computeBreakpoints(alphabet_size, mean_value, std_value);
             std::vector<int> alphabet = generateAlphabet(alphabet_size);
-            auto a_h = khiva::utils::makeScopedHostPtr(ts.host<float>());
+            auto a_h = algos::utils::makeScopedHostPtr(ts.host<float>());
 
             // Iterate across elements of ts
             for (int i = 0; i < n; i++) {
@@ -609,7 +603,7 @@ af::array khiva::dimensionality::SAX(const af::array &a, int alphabet_size) {
     return result;
 }
 
-std::vector<Point> khiva::dimensionality::visvalingam(const std::vector<Point> &pointList, int64_t numPoints,
+std::vector<Point> algos::dimensionality::visvalingam(const std::vector<Point> &pointList, int64_t numPoints,
                                                       int64_t scale) {
     std::map<int64_t, VisvalingamSummaryPoint> points;
     std::set<std::pair<int64_t, int64_t>, mapComparator> point_indexer;
@@ -661,14 +655,14 @@ std::vector<Point> khiva::dimensionality::visvalingam(const std::vector<Point> &
 
     return out_vector;
 }
-af::array khiva::dimensionality::visvalingam(const af::array &pointList, int numPoints) {
+af::array algos::dimensionality::visvalingam(const af::array &pointList, int numPoints) {
     if (pointList.dims(1) != 2) {
         throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");
     }
     std::vector<Point> points;
     points.reserve(pointList.dims(0));
-    auto x = khiva::utils::makeScopedHostPtr(pointList.col(0).host<float>());
-    auto y = khiva::utils::makeScopedHostPtr(pointList.col(1).host<float>());
+    auto x = algos::utils::makeScopedHostPtr(pointList.col(0).host<float>());
+    auto y = algos::utils::makeScopedHostPtr(pointList.col(1).host<float>());
 
     for (int i = 0; i < pointList.dims(0); i++) {
         points.emplace_back(x[i], y[i]);

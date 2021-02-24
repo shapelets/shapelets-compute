@@ -1,16 +1,10 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_LINALG_H
-#define KHIVA_CORE_LINALG_H
+#ifndef ALGOS_CORE_LINALG_H
+#define ALGOS_CORE_LINALG_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
-namespace khiva {
+namespace algos {
 
 namespace linalg {
 
@@ -26,9 +20,9 @@ namespace linalg {
  *
  * @return af::array Contains the solution to the linear equation problem minimizing the norm 2.
  */
-KHIVAAPI af::array lls(const af::array &A, const af::array &b);
+ALGOSAPI af::array lls(const af::array &A, const af::array &b);
 
 }  // namespace linalg
-}  // namespace khiva
+}  // namespace algos
 
 #endif

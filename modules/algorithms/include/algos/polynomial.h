@@ -1,16 +1,10 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_POLYNOMIAL_H
-#define KHIVA_CORE_POLYNOMIAL_H
+#ifndef ALGOS_CORE_POLYNOMIAL_H
+#define ALGOS_CORE_POLYNOMIAL_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
-namespace khiva {
+namespace algos {
 
 namespace polynomial {
 
@@ -24,7 +18,7 @@ namespace polynomial {
  *
  * @return af::array Polynomial coefficients, highest power first.
  */
-KHIVAAPI af::array polyfit(const af::array &x, const af::array &y, int deg);
+ALGOSAPI af::array polyfit(const af::array &x, const af::array &y, int deg);
 
 /**
  * @brief Calculates the roots of a polynomial with coefficients given in \f$p\f$. The values in the rank-1 array
@@ -37,9 +31,9 @@ KHIVAAPI af::array polyfit(const af::array &x, const af::array &y, int deg);
  *
  * @return af::array Containing the roots of the polynomial.
  */
-KHIVAAPI af::array roots(const af::array &pp);
+ALGOSAPI af::array roots(const af::array &pp);
 
 }  // namespace polynomial
-}  // namespace khiva
+}  // namespace algos
 
 #endif

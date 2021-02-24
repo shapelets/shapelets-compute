@@ -1,9 +1,3 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include <algos/internal/scopedHostPtr.h>
 #include <algos/linalg.h>
 #include <algos/polynomial.h>
@@ -27,7 +21,7 @@ af::array vandermonde(const af::array &x, int order, bool ascending) {
 
 }  // namespace
 
-af::array khiva::polynomial::polyfit(const af::array &x, const af::array &y, int deg) {
+af::array algos::polynomial::polyfit(const af::array &x, const af::array &y, int deg) {
     int order = deg + 1;
     af::array lhs = vandermonde(x, order, false);
     const af::array &rhs = y;
@@ -36,7 +30,7 @@ af::array khiva::polynomial::polyfit(const af::array &x, const af::array &y, int
 
     lhs /= af::tile(scale, static_cast<unsigned int>(lhs.dims(0)));
 
-    af::array c = khiva::linalg::lls(lhs, rhs);
+    af::array c = algos::linalg::lls(lhs, rhs);
     c = af::transpose(c);
     c /= af::tile(scale, static_cast<unsigned int>(c.dims(0)));
     c = af::transpose(c);
@@ -44,7 +38,7 @@ af::array khiva::polynomial::polyfit(const af::array &x, const af::array &y, int
     return c;
 }
 
-af::array khiva::polynomial::roots(const af::array &pp) {
+af::array algos::polynomial::roots(const af::array &pp) {
     af::array result = af::array(pp.dims(0) - 1, pp.dims(1), af::dtype::c32);
     for (int i = 0; i < pp.dims(1); i++) {
         af::array p = pp(af::span, i);
@@ -54,7 +48,7 @@ af::array khiva::polynomial::roots(const af::array &pp) {
         p = (-1 * p(af::seq(1, static_cast<double>(p.dims(0)) - 1), af::span)) /
             af::tile(p(0, af::span), static_cast<unsigned int>(p.dims(0)) - 1);
 
-        auto coeffs = khiva::utils::makeScopedHostPtr(p.as(af::dtype::f32).host<float>());
+        auto coeffs = algos::utils::makeScopedHostPtr(p.as(af::dtype::f32).host<float>());
 
         Eigen::VectorXf vec = Eigen::VectorXf::Ones(p.dims(0));
         Eigen::MatrixXf diag = vec.asDiagonal();

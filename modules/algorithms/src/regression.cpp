@@ -1,9 +1,3 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include <algos/internal/scopedHostPtr.h>
 #include <algos/regression.h>
 #include <algos/statistics.h>
@@ -12,7 +6,7 @@
 
 constexpr auto EPSILON = 1e-20;
 
-void khiva::regression::linear(const af::array &xss, const af::array &yss, af::array &slope, af::array &intercept,
+void algos::regression::linear(const af::array &xss, const af::array &yss, af::array &slope, af::array &intercept,
                                af::array &rvalue, af::array &pvalue, af::array &stderrest) {
     auto n = xss.dims(0);
 
@@ -24,7 +18,7 @@ void khiva::regression::linear(const af::array &xss, const af::array &yss, af::a
     // Assuming xss and yss contain the same number of time series
     for (int i = 0; i < xss.dims(1); i++) {
         sumSquares(af::span, af::span, i) =
-            khiva::statistics::covariance(af::join(1, xss(af::span, i), yss(af::span, i)));
+            algos::statistics::covariance(af::join(1, xss(af::span, i), yss(af::span, i)));
     }
 
     af::array ssxm = sumSquares(0, 0, af::span);
@@ -57,7 +51,7 @@ void khiva::regression::linear(const af::array &xss, const af::array &yss, af::a
     // It would be better to move this computation to the GPU
     // Converting to af::dtype::f32 and back to the original type later on
     // to avoid templating this function and all the ones using it
-    auto aux = khiva::utils::makeScopedHostPtr(af::abs(t).as(af::dtype::f32).host<float>());
+    auto aux = algos::utils::makeScopedHostPtr(af::abs(t).as(af::dtype::f32).host<float>());
     for (long i = 0; i < t.dims(1); i++) {
         aux[i] = 2.0f * (1.0f - static_cast<float>(boost::math::cdf(dist, aux[i])));
     }

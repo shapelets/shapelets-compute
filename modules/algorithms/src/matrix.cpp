@@ -1,9 +1,3 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include <algos/internal/libraryInternal.h>
 #include <algos/internal/matrixInternal.h>
 #include <algos/matrix.h>
@@ -16,7 +10,7 @@ constexpr long BATCH_SIZE_B = 1024;
 constexpr long BATCH_SIZE_A = 8192;
 }  // namespace
 
-namespace khiva {
+namespace algos {
 namespace matrix {
 
 void mass(const af::array &q, const af::array &t, af::array &distances) {
@@ -39,7 +33,7 @@ void findBestNOccurrences(const af::array &q, const af::array &t, long n, af::ar
 
     af::array distancesGlobal;
 
-    khiva::matrix::mass(q, t, distancesGlobal);
+    algos::matrix::mass(q, t, distancesGlobal);
 
     af::array sortedDistances;
     af::array sortedIndexes;
@@ -62,7 +56,7 @@ void findBestNDiscords(const af::array &profile, const af::array &index, long m,
 
 void stomp(const af::array &ta, const af::array &tb, long m, af::array &profile, af::array &index) {
     auto batchSizeSquared = library::internal::getValueScaledToMemoryDevice(
-        BATCH_SIZE_SQUARED, khiva::library::internal::Complexity::CUADRATIC);
+        BATCH_SIZE_SQUARED, algos::library::internal::Complexity::CUADRATIC);
     if (tb.dims(0) > batchSizeSquared) {
         if (ta.dims(0) > batchSizeSquared) {
             // Calculates the distance and index profiles using a double batching strategy. First by the number of query
@@ -81,13 +75,13 @@ void stomp(const af::array &ta, const af::array &tb, long m, af::array &profile,
 
 void stomp(const af::array &t, long m, af::array &profile, af::array &index) {
     const auto batchSizeSquared = library::internal::getValueScaledToMemoryDevice(
-        BATCH_SIZE_SQUARED, khiva::library::internal::Complexity::CUADRATIC);
+        BATCH_SIZE_SQUARED, algos::library::internal::Complexity::CUADRATIC);
 
     const auto batchSizeB =
-        library::internal::getValueScaledToMemoryDevice(BATCH_SIZE_B, khiva::library::internal::Complexity::CUADRATIC);
+        library::internal::getValueScaledToMemoryDevice(BATCH_SIZE_B, algos::library::internal::Complexity::CUADRATIC);
 
     const auto batchSizeA =
-        library::internal::getValueScaledToMemoryDevice(BATCH_SIZE_A, khiva::library::internal::Complexity::CUADRATIC);
+        library::internal::getValueScaledToMemoryDevice(BATCH_SIZE_A, algos::library::internal::Complexity::CUADRATIC);
     if (t.dims(0) > batchSizeSquared) {
         // Calculates the distance and index profiles using a double batching strategy. First by the number of query
         // sequences from t to compare simultaneously; and second, the chunk size of the reference time series t
@@ -114,4 +108,4 @@ void matrixProfileLR(const af::array &tss, long m, af::array &profileLeft, af::a
 void getChains(const af::array &tss, long m, af::array &chains) { internal::getChains(tss, m, chains); }
 
 }  // namespace matrix
-}  // namespace khiva
+}  // namespace algos

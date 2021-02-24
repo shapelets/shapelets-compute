@@ -4,10 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef KHIVA_CORE_MATRIX_INTERNAL_H
-#define KHIVA_CORE_MATRIX_INTERNAL_H
+#ifndef ALGOS_CORE_MATRIX_INTERNAL_H
+#define ALGOS_CORE_MATRIX_INTERNAL_H
 
-#ifndef BUILDING_KHIVA
+#ifndef BUILDING_ALGOS
 #error Internal headers cannot be included from user code
 #endif
 
@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-namespace khiva {
+namespace algos {
 namespace matrix {
 namespace internal {
 
@@ -38,7 +38,7 @@ using ChainVector = std::vector<Chain>;
  * @return array Returns an array with as many elements as 't' in the first dimension and as many elements as the last
  * dimension of 'q' in the last dimension.
  */
-KHIVAAPI af::array slidingDotProduct(const af::array &q, const af::array &t);
+ALGOSAPI af::array slidingDotProduct(const af::array &q, const af::array &t);
 
 /**
  * @brief Calculates the moving average and standard deviation of the time series 't'.
@@ -50,7 +50,7 @@ KHIVAAPI af::array slidingDotProduct(const af::array &q, const af::array &t);
  * @param mean Output array containing the moving average.
  * @param stdev Output array containing the moving standard deviation.
  */
-KHIVAAPI void meanStdev(const af::array &t, af::array &a, long m, af::array &mean, af::array &stdev);
+ALGOSAPI void meanStdev(const af::array &t, af::array &a, long m, af::array &mean, af::array &stdev);
 
 /**
  * @brief Calculates the moving average and standard deviation of the time series 't'.
@@ -60,7 +60,7 @@ KHIVAAPI void meanStdev(const af::array &t, af::array &a, long m, af::array &mea
  * @param mean Output array containing the moving average.
  * @param stdev Output array containing the moving standard deviation.
  */
-KHIVAAPI void meanStdev(const af::array &t, long m, af::array &mean, af::array &stdev);
+ALGOSAPI void meanStdev(const af::array &t, long m, af::array &mean, af::array &stdev);
 
 /**
  * @brief Calculates the distance between 'q' and the time series 't', which produced the sliding. Multiple queries can
@@ -76,7 +76,7 @@ KHIVAAPI void meanStdev(const af::array &t, long m, af::array &mean, af::array &
  * @param mask Mask band matrix to filter the trivial match of a subsequence with itself.
  * @param distances Resulting distances.
  */
-KHIVAAPI void calculateDistances(const af::array &qt, const af::array &a, const af::array &sum_q,
+ALGOSAPI void calculateDistances(const af::array &qt, const af::array &a, const af::array &sum_q,
                                  const af::array &sum_q2, const af::array &mean_t, const af::array &sigma_t,
                                  const af::array &mask, af::array &distances);
 
@@ -93,7 +93,7 @@ KHIVAAPI void calculateDistances(const af::array &qt, const af::array &a, const 
  * @param sigma_t Moving standard deviation of 't' using a window size equal to the number of elements in 'q'.
  * @param distances Resulting distances.
  */
-KHIVAAPI void calculateDistances(const af::array &qt, const af::array &a, const af::array &sum_q,
+ALGOSAPI void calculateDistances(const af::array &qt, const af::array &a, const af::array &sum_q,
                                  const af::array &sum_q2, const af::array &mean_t, const af::array &sigma_t,
                                  af::array &distances);
 
@@ -109,7 +109,7 @@ KHIVAAPI void calculateDistances(const af::array &qt, const af::array &a, const 
  *
  * @return If it is far or not.
  */
-KHIVAAPI bool tileIsFarFromDiagonal(long bandSize, long numRows, long row, long numColumns, long column);
+ALGOSAPI bool tileIsFarFromDiagonal(long bandSize, long numRows, long row, long numColumns, long column);
 
 /**
  * @brief Generate an identity band matrix for a given tile indices.
@@ -123,7 +123,7 @@ KHIVAAPI bool tileIsFarFromDiagonal(long bandSize, long numRows, long row, long 
  *
  * @return The mask.
  */
-KHIVAAPI af::array generateMask(long m, long numRows, long row, long numColumns, long column, long nTimeSeries = 1);
+ALGOSAPI af::array generateMask(long m, long numRows, long row, long numColumns, long column, long nTimeSeries = 1);
 
 /**
  * @brief Calculates the Mueen distance.
@@ -142,7 +142,7 @@ KHIVAAPI af::array generateMask(long m, long numRows, long row, long numColumns,
  * @param mask Specifies the elements that should not be considered in the computation.
  * @param distances Resulting distances.
  */
-KHIVAAPI void massWithMask(af::array q, const af::array &t, const af::array &a, const af::array &mean_t,
+ALGOSAPI void massWithMask(af::array q, const af::array &t, const af::array &a, const af::array &mean_t,
                            const af::array &sigma_t, const af::array &mask, af::array &distances);
 
 /**
@@ -157,40 +157,40 @@ KHIVAAPI void massWithMask(af::array q, const af::array &t, const af::array &a, 
  * @param sigma_t Moving standard deviation of 't' using a window size equal to the number of elements in 'q'.
  * @param distances Resulting distances.
  */
-KHIVAAPI void mass(af::array q, const af::array &t, const af::array &a, const af::array &mean_t,
+ALGOSAPI void mass(af::array q, const af::array &t, const af::array &a, const af::array &mean_t,
                    const af::array &sigma_t, af::array &distances);
 
-KHIVAAPI void stomp_batched(const af::array &ta, af::array tb, long m, long batch_size, af::array &profile,
+ALGOSAPI void stomp_batched(const af::array &ta, af::array tb, long m, long batch_size, af::array &profile,
                             af::array &index);
 
-KHIVAAPI void stomp_batched_two_levels(af::array ta, af::array tb, long m, long batch_size_b, long batch_size_a,
+ALGOSAPI void stomp_batched_two_levels(af::array ta, af::array tb, long m, long batch_size_b, long batch_size_a,
                                        af::array &profile, af::array &index);
 
-KHIVAAPI void stomp_parallel(const af::array &ta, af::array tb, long m, af::array &profile, af::array &index);
+ALGOSAPI void stomp_parallel(const af::array &ta, af::array tb, long m, af::array &profile, af::array &index);
 
-KHIVAAPI void stomp_batched_two_levels(af::array t, long m, long batch_size_b, long batch_size_a, af::array &profile,
+ALGOSAPI void stomp_batched_two_levels(af::array t, long m, long batch_size_b, long batch_size_a, af::array &profile,
                                        af::array &index);
 
-KHIVAAPI void stomp_parallel(af::array t, long m, af::array &profile, af::array &index);
+ALGOSAPI void stomp_parallel(af::array t, long m, af::array &profile, af::array &index);
 
-KHIVAAPI void findBestN(const af::array &profile, const af::array &index, long m, long n, af::array &distance,
+ALGOSAPI void findBestN(const af::array &profile, const af::array &index, long m, long n, af::array &distance,
                         af::array &indices, af::array &subsequenceIndices, bool selfJoin, bool lookForMotifs);
 
-KHIVAAPI void scamp(af::array tss, long m, af::array &profile, af::array &index);
+ALGOSAPI void scamp(af::array tss, long m, af::array &profile, af::array &index);
 
-KHIVAAPI void scamp(af::array ta, af::array tb, long m, af::array &profile, af::array &index);
+ALGOSAPI void scamp(af::array ta, af::array tb, long m, af::array &profile, af::array &index);
 
-KHIVAAPI void getChains(af::array tss, long m, af::array &chains);
+ALGOSAPI void getChains(af::array tss, long m, af::array &chains);
 
-KHIVAAPI ChainVector extractAllChains(const IndexesVector &profileLeft, const IndexesVector &profileRight);
+ALGOSAPI ChainVector extractAllChains(const IndexesVector &profileLeft, const IndexesVector &profileRight);
 
-KHIVAAPI LeftRightProfilePair scampLR(std::vector<double> &&ta, long m);
+ALGOSAPI LeftRightProfilePair scampLR(std::vector<double> &&ta, long m);
 
-KHIVAAPI void scampLR(af::array tss, long m, af::array &profileLeft, af::array &indexLeft, af::array &profileRight,
+ALGOSAPI void scampLR(af::array tss, long m, af::array &profileLeft, af::array &indexLeft, af::array &profileRight,
                       af::array &indexRight);
 
 }  // namespace internal
 }  // namespace matrix
-}  // namespace khiva
+}  // namespace algos
 
 #endif

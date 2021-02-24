@@ -1,16 +1,10 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_FILTERS_H
-#define KHIVA_CORE_FILTERS_H
+#ifndef ALGOS_CORE_FILTERS_H
+#define ALGOS_CORE_FILTERS_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
-namespace khiva {
+namespace algos {
 
 namespace filters {
 
@@ -39,9 +33,9 @@ namespace filters {
  *  - https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter
  *  - https://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay (Used as reference implementation)
  */
-KHIVAAPI af::array savitzkyGolay(const af::array &y, int window_size, int order, int deriv);
+ALGOSAPI af::array savitzkyGolay(const af::array &y, int window_size, int order, int deriv);
 
 } // namespace filters
-} // namespace khiva
+} // namespace algos
 
 #endif

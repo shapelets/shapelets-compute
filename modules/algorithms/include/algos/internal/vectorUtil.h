@@ -4,10 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef KHIVA_CORE_VECTOR_H
-#define KHIVA_CORE_VECTOR_H
+#ifndef ALGOS_CORE_VECTOR_H
+#define ALGOS_CORE_VECTOR_H
 
-#ifndef BUILDING_KHIVA
+#ifndef BUILDING_ALGOS
 #error Internal headers cannot be included from user code
 #endif
 
@@ -15,7 +15,7 @@
 
 #include <vector>
 
-namespace khiva {
+namespace algos {
 namespace vectorutil {
 
 template <typename T>
@@ -47,6 +47,6 @@ af::array createArray(const std::vector<T> &values) {
 }
 
 }  // namespace vectorutil
-}  // namespace khiva
+}  // namespace algos
 
 #endif

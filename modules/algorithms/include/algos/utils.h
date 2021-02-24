@@ -1,19 +1,13 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_UTILS_H
-#define KHIVA_CORE_UTILS_H
+#ifndef ALGOS_CORE_UTILS_H
+#define ALGOS_CORE_UTILS_H
 
 #include <algos/defines.h>
 #include <algos/dimensionality.h>
 
 #include <iostream>
 
-void printVectorSegment(const std::vector<khiva::dimensionality::Segment> &seg,
-                        std::vector<khiva::dimensionality::Point> ts) {
+void printVectorSegment(const std::vector<algos::dimensionality::Segment> &seg,
+                        std::vector<algos::dimensionality::Point> ts) {
     std::cout << "VECTORPOINT: " << seg.size() << std::endl;
     int i = 0;
     for (auto &s : seg) {
@@ -23,7 +17,7 @@ void printVectorSegment(const std::vector<khiva::dimensionality::Segment> &seg,
     std::cout << std::endl;
 }
 
-void printVectorPoint(const std::vector<khiva::dimensionality::Point> &vec) {
+void printVectorPoint(const std::vector<algos::dimensionality::Point> &vec) {
     std::cout << "VECTORPOINT: " << vec.size() << std::endl;
     int i = 0;
     for (auto &v : vec) {

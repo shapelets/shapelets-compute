@@ -1,16 +1,11 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef KHIVA_CORE_REGULARIZATION_H
-#define KHIVA_CORE_REGULARIZATION_H
+#ifndef ALGOS_CORE_REGULARIZATION_H
+#define ALGOS_CORE_REGULARIZATION_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
-namespace khiva {
+namespace algos {
 
 namespace regularization {
 
@@ -29,7 +24,7 @@ using AggregationFuncInt = af::array (*)(const af::array &, const int);
  *
  * @return af::array Array with the values of the group keys aggregated using the aggregationFunction.
  */
-KHIVAAPI af::array groupBy(const af::array &in, AggregationFuncBoolDimT aggregationFunction, int nColumnsKey = 1,
+ALGOSAPI af::array groupBy(const af::array &in, AggregationFuncBoolDimT aggregationFunction, int nColumnsKey = 1,
                            int nColumnsValue = 1);
 
 /**
@@ -43,7 +38,7 @@ KHIVAAPI af::array groupBy(const af::array &in, AggregationFuncBoolDimT aggregat
  *
  * @return af::array Array with the values of the group keys aggregated using the aggregationFunction.
  */
-KHIVAAPI af::array groupBy(const af::array &in, AggregationFuncInt aggregationFunction, int nColumnsKey = 1,
+ALGOSAPI af::array groupBy(const af::array &in, AggregationFuncInt aggregationFunction, int nColumnsKey = 1,
                            int nColumnsValue = 1);
 
 /**
@@ -57,10 +52,10 @@ KHIVAAPI af::array groupBy(const af::array &in, AggregationFuncInt aggregationFu
  *
  * @return af::array Array with the values of the group keys aggregated using the aggregationFunction.
  */
-KHIVAAPI af::array groupBy(const af::array &in, AggregationFuncDimT aggregationFunction, int nColumnsKey = 1,
+ALGOSAPI af::array groupBy(const af::array &in, AggregationFuncDimT aggregationFunction, int nColumnsKey = 1,
                            int nColumnsValue = 1);
 
 }  // namespace regularization
-}  // namespace khiva
+}  // namespace algos
 
 #endif

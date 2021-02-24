@@ -1,10 +1,5 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-#ifndef KHIVA_CORE_ARRAY_H
-#define KHIVA_CORE_ARRAY_H
+#ifndef ALGOS_CORE_ARRAY_H
+#define ALGOS_CORE_ARRAY_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
@@ -13,7 +8,7 @@
 #include <iostream>
 #include <limits>
 
-namespace khiva {
+namespace algos {
 
 using dtype = af::dtype;
 constexpr auto KHIVA_MAX_DIMS = 4U;
@@ -30,14 +25,14 @@ namespace array {
  *
  * @return af::array Containing the data.
  */
-KHIVAAPI af::array createArray(const void *data, unsigned ndims, const dim_t *dims, int type);
+ALGOSAPI af::array createArray(const void *data, unsigned ndims, const dim_t *dims, int type);
 
 /**
  * @brief Decreases the references count for the given array.
  *
  * @param array The Array to be deleted.
  */
-KHIVAAPI void deleteArray(af_array array);
+ALGOSAPI void deleteArray(af_array array);
 
 /**
  * @brief Retrieves the data from the device to the host.
@@ -45,7 +40,7 @@ KHIVAAPI void deleteArray(af_array array);
  * @param array The Array that contains the data to be retrieved.
  * @param data Pointer to a preallocated block of memory in the host.
  */
-KHIVAAPI void getData(const af::array &array, void *data);
+ALGOSAPI void getData(const af::array &array, void *data);
 
 /**
  * @brief Returns the dimensions from a given array.
@@ -54,7 +49,7 @@ KHIVAAPI void getData(const af::array &array, void *data);
  *
  * @return af::dim4 The dimensions.
  */
-KHIVAAPI af::dim4 getDims(const af::array &array);
+ALGOSAPI af::dim4 getDims(const af::array &array);
 
 /**
  * @brief Gets the type of the array.
@@ -63,7 +58,7 @@ KHIVAAPI af::dim4 getDims(const af::array &array);
  *
  * @return int Value of the Dtype enumeration.
  */
-KHIVAAPI int getType(const af::array &array);
+ALGOSAPI int getType(const af::array &array);
 
 /**
  * @brief Joins the first and second arrays along the specified dimension.
@@ -74,14 +69,14 @@ KHIVAAPI int getType(const af::array &array);
  *
  * @return af::array The result of joining first and second along the specified dimension.
  */
-KHIVAAPI af::array join(int dim, const af::array &first, const af::array &second);
+ALGOSAPI af::array join(int dim, const af::array &first, const af::array &second);
 
 /**
  * @brief Prints the content of an array.
  *
  * @param array The array to be printed.
  */
-KHIVAAPI void print(const af::array &array);
+ALGOSAPI void print(const af::array &array);
 
 /**
  * @brief Creates an af::array from its af_array C pointer. The resulting array does not acquire the input pointer
@@ -89,7 +84,7 @@ KHIVAAPI void print(const af::array &array);
  *
  * @param array The array to be printed.
  */
-KHIVAAPI af::array from_af_array(const af_array array);
+ALGOSAPI af::array from_af_array(const af_array array);
 
 /**
  * @brief Increments the reference count of the af_array C pointer passed throwing if there is an error.
@@ -97,7 +92,7 @@ KHIVAAPI af::array from_af_array(const af_array array);
  *
  * @param array The array whose reference count is going to be incremented.
  */
-KHIVAAPI af_array increment_ref_count(const af_array array);
+ALGOSAPI af_array increment_ref_count(const af_array array);
 
 /**
  * @brief Array class, This class provides functionality manage Arrays on the host side.
@@ -324,7 +319,7 @@ class Array {
  * @return std::vector<int> with the indices of the rows with maximals.
  */
 template <typename T>
-std::vector<int> getRowsWithMaximals(const khiva::array::Array<T> &a) {
+std::vector<int> getRowsWithMaximals(const algos::array::Array<T> &a) {
     std::vector<int> result;
     result.reserve(a.getNumX());
     for (int i = 0; i < a.getNumX(); i++) {
@@ -357,6 +352,6 @@ std::vector<int> getIndexMaxColumns(const std::vector<T> &r) {
 }
 
 }  // namespace array
-}  // namespace khiva
+}  // namespace algos
 
 #endif

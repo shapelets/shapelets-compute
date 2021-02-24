@@ -4,10 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef KHIVA_CORE_PRIVATE_HOST_PTR_H
-#define KHIVA_CORE_PRIVATE_HOST_PTR_H
+#ifndef ALGOS_CORE_PRIVATE_HOST_PTR_H
+#define ALGOS_CORE_PRIVATE_HOST_PTR_H
 
-#ifndef BUILDING_KHIVA
+#ifndef BUILDING_ALGOS
 #error Internal headers cannot be included from user code
 #endif
 
@@ -15,7 +15,7 @@
 
 #include <memory>
 
-namespace khiva {
+namespace algos {
 namespace utils {
 
 template <typename T>
@@ -26,6 +26,6 @@ ScopedHostPtr<T> makeScopedHostPtr(T *ptr) {
     return ScopedHostPtr<T>(ptr, &af::freeHost);
 }
 }  // namespace utils
-}  // namespace khiva
+}  // namespace algos
 
 #endif

@@ -1,12 +1,6 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include <algos/normalization.h>
 
-af::array khiva::normalization::decimalScalingNorm(const af::array &tss) {
+af::array algos::normalization::decimalScalingNorm(const af::array &tss) {
     auto maxAbs = af::max(af::abs(tss), 0);
     auto const10 = af::constant(10, 1, tss.dims(1));
     auto d = af::ceil(af::log10(maxAbs));
@@ -15,7 +9,7 @@ af::array khiva::normalization::decimalScalingNorm(const af::array &tss) {
     return result;
 }
 
-void khiva::normalization::decimalScalingNormInPlace(af::array &tss) {
+void algos::normalization::decimalScalingNormInPlace(af::array &tss) {
     auto maxAbs = af::max(af::abs(tss), 0);
     auto const10 = af::constant(10, 1, tss.dims(1));
     auto d = af::ceil(af::log10(maxAbs));
@@ -23,7 +17,7 @@ void khiva::normalization::decimalScalingNormInPlace(af::array &tss) {
     tss /= af::tile(divFactor, static_cast<unsigned int>(tss.dims(0)));
 }
 
-af::array khiva::normalization::maxMinNorm(const af::array &tss, double high, double low, double epsilon) {
+af::array algos::normalization::maxMinNorm(const af::array &tss, double high, double low, double epsilon) {
     auto max = af::tile(af::max(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto min = af::tile(af::min(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto scale = max - min;
@@ -32,7 +26,7 @@ af::array khiva::normalization::maxMinNorm(const af::array &tss, double high, do
     return low + (((high - low) * (tss - min)) / scale);
 }
 
-void khiva::normalization::maxMinNormInPlace(af::array &tss, double high, double low, double epsilon) {
+void algos::normalization::maxMinNormInPlace(af::array &tss, double high, double low, double epsilon) {
     auto max = af::tile(af::max(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto min = af::tile(af::min(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto scale = max - min;
@@ -44,7 +38,7 @@ void khiva::normalization::maxMinNormInPlace(af::array &tss, double high, double
     tss += low;
 }
 
-af::array khiva::normalization::meanNorm(const af::array &tss) {
+af::array algos::normalization::meanNorm(const af::array &tss) {
     auto max = af::tile(af::max(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto min = af::tile(af::min(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto mean = af::tile(af::mean(tss, 0), static_cast<unsigned int>(tss.dims(0)));
@@ -53,7 +47,7 @@ af::array khiva::normalization::meanNorm(const af::array &tss) {
     return dividing / divider;
 }
 
-void khiva::normalization::meanNormInPlace(af::array &tss) {
+void algos::normalization::meanNormInPlace(af::array &tss) {
     auto max = af::tile(af::max(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto min = af::tile(af::min(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto mean = af::tile(af::mean(tss, 0), static_cast<unsigned int>(tss.dims(0)));
@@ -62,7 +56,7 @@ void khiva::normalization::meanNormInPlace(af::array &tss) {
     tss = tss / divider;
 }
 
-af::array khiva::normalization::znorm(const af::array &tss, double epsilon) {
+af::array algos::normalization::znorm(const af::array &tss, double epsilon) {
     auto mean = af::tile(af::mean(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto stdev = af::stdev(tss, 0);
     auto lessThanEpsilon = epsilon >= stdev;
@@ -71,7 +65,7 @@ af::array khiva::normalization::znorm(const af::array &tss, double epsilon) {
     return (tss - mean) / stdev;
 }
 
-void khiva::normalization::znormInPlace(af::array &tss, double epsilon) {
+void algos::normalization::znormInPlace(af::array &tss, double epsilon) {
     auto mean = af::tile(af::mean(tss, 0), static_cast<unsigned int>(tss.dims(0)));
     auto stdev = af::stdev(tss, 0);
     auto lessThanEpsilon = epsilon >= stdev;

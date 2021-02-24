@@ -1,9 +1,3 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 #include <algos/distances.h>
 #include <algos/normalization.h>
 
@@ -48,7 +42,7 @@ af::array dtwInternal(const af::array &a, const af::array &bss) {
 
 }  // namespace
 
-double khiva::distances::dtw(const std::vector<double> &t0, const std::vector<double> &t1) {
+double algos::distances::dtw(const std::vector<double> &t0, const std::vector<double> &t1) {
     auto m = t0.size();
     auto n = t1.size();
 
@@ -78,7 +72,7 @@ double khiva::distances::dtw(const std::vector<double> &t0, const std::vector<do
     return cost[m - 1][n - 1];
 }
 
-af::array khiva::distances::dtw(const af::array &tss) {
+af::array algos::distances::dtw(const af::array &tss) {
     // get the number of time series
     auto numOfTs = tss.dims(1);
     // the result is a squared matrix of dimensions numOfTs x numOfTs
@@ -97,13 +91,13 @@ af::array khiva::distances::dtw(const af::array &tss) {
     return result;
 }
 
-af::array khiva::distances::euclidean(const af::array &tss) {
+af::array algos::distances::euclidean(const af::array &tss) {
     // simply invokes non squared version and completes with
     // an elementwise sqrt operation.
-    return af::sqrt(khiva::distances::squaredEuclidean(tss));
+    return af::sqrt(algos::distances::squaredEuclidean(tss));
 }
 
-af::array khiva::distances::hamming(const af::array &tss) {
+af::array algos::distances::hamming(const af::array &tss) {
     // get the number of time series
     auto numOfTs = tss.dims(1);
     // the result is a squared matrix of dimensions numOfTs x numOfTs
@@ -120,7 +114,7 @@ af::array khiva::distances::hamming(const af::array &tss) {
     return result;
 }
 
-af::array khiva::distances::manhattan(const af::array &tss) {
+af::array algos::distances::manhattan(const af::array &tss) {
     // get the number of time series
     auto numOfTs = tss.dims(1);
     // the result is a squared matrix of dimensions numOfTs x numOfTs
@@ -136,7 +130,7 @@ af::array khiva::distances::manhattan(const af::array &tss) {
     return result;
 }
 
-af::array khiva::distances::sbd(const af::array &tss) {
+af::array algos::distances::sbd(const af::array &tss) {
     // get the number of time series
     auto numOfTs = tss.dims(1);
     // the result is a squared matrix of dimensions numOfTs x numOfTs
@@ -146,8 +140,8 @@ af::array khiva::distances::sbd(const af::array &tss) {
     // for each time series, calculate in parallel all distances
     for (dim_t currentCol = 0; currentCol < numOfTs - 1; currentCol++) {
         gfor(af::seq otherCol, currentCol + 1, numOfTs - 1) {
-            af::array xZNorm = khiva::normalization::znorm(tss(af::span, currentCol));
-            af::array yZNorm = khiva::normalization::znorm(tss(af::span, otherCol));
+            af::array xZNorm = algos::normalization::znorm(tss(af::span, currentCol));
+            af::array yZNorm = algos::normalization::znorm(tss(af::span, otherCol));
             af::array xNorm = af::sqrt(af::sum(af::pow(xZNorm, 2), 0));
             af::array yNorm = af::sqrt(af::sum(af::pow(yZNorm, 2), 0));
             result(currentCol, otherCol) =
@@ -158,7 +152,7 @@ af::array khiva::distances::sbd(const af::array &tss) {
     return result;
 }
 
-af::array khiva::distances::squaredEuclidean(const af::array &tss) {
+af::array algos::distances::squaredEuclidean(const af::array &tss) {
     // get the number of time series
     auto numOfTs = tss.dims(1);
     // the result is a squared matrix of dimensions numOfTs x numOfTs

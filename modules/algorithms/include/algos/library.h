@@ -1,16 +1,10 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_LIBRARY_H
-#define KHIVA_CORE_LIBRARY_H
+#ifndef ALGOS_CORE_LIBRARY_H
+#define ALGOS_CORE_LIBRARY_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
-namespace khiva {
+namespace algos {
 
 namespace library {
 
@@ -28,49 +22,49 @@ typedef khiva_backend Backend;
  *
  * @return std::string The information of the backend.
  */
-KHIVAAPI std::string backendInfo();
+ALGOSAPI std::string backendInfo();
 
 /**
  * @brief Set the backend.
  *
  * @param be The desired backend.
  */
-KHIVAAPI void setBackend(khiva::library::Backend be);
+ALGOSAPI void setBackend(algos::library::Backend be);
 
 /**
  * @brief Get the active backend.
  *
- * @return khiva::library::Backend The active backend.
+ * @return algos::library::Backend The active backend.
  */
-KHIVAAPI khiva::library::Backend getBackend();
+ALGOSAPI algos::library::Backend getBackend();
 
 /**
  * @brief Get the available backends.
  *
  * @return int The available backends.
  */
-KHIVAAPI int getBackends();
+ALGOSAPI int getBackends();
 
 /**
  * @brief Set the device.
  *
  * @param device The desired device.
  */
-KHIVAAPI void setDevice(int device);
+ALGOSAPI void setDevice(int device);
 
 /**
  * @brief Get the active device.
  *
  * @return int The active device.
  */
-KHIVAAPI int getDevice();
+ALGOSAPI int getDevice();
 
 /**
  * @brief Get the device count.
  *
  * @return int The device count.
  */
-KHIVAAPI int getDeviceCount();
+ALGOSAPI int getDeviceCount();
 
 /**
  * @brief Set the memory of the device in use. This information is used for splitting some algorithms and execute them
@@ -78,9 +72,9 @@ KHIVAAPI int getDeviceCount();
  *
  * @param memory The device memory.
  */
-KHIVAAPI void setDeviceMemoryInGB(double memory);
+ALGOSAPI void setDeviceMemoryInGB(double memory);
 
 }  // namespace library
-}  // namespace khiva
+}  // namespace algos
 
 #endif

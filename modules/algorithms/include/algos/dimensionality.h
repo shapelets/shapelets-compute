@@ -1,18 +1,12 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_DIMENSIONALITY_H
-#define KHIVA_CORE_DIMENSIONALITY_H
+#ifndef ALGOS_CORE_DIMENSIONALITY_H
+#define ALGOS_CORE_DIMENSIONALITY_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
 #include <vector>
 
-namespace khiva {
+namespace algos {
 
 namespace dimensionality {
 
@@ -36,7 +30,7 @@ using Segment = std::pair<int, int>;
  *
  * @return result A vector of Points with the reduced dimensionality.
  */
-KHIVAAPI std::vector<Point> PAA(const std::vector<Point> &points, int bins);
+ALGOSAPI std::vector<Point> PAA(const std::vector<Point> &points, int bins);
 
 /**
  * @brief Piecewise Aggregate Approximation (PAA) approximates a time series \f$X\f$ of length \f$n\f$ into vector
@@ -54,7 +48,7 @@ KHIVAAPI std::vector<Point> PAA(const std::vector<Point> &points, int bins);
  *
  * @return af::array An array of points with the reduced dimensionality.
  */
-KHIVAAPI af::array PAA(const af::array &a, int bins);
+ALGOSAPI af::array PAA(const af::array &a, int bins);
 
 /**
  * @brief Calculates the number of Perceptually Important Points (PIP) in the time series.
@@ -67,7 +61,7 @@ KHIVAAPI af::array PAA(const af::array &a, int bins);
  *
  * @return af::array Array with the most Perceptually Important numPoints.
  */
-KHIVAAPI af::array PIP(const af::array &ts, int numberIPs);
+ALGOSAPI af::array PIP(const af::array &ts, int numberIPs);
 
 /**
  * @brief Applies the Piecewise Linear Approximation (PLA BottomUP) to the time series.
@@ -80,7 +74,7 @@ KHIVAAPI af::array PIP(const af::array &ts, int numberIPs);
  *
  * @return std::vector Vector with the reduced number of points.
  */
-KHIVAAPI std::vector<Point> PLABottomUp(const std::vector<Point> &ts, float maxError);
+ALGOSAPI std::vector<Point> PLABottomUp(const std::vector<Point> &ts, float maxError);
 
 /**
  * @brief Applies the Piecewise Linear Approximation (PLA BottomUP) to the time series.
@@ -94,7 +88,7 @@ KHIVAAPI std::vector<Point> PLABottomUp(const std::vector<Point> &ts, float maxE
  *
  * @return af::array with the reduced number of points.
  */
-KHIVAAPI af::array PLABottomUp(const af::array &ts, float maxError);
+ALGOSAPI af::array PLABottomUp(const af::array &ts, float maxError);
 
 /**
  * @brief Applies the Piecewise Linear Approximation (PLA Sliding Window) to the time series.
@@ -107,7 +101,7 @@ KHIVAAPI af::array PLABottomUp(const af::array &ts, float maxError);
  *
  * @return std::vector Vector with the reduced number of points.
  */
-KHIVAAPI std::vector<Point> PLASlidingWindow(const std::vector<Point> &ts, float maxError);
+ALGOSAPI std::vector<Point> PLASlidingWindow(const std::vector<Point> &ts, float maxError);
 
 /**
  * @brief Applies the Piecewise Linear Approximation (PLA Sliding Window) to the time series.
@@ -121,7 +115,7 @@ KHIVAAPI std::vector<Point> PLASlidingWindow(const std::vector<Point> &ts, float
  *
  * @return af::array with the reduced number of points.
  */
-KHIVAAPI af::array PLASlidingWindow(const af::array &ts, float maxError);
+ALGOSAPI af::array PLASlidingWindow(const af::array &ts, float maxError);
 
 /**
  * @brief The Ramer–Douglas–Peucker algorithm (RDP) is an algorithm for reducing the number of points in a curve
@@ -137,9 +131,9 @@ KHIVAAPI af::array PLASlidingWindow(const af::array &ts, float maxError);
  * @param pointList Set of input points.
  * @param epsilon It acts as the threshold value to decide which points should be considered meaningful or not.
  *
- * @return std:vector<khiva::dimensionality::Point> with the selected points.
+ * @return std:vector<algos::dimensionality::Point> with the selected points.
  */
-KHIVAAPI std::vector<Point> ramerDouglasPeucker(const std::vector<Point> &pointList, double epsilon);
+ALGOSAPI std::vector<Point> ramerDouglasPeucker(const std::vector<Point> &pointList, double epsilon);
 
 /**
  * @brief The Ramer–Douglas–Peucker algorithm (RDP) is an algorithm for reducing the number of points in a curve
@@ -157,7 +151,7 @@ KHIVAAPI std::vector<Point> ramerDouglasPeucker(const std::vector<Point> &pointL
  *
  * @return af::array with the selected points.
  */
-KHIVAAPI af::array ramerDouglasPeucker(const af::array &pointList, double epsilon);
+ALGOSAPI af::array ramerDouglasPeucker(const af::array &pointList, double epsilon);
 
 /**
  * @brief Symbolic Aggregate approXimation (SAX). It transforms a numeric time series into a time series of symbols with
@@ -176,7 +170,7 @@ KHIVAAPI af::array ramerDouglasPeucker(const af::array &pointList, double epsilo
  *
  * @return result An array of symbols.
  */
-KHIVAAPI af::array SAX(const af::array &a, int alphabetSize);
+ALGOSAPI af::array SAX(const af::array &a, int alphabetSize);
 
 /**
  * @brief Reduces a set of points by applying the Visvalingam method (minimum triangle area) until the number
@@ -189,9 +183,9 @@ KHIVAAPI af::array SAX(const af::array &a, int alphabetSize);
  * @param numPoints Sets the number of points returned after the execution of the method.
  * @param scale Sets the precision used to compute the areas of the triangularization, the longer, the more accurate.
  *
- * @return std:vector<khiva::dimensionality::Point> where the number of points has been reduced to numPoints.
+ * @return std:vector<algos::dimensionality::Point> where the number of points has been reduced to numPoints.
  */
-KHIVAAPI std::vector<Point> visvalingam(const std::vector<Point> &pointList, int64_t numPoints,
+ALGOSAPI std::vector<Point> visvalingam(const std::vector<Point> &pointList, int64_t numPoints,
                                         int64_t scale = 1000000000);
 
 /**
@@ -207,9 +201,9 @@ KHIVAAPI std::vector<Point> visvalingam(const std::vector<Point> &pointList, int
  *
  * @return af::array where the number of points has been reduced to numPoints.
  */
-KHIVAAPI af::array visvalingam(const af::array &pointList, int numPoints);
+ALGOSAPI af::array visvalingam(const af::array &pointList, int numPoints);
 
 }  // namespace dimensionality
-}  // namespace khiva
+}  // namespace algos
 
 #endif

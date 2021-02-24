@@ -4,16 +4,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef KHIVA_CORE_LIBRARY_INTERNAL_H
-#define KHIVA_CORE_LIBRARY_INTERNAL_H
+#ifndef ALGOS_CORE_LIBRARY_INTERNAL_H
+#define ALGOS_CORE_LIBRARY_INTERNAL_H
 
-#ifndef BUILDING_KHIVA
+#ifndef BUILDING_ALGOS
 #error Internal headers cannot be included from user code
 #endif
 
 #include <algos/defines.h>
 
-namespace khiva {
+namespace algos {
 namespace library {
 namespace internal {
 
@@ -25,7 +25,7 @@ enum class Complexity { LINEAR, CUADRATIC, CUBIC };
  *
  * @param memory The device memory.
  */
-KHIVAAPI void setDeviceMemoryInGB(double memory);
+ALGOSAPI void setDeviceMemoryInGB(double memory);
 
 /**
  * @brief Get the value scaled to the memory of the device taking into account the Memory complexity.
@@ -35,10 +35,10 @@ KHIVAAPI void setDeviceMemoryInGB(double memory);
  *
  * @return the scaled value.
  */
-KHIVAAPI long getValueScaledToMemoryDevice(long value, Complexity complexity);
+ALGOSAPI long getValueScaledToMemoryDevice(long value, Complexity complexity);
 
 }  // namespace internal
 }  // namespace library
-}  // namespace khiva
+}  // namespace algos
 
 #endif

@@ -1,16 +1,10 @@
-// Copyright (c) 2019 Shapelets.io
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#ifndef KHIVA_CORE_REGRESSION_H
-#define KHIVA_CORE_REGRESSION_H
+#ifndef ALGOS_CORE_REGRESSION_H
+#define ALGOS_CORE_REGRESSION_H
 
 #include <arrayfire.h>
 #include <algos/defines.h>
 
-namespace khiva {
+namespace algos {
 
 namespace regression {
 
@@ -29,10 +23,10 @@ namespace regression {
  * Test with t-distribution of the test statistic.
  * @param stderrest Standard error of the estimated gradient.
  */
-KHIVAAPI void linear(const af::array &xss, const af::array &yss, af::array &slope, af::array &intercept,
+ALGOSAPI void linear(const af::array &xss, const af::array &yss, af::array &slope, af::array &intercept,
                      af::array &rvalue, af::array &pvalue, af::array &stderrest);
 
 }  // namespace regression
-}  // namespace khiva
+}  // namespace algos
 
 #endif
