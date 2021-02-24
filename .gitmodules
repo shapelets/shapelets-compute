@@ -1,0 +1,3 @@
+[submodule "modules/gauss/external/scamp"]
+	path = modules/gauss/external/scamp
+	url = https://github.com/shapelets/SCAMP
