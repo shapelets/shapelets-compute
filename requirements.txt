@@ -1,0 +1,3 @@
+pytest~=6.2.2
+matrixprofile~=1.1.5
+stumpy~=1.8.0

@@ -168,7 +168,7 @@ GAUSSAPI void stomp_parallel(af::array t, long m, af::array &profile, af::array 
 GAUSSAPI void findBestN(const af::array &profile, const af::array &index, long m, long n, af::array &distance,
                         af::array &indices, af::array &subsequenceIndices, bool selfJoin, bool lookForMotifs);
 
-GAUSSAPI void scamp(af::array tss, long m, af::array &profile, af::array &index);
+GAUSSAPI void scamp(const af::array &tss, long m, af::array &profile, af::array &index);
 
 GAUSSAPI void scamp(af::array ta, af::array tb, long m, af::array &profile, af::array &index);
 

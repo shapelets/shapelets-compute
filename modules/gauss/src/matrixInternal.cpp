@@ -411,7 +411,7 @@ void mass(af::array q, const af::array &t, const af::array &a, const af::array &
     calculateDistances(qt, a, sum_q, sum_q2, mean_t, sigma_t, distances);
 }
 
-void scamp(af::array tss, long m, af::array &profile, af::array &index) {
+void scamp(const af::array& tss, long m, af::array &profile, af::array &index) {
     if (tss.dims(2) > 1 || tss.dims(3) > 1) {
         throw std::invalid_argument("Dimension 2 o dimension 3 is bigger than 1");
     }
@@ -419,9 +419,9 @@ void scamp(af::array tss, long m, af::array &profile, af::array &index) {
     profile = af::array(tss.dims(0) - m + 1, tss.dims(1), f64);
     index = af::array(tss.dims(0) - m + 1, tss.dims(1), u32);
 
-    tss = tss.as(f64);
-    for (dim_t tssIdx = 0; tssIdx < tss.dims(1); ++tssIdx) {
-        auto vect = gauss::vectorutil::get<double>(tss(af::span, tssIdx));
+    auto input = tss.type() == f64 ? tss : tss.as(f64);
+    for (dim_t tssIdx = 0; tssIdx < input.dims(1); ++tssIdx) {
+        auto vect = gauss::vectorutil::get<double>(input(af::span, tssIdx));
         auto res = ::scamp(std::move(vect), m);
         profile(af::span, tssIdx) = gauss::vectorutil::createArray<double>(res.first);
         index(af::span, tssIdx) = gauss::vectorutil::createArray<unsigned int>(res.second);

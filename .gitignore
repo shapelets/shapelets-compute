@@ -5,3 +5,5 @@
 /cmake/_mac_af.pkg
 /.idea
 /cmake-build-debug
+/pkg
+/dist

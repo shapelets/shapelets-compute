@@ -61,4 +61,4 @@ endif()
 
 
 add_subdirectory(modules/gauss)
-add_subdirectory(modules/python)
+add_subdirectory(modules/pygauss)
