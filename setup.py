@@ -5,12 +5,12 @@ import re
 import platform
 import subprocess
 import versioneer
-
-from textwrap import dedent
+from typing import Union, List
+from distutils.version import LooseVersion
+from setuptools import setup, Extension, find_packages
 import warnings
-import builtins
 
-
+cmdclass = versioneer.get_cmdclass()
 
 
 def process_version_information(full_version):
@@ -28,21 +28,24 @@ def get_documentation_url(ver_details, doc_root="https:://shapelets.io/doc/"):
     return doc_root + "dev" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
 
 
-def create_metadata(full_version, ver_details, doc_url, cmdclass):
-    return dict(
-        project_urls={
-            "Documentation": doc_url
-        },
-        version=full_version,
-        cmdclass=cmdclass,
-        python_requires='>=3.7',
-    )
+def check_submodules():
+    """ Ensure we have source code for gauss external repos """
+    if not os.path.exists('.git'):
+        return
 
+    with open('.gitmodules') as f:
+        for line in f:
+            if 'path' in line:
+                p = line.split('=')[-1].strip()
+                if not os.path.exists(p):
+                    raise ValueError('Submodule {} missing'.format(p))
 
-
-from distutils.version import LooseVersion
-from setuptools import setup, Extension, find_packages
-from setuptools.command.build_ext import build_ext
+    proc = subprocess.Popen(['git', 'submodule', 'status'], stdout=subprocess.PIPE)
+    status, _ = proc.communicate()
+    status = status.decode("ascii", "replace")
+    for line in status.splitlines():
+        if line.startswith('-') or line.startswith('+'):
+            raise ValueError('Submodule not clean: {}'.format(line))
 
 
 ##
@@ -55,16 +58,16 @@ from setuptools.command.build_ext import build_ext
 # The output is a single library which will be always placed
 # under modules/shapelets/internal folder
 #
+class CMakeExtension(Extension):
+    """ It will be used in setup method under ext_modules parameter """
+
+    def __init__(self, name, sourcedir='', target: Union[List[str], str] = None):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
+        self.target = target
 
 
-# class CMakeExtension(Extension):
-#     """ It will be used in setup method under ext_modules parameter """
-#     def __init__(self, name, sourcedir=''):
-#         Extension.__init__(self, name, sources=[])
-#         self.sourcedir = os.path.abspath(sourcedir)
-
-
-class CMakeBuild(build_ext):
+class CMakeBuild(cmdclass["build_ext"]):
     """ Actual build action and CMAKE control """
 
     def run(self):
@@ -76,14 +79,15 @@ class CMakeBuild(build_ext):
 
         if platform.system() == "Windows":
             cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < '3.1.0':
-                raise RuntimeError("CMake >= 3.1.0 is required on Windows")
+            if cmake_version < '3.9.6':
+                raise RuntimeError("CMake >= 3.9.6 is required on Windows")
 
         for ext in self.extensions:
             self.build_extension(ext)
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        extdir = os.path.join(extdir, "shapelets")
         cmake_args = [
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
             '-DPYTHON_EXECUTABLE=' + sys.executable
@@ -108,33 +112,33 @@ class CMakeBuild(build_ext):
             os.makedirs(self.build_temp)
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+        if ext.target:
+            if isinstance(ext.target, list):
+                for target in ext.target:
+                    subprocess.check_call(['cmake', '--build', '.', '--target', target] + build_args,
+                                          cwd=self.build_temp)
+            else:
+                subprocess.check_call(['cmake', '--build', '.', '--target', ext.target] + build_args,
+                                      cwd=self.build_temp)
+        else:
+            subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-        # Copy *_test file to tests directory
-        # test_bin = os.path.join(self.build_temp, 'python_cpp_example_test')
-        # self.copy_test_file(test_bin)
-
-        # Add an empty line for cleaner output
         print()
 
-    # def copy_test_file(self, src_file):
-    #     """
-    #     Copy ``src_file`` to ``dest_file`` ensuring parent directory exists.
-    #     By default, message like `creating directory /path/to/package` and
-    #     `copying directory /src/path/to/package -> path/to/package` are displayed on standard output.
-    #     Adapted from scikit-build.
-    #     """
-    #     # Create directory if needed
-    #     dest_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tests', 'bin')
-    #     if dest_dir != "" and not os.path.exists(dest_dir):
-    #         print("creating directory {}".format(dest_dir))
-    #         os.makedirs(dest_dir)
-    #
-    #     # Copy file
-    #     dest_file = os.path.join(dest_dir, os.path.basename(src_file))
-    #     print("copying {} -> {}".format(src_file, dest_file))
-    #     copyfile(src_file, dest_file)
-    #     copymode(src_file, dest_file)
+
+def create_metadata(full_version, doc_url):
+    return dict(
+        project_urls={
+            "Documentation": doc_url
+        },
+        version=full_version,
+        cmdclass=cmdclass,
+        packages=find_packages(where='modules'),
+        package_dir={'': 'modules'},
+        test_suite="pytest",
+        ext_modules=[CMakeExtension("pygauss", target=["PyGauss"])],
+        python_requires='>=3.7',
+    )
 
 
 def setup_package():
@@ -143,7 +147,10 @@ def setup_package():
     if sys.version_info[:2] < (3, 7):
         raise RuntimeError("Python version >= 3.7 required.")
 
-    cmdclass = versioneer.get_cmdclass({"build_ext": CMakeBuild})
+    check_submodules()
+
+    cmdclass.update({'build_ext': CMakeBuild})
+
     ver_info = versioneer.get_version()
     ver_details = process_version_information(ver_info)
 
@@ -153,7 +160,7 @@ def setup_package():
         del fmt
 
     doc_url = get_documentation_url(ver_details)
-    meta = create_metadata(ver_info, ver_details, doc_url, cmdclass)
+    meta = create_metadata(ver_info, doc_url)
 
     # Remove MANIFEST to ensure the correct information
     # is generated from MANIFEST.in
@@ -165,10 +172,6 @@ def setup_package():
 
 if __name__ == '__main__':
     setup_package()
-
-
-
-
 
 # from pybind11_stubgen import ModuleStubsGenerator
 # module = ModuleStubsGenerator("khiva")

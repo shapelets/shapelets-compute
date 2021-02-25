@@ -7,3 +7,5 @@
 /cmake-build-debug
 /pkg
 /dist
+/modules/shapelets.egg-info
+/modules/shapelets/*.so
