@@ -10,3 +10,4 @@
 /modules/shapelets.egg-info
 /modules/shapelets/*.so
 /.mypy_cache
+__pycache__
