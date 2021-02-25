@@ -1,7 +1,6 @@
-import pygauss as sh
+import shapelets as sh
 import matrixprofile as mp
 import stumpy as st
-import numpy as np
 
 
 def st_stump(data):

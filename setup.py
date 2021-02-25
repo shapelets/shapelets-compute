@@ -9,8 +9,12 @@ from typing import Union, List
 from distutils.version import LooseVersion
 from setuptools import setup, Extension, find_packages
 import warnings
+import builtins
 
 cmdclass = versioneer.get_cmdclass()
+
+# Technique from numpy
+builtins.__SHAPELETS_SETUP__ = True
 
 
 def process_version_information(full_version):
