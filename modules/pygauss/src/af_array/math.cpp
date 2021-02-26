@@ -137,21 +137,21 @@ void math_bindings(py::module &left) {
              py::arg("a").none(false),
              "The gamma function");
 
-    left.def("acosh",
+    left.def("arccosh",
              [](const af::array &a) {
                  return af::acosh(a);
              },
              py::arg("a").none(false),
              "Inverse hyperbolic cosine");
 
-    left.def("asinh",
+    left.def("arcsinh",
              [](const af::array &a) {
                  return af::asinh(a);
              },
              py::arg("a").none(false),
              "Inverse hyperbolic sine");
 
-    left.def("atanh",
+    left.def("arctanh",
              [](const af::array &a) {
                  return af::atanh(a);
              },
@@ -228,21 +228,21 @@ void math_bindings(py::module &left) {
              py::arg("a").none(false),
              "Truncate float values.");
 
-    left.def("acos",
+    left.def("arccos",
              [](const af::array &a) {
                  return af::acos(a);
              },
              py::arg("a").none(false),
              "Inverse cosine");
 
-    left.def("asin",
+    left.def("arcsin",
              [](const af::array &a) {
                  return af::asin(a);
              },
              py::arg("a").none(false),
              "Inverse sine");
 
-    left.def("atan",
+    left.def("arctan",
              [](const af::array &a) {
                  return af::atan(a);
              },
