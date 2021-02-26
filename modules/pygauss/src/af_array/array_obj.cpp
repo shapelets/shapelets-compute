@@ -104,7 +104,13 @@ void array_obj_bindings(py::module &m) {
                if (other.type() != self.type())
                    typed = other.as(self.type());
 
-               return af::allTrue<bool>(af::abs(self - typed) < (double) eps);
+               auto non_nan_self = self.copy();
+               auto non_nan_other = other.copy();
+
+               non_nan_self(af::where(af::isNaN(self))) = 0.0;
+               non_nan_other(af::where(af::isNaN(other))) = 0.0;
+
+               return af::allTrue<bool>(af::abs(non_nan_self - non_nan_other) < (double) eps);
            },
            py::arg("arr_like").none(false),
            py::arg("eps") = 1e-4,
