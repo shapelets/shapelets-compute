@@ -85,6 +85,8 @@ void device_bindings(py::module &m) {
             .def_readonly("platform", &DeviceInfo::platform,
                           "Platform information associated to the backend and device.")
             .def_readonly("compute", &DeviceInfo::compute, "Compute capabilities of the device within the platform")
+            .def_readonly("isHalfAvailable",&DeviceInfo::isHalfAvailable, "Returns true if Float16 is supported.")
+            .def_readonly("isDoubleAvailable",&DeviceInfo::isDoubleAvailable, "Returns true if Float64 is supported.")
             .def("__repr__", [](const DeviceInfo &dev) {
                 std::stringstream result;
                 result << "[" << dev.id << "] ";
