@@ -55,11 +55,11 @@ void device_bindings(py::module &m) {
     )__d__");
 
     m.def("has_backend",
-          [](af::Backend testBackend) {
+          [](af::Backend test_backend) {
               auto code = af::getAvailableBackends();
-              return code & testBackend;
+              return code & test_backend;
           },
-          py::arg("testBackend").none(false),
+          py::arg("test_backend").none(false),
           "Checks if a particular backend is supported in this platform.");
 
     m.def("get_available_backends",
