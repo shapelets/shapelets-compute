@@ -196,12 +196,14 @@ void device_bindings(py::module &m) {
                   return;
               }
 
-              auto deviceId = -1;
+              int deviceId;
               auto v = dev.value();
               if (auto pid = std::get_if<int>(&v))
                   deviceId = *pid;
               else
                   deviceId = std::get<DeviceInfo>(v).id;
+
+              af::sync(deviceId);
           },
           py::arg("dev") = py::none(),
           "Blocks until the device has finished processing.");
