@@ -93,7 +93,8 @@ ParallelFor::ParallelFor(const py::slice &slice) {
 thread_local bool GForStatus::status = false;
 
 
-std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector, const af::dim4 &arr_dim) {
+std::tuple<dim_t, af::dim4, af_index_t *> build_index_internal(const py::object &selector, const af::dim4 &arr_dim) {
+
     if (selector.is_none())
         throw std::runtime_error("No selector");
 
@@ -106,7 +107,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
     if (py::isinstance<py::ellipsis>(selector)) {
         // the user has done something like array[...]
         // which should result in a select all operation.
-        spd::debug("Selector was ...; returning without further indexing");
+        spd::trace("Selector was ...; returning without further indexing");
         result_dim = arr_dim;
         result_dimensions = arr_dim.ndims();
         return {result_dimensions, result_dim, afIndex};
@@ -121,7 +122,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
         // which is not an ellipsis
         items[0] = std::move(selector);
         result_dimensions = 1;
-        spd::debug("Selector is a tuple of only one element");
+        spd::trace("Selector is a tuple of only one element");
     } else {
         auto tuple = py::cast<py::tuple>(selector);
         auto tuple_size = tuple.size();
@@ -134,7 +135,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
             throw std::runtime_error("Up to four dimensions are supported.  If more dimensions are required, "
                                      "cast to numpy using either a memoryview object or np.array(obj)");
 
-        spd::debug("Selector is a tuple of {} elements", tuple_size);
+        spd::trace("Selector is a tuple of {} elements", tuple_size);
 
         size_t i = 0; // tuple item
         size_t d = 0; // current dimension
@@ -148,9 +149,9 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
                 //
                 auto next_d = arr_dim.ndims() - tuple_size + i + 1;
                 // an ellipsis forces us to include the dimensions
-                spd::debug("Detected ellipsis in tuple at position {}...", i);
+                spd::trace("Detected ellipsis in tuple at position {}...", i);
                 for (auto j=d; j<next_d;j++) {
-                    spd::debug("\t...taking {} elements at dimension {}", arr_dim[j], j);
+                    spd::trace("\t...taking {} elements at dimension {}", arr_dim[j], j);
                     result_dim[j] = arr_dim[j];
                     result_dimensions += 1;
                 }
@@ -171,28 +172,28 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
     for (auto i=0; i<4; i++) {
         auto item_op = items[i];
         if (!item_op.has_value()) {
-            spd::debug("Preprocessed selector: no value at position {}", i);
+            spd::trace("Preprocessed selector: no value at position {}", i);
             continue;
         }
         auto item = item_op.value();
 
         if (item.is_none()) {
-            spd::debug("Preprocessed selector: none value at position {}", i);
+            spd::trace("Preprocessed selector: none value at position {}", i);
             continue;
         }
 
         if (py::isinstance<py::int_>(item)) {
             auto v = py::cast<int>(item);
-            spd::debug("Preprocessed selector: found a integer at pos {} interpreted as {}, {}, {}", i, v, v, 1);
+            spd::trace("Preprocessed selector: found a integer at pos {} interpreted as {}, {}, {}", i, v, v, 1);
             check_af_error(af_set_seq_param_indexer(afIndex, v, v, 1, i, false));
-            spd::debug("Preprocessed selector: resulting dimension at pos {} is 1", i);
+            spd::trace("Preprocessed selector: resulting dimension at pos {} is 1", i);
             result_dim[i] = 1;
             continue;
         }
 
         if (py::isinstance<py::slice>(item)) {
             auto[start, stop, step] = interpret_slice(py::cast<py::slice>(item));
-            spd::debug("Preprocessed selector: found a slice at pos {} interpreted as {}, {}, {}", i, start, stop, step);
+            spd::trace("Preprocessed selector: found a slice at pos {} interpreted as {}, {}, {}", i, start, stop, step);
             check_af_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, false));
             auto v1 = start < 0 ? arr_dim[i] + start : start;
             auto v2 = stop < 0 ? arr_dim[i] + stop : stop;
@@ -200,7 +201,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
             auto int_div = div(span, abs(step));
             auto len = int_div.quot + (int_div.rem != 0 ? 1 : 0);
             result_dim[i] = (dim_t) len;
-            spd::debug("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i, result_dim[i], arr_dim[i]);
+            spd::trace("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i, result_dim[i], arr_dim[i]);
             continue;
         }
 
@@ -209,7 +210,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
             auto start = pf.getStart();
             auto stop = pf.getStop();
             auto step = pf.getStep();
-            spd::debug("Preprocessed selector: found a parallel for at pos {} interpreted as {}, {}, {}", i, start, stop, step);
+            spd::trace("Preprocessed selector: found a parallel for at pos {} interpreted as {}, {}, {}", i, start, stop, step);
             check_af_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, true));
             auto v1 = start < 0 ? arr_dim[i] + start : start;
             auto v2 = stop < 0 ? arr_dim[i] + stop : stop;
@@ -217,7 +218,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
             auto int_div = div(span, abs(step));
             auto len = int_div.quot + (int_div.rem != 0 ? 1 : 0);
             result_dim[i] = (dim_t) len;
-            spd::debug("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i, result_dim[i], arr_dim[i]);
+            spd::trace("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i, result_dim[i], arr_dim[i]);
             continue;
         }
 
@@ -226,24 +227,49 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector
             af_array out;
             if (ind_arr.type() == af::dtype::b8) {
                 check_af_error(af_where(&out, ind_arr.get()));
-                spd::debug("Preprocessed selector: found boolean array at pos {}", i);
+                spd::trace("Preprocessed selector: found boolean array at pos {}", i);
             }
             else {
                 out = ind_arr.get();
-                spd::debug("Preprocessed selector: found any array at pos {}", i);
+                spd::trace("Preprocessed selector: found any array at pos {}", i);
             }
 
             // store the number of elements as the dimension size
             check_af_error(af_get_elements(&result_dim[i], out));
             check_af_error(af_set_array_indexer(afIndex, out, i));
-            spd::debug("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i, result_dim[i], arr_dim[i]);
+            spd::trace("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i, result_dim[i], arr_dim[i]);
             continue;
         }
 
         throw std::runtime_error("Unable to process index expression");
     }
 
-    spd::debug("Indexing calculations ended. Result dimensions ({}) [{}, {}, {}, {}]",
-               result_dimensions, result_dim[0], result_dim[1], result_dim[2], result_dim[3]);
+    spd::trace("Indexing calculations ended. Result dimensions ({}) {}", result_dimensions, result_dim);
     return {result_dimensions, result_dim, afIndex};
+}
+
+
+std::tuple<dim_t, af::dim4, af_index_t *> build_index(const py::object &selector, const af::dim4 &arr_dim) {
+    auto result = build_index_internal(selector, arr_dim);
+
+    if (spd::get_level() == spd::level::debug) {
+        auto[res_dim, index_dim, index] = result;
+        std::string str_selector = py::repr(selector);
+        spd::debug("Selector is {} over array {}", str_selector, arr_dim);
+        for (auto i = 0; i < 4; i++) {
+            auto index_entry = index[i];
+            if (index_entry.isSeq) {
+                spd::debug("\t{}\t{}: Sequence {}-{}-{} with dimensions {}",
+                           i < res_dim ? "In" : "Out",
+                           i,
+                           index_entry.idx.seq.begin,
+                           index_entry.idx.seq.end, index_entry.idx.seq.step,
+                           af::calcDim(index_entry.idx.seq, arr_dim[i]));
+            } else {
+                spd::debug("\t{}: Array", i);
+            }
+        }
+    }
+
+    return result;
 }

@@ -91,11 +91,11 @@ py::buffer_info af_buffer_protocol(const af::array &self) {
                        af::freeHost(f);
                    });
 
-    spd::debug("Returning a {}writable of type [{}{}] [{},{},{},{}]",
+    spd::debug("Returning a {}writable of type [{}-{}] {}",
                isDirect ? "" : "non ",
                fmt.kind(),
                fmt.itemsize(),
-               shape[0], shape[1], shape[2], shape[3]);
+               shape);
 
     return py::array(fmt, dimensions, strides, data, capsule).request(isDirect);
 }

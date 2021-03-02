@@ -120,33 +120,40 @@ void array_obj_bindings(py::module &m) {
 
     ka.def("__setitem__",
            [](af::array &self, const py::object &selector, const py::object &value) {
-               auto value_is_array = py::isinstance<af::array>(value);
-               auto[res_dim, index_dim, index] = build_index(selector, self.dims());
 
-               af_array rhs = nullptr;
-               if (value_is_array) {
-                   auto rhsa = py::cast<af::array>(value);
-                   if (rhsa.dims() != index_dim) {
-                       std::ostringstream msg;
-                       msg << "Not the same dimensions: expected " << index_dim << " vs given " << rhsa.dims();
-                       throw std::runtime_error(msg.str());
+               auto[res_dim, index_dim, index] = build_index(selector, self.dims());
+               af::array rhs;
+
+               if (py::isinstance<af::array>(value)) {
+                   spd::debug("Set Operation: Value is array");
+                   rhs = py::cast<af::array>(value);
+                   if (rhs.dims() != index_dim) {
+                       spd::debug("Set Operation: Value has different dimensions {} as implied by selector {}", rhs.dims(), index_dim);
+                       if (index_dim.elements() != rhs.elements()) {
+                           std::ostringstream msg;
+                           msg << "Not the same dimensions: expected " << index_dim << " vs given " << rhs.dims();
+                           throw std::runtime_error(msg.str());
+                       }
+                       else {
+                           spd::debug("Set Operation: Since the number of elements is the same, adjusting dimensions");
+                           rhs = af::moddims(rhs, index_dim.ndims(), index_dim.get());
+                       }
                    }
-                   rhs = py::cast<af::array>(value).get();
+
+                   if (self.type() != rhs.type()) {
+                       spd::debug("Set Operation: Changing the type of the value array from {} to {}", rhs.type(), self.type());
+                       rhs = rhs.as(self.type());
+                   }
                }
                else {
-                   spd::debug("Creating constant array for __setitem__ operation with dimensions {}, {}, {}, {}",
-                              index_dim[0], index_dim[1], index_dim[2], index_dim[3]);
-                   rhs = constant_array(value, index_dim);
+                   spd::debug("Set Operation: Creating constant array with dimensions {}",index_dim);
+                   rhs = af::array(constant_array(value, index_dim, self.type()));
                }
 
                af_array out = nullptr;
-               auto err = af_assign_gen(&out, self.get(), res_dim, index, rhs);
-               spd::debug("The error code for af_assign_gen is {}", err);
-
-               // ensure rhs is removed before checking for errors...
-               if (!value_is_array) check_af_error(af_release_array(rhs));
-               check_af_error(err);
+               auto err = af_assign_gen(&out, self.get(), self.numdims(), index, rhs.get());
                check_af_error(af_release_indexers(index));
+               check_af_error(err);
                self = af::array(out);
                return self;
            },

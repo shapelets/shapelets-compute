@@ -86,22 +86,36 @@ def test_logical_filters():
     # be more adequate.
     assert (a * (1 < a < 4)).same_as(sh.replace(a, 1 < a < 4, 0.))
 
-# def test_assigment():
-#     sh.set_backend(sh.Backend.CPU)
-#     a = sh.iota(9, 1, dtype="int32")
-#     (a < 4).display()
-#     a[a < 4]=7 #.display()
-#     a.display()
-# print(a.backend)
-# print(sh.array([-2, -2, -2]).backend)
-#
-# a[::, 0] = -2
-# a[::, 0] = sh.array([-2, -2, -2])
-#
-#
-# a[0, ::].display()
-# sh.array([0, 0, 0], dtype="int32").T.display()
-# a[0, ::] = sh.array([0, 0, 0], dtype="int32").T
-# a[1, ::] = sh.array([1, 1, 1]).T
-# a[2, ::] = sh.array([2, 2, 2]).T
-# a.display()
+
+def test_assigment_scalar():
+    c = sh.constant((3, 3, 3), 0, dtype="complex64")
+    c[1, ...] = 1+1j
+    c[..., 1] = 1-1j
+
+    assert c.same_as([[[0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j]],
+                      [[1.+1.j, 1.-1.j, 1.+1.j],
+                       [1.+1.j, 1.-1.j, 1.+1.j],
+                       [1.+1.j, 1.-1.j, 1.+1.j]],
+                      [[0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j]]])
+
+    c[1, 1, 1] = -1-1j
+    assert c.same_as([[[0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j]],
+                      [[1.+1.j, 1.-1.j, 1.+1.j],
+                       [1.+1.j, -1.-1.j, 1.+1.j],
+                       [1.+1.j, 1.-1.j, 1.+1.j]],
+                      [[0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j],
+                       [0.+0.j, 1.-1.j, 0.+0.j]]])
+
+
+def test_assigment_vector():
+    c = sh.constant((3, 3, 3), 0., dtype="float32")
+    d = sh.constant((3, 3, 3), 1., dtype="float32")
+    c[0, ..., 0] = 1.
+    c[0, ..., 0] = d[0, ..., 0]
