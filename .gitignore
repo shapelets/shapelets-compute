@@ -8,6 +8,6 @@
 /pkg
 /dist
 /modules/shapelets.egg-info
-/modules/shapelets/*.so
+/modules/shapelets/compute/*.so
 /.mypy_cache
 __pycache__
