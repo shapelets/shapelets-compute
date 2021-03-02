@@ -74,7 +74,6 @@ slice_interpretation interpret_slice(const py::slice &slice);
 //af::dim4 assign_dimensions(const py::object& selector, const af::dim4& original_dimensions);
 //af_index_t* build_index(const py::object& selector, int array_num_dimensions);
 
-std::tuple<af::dim4,af_index_t*> build_index(const py::object& selector, const af::dim4& arr_dim);
+std::tuple<dim_t, af::dim4,af_index_t*> build_index(const py::object& selector, const af::dim4& arr_dim);
 
 #endif // AF_ARRAY_INDEX__H
-
