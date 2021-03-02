@@ -18,7 +18,7 @@ PYBIND11_MODULE(pygauss, m) {
             :toctree: _generate
         
     )";
-
+    spd::set_level(spd::level::level_enum::debug);
 #ifndef NDEBUG
     spd::set_level(spd::level::level_enum::debug);
 #endif

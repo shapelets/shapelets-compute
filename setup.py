@@ -65,10 +65,12 @@ def check_submodules():
 class CMakeExtension(Extension):
     """ It will be used in setup method under ext_modules parameter """
 
-    def __init__(self, name, sourcedir='', target: Union[List[str], str] = None):
+    def __init__(self, name, sourcedir='', debug: bool = False, output_dir: str = '', target: Union[List[str], str] = None):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
         self.target = target
+        self.output_dir = output_dir
+        self.debug = debug
 
 
 class CMakeBuild(cmdclass["build_ext"]):
@@ -91,7 +93,7 @@ class CMakeBuild(cmdclass["build_ext"]):
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
-        extdir = os.path.join(extdir, "shapelets")
+        extdir = os.path.join(extdir, ext.output_dir)
         cmake_args = [
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
             '-DPYTHON_EXECUTABLE=' + sys.executable
@@ -110,7 +112,10 @@ class CMakeBuild(cmdclass["build_ext"]):
             build_args += ['--', '-j2']
 
         env = os.environ.copy()
-        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''), self.distribution.get_version())
+        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(
+            env.get('CXXFLAGS', ''),                # get existing flags
+            self.distribution.get_version()         # plus version
+        )
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
@@ -140,13 +145,19 @@ def create_metadata(full_version, doc_url):
         packages=find_packages(where='modules'),
         package_dir={'': 'modules'},
         test_suite="pytest",
-        ext_modules=[CMakeExtension("pygauss", target=["PyGauss"])],
+        ext_modules=[CMakeExtension("pygauss",
+                                    debug=True,
+                                    output_dir='shapelets/compute',
+                                    target=["PyGauss", "stubcpu", "stubcuda", "stubcl"])],
         python_requires='>=3.7',
+        package_data={
+            'shapelets': ['*.pyi', 'py.typed'],
+        },
     )
 
 
 def setup_package():
-    """ Main entry point that sets everything up"""
+    """ Main entry point that sets everything up """
     # At least, version 3.7
     if sys.version_info[:2] < (3, 7):
         raise RuntimeError("Python version >= 3.7 required.")

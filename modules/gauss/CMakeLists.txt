@@ -11,6 +11,7 @@ find_package(ArrayFire CONFIG REQUIRED)
 find_package(Boost REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 
+#find_package(CUDA )
 include(CheckLanguage)
 check_language(CUDA)
 
@@ -137,7 +138,7 @@ target_link_libraries(gauss_scamp
 # Main algos
 ####
 
-# Set the base directory to parent so src and include become equaly visible
+# Set the base directory to parent so src and include become equally visible
 set(GAUSSLIB_BASE_DIR ${PROJECT_SOURCE_DIR})
 # Define source directory
 set(GAUSSLIB_SRC "${GAUSSLIB_BASE_DIR}/src")

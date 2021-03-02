@@ -36,10 +36,7 @@ void af_array_bindings(py::module_ &m) {
     enum_bindings(m);
     array_obj_bindings(m);
     construction_bindings(m);
-
-    auto rnd_module = m.def_submodule("random", "Functions for random initialization of arrays");
-    random_bindings(rnd_module);
-
+    random_bindings(m);
     informative_bindings(m);
     extract_transform_bindings(m);
     linear_algebra_bindings(m);

@@ -4,6 +4,8 @@
 #include <pybind11/numpy.h>
 
 #include <af_array/af_array.h>
+//#include <arrow/python/pyarrow.h>
+//#include <arrow/array.h>
 
 namespace spd = spdlog;
 namespace py = pybind11;
@@ -101,6 +103,36 @@ py::buffer_info af_buffer_protocol(const af::array &self) {
 af::array af_from_array_like(const py::object &arr_like,
                              const std::optional<af::dim4> &shape,
                              const std::optional<af::dtype> &dtype) {
+
+//    if (arrow::py::is_tensor(arr_like.ptr())) {
+//        std::shared_ptr<arrow::Tensor> tensor;
+//        auto result = arrow::py::unwrap_tensor(arr_like.ptr());
+//        if (result.ok()) {
+//            auto t = result.ValueOrDie();
+//            t->type()->id()
+//        }
+//
+//    }
+
+//    if (arrow::py::is_array(arr_like.ptr()))
+//    {
+//        arrow::Result<std::shared_ptr<arrow::Array>> result = arrow::py::unwrap_array(arr_like.ptr());
+//        if (result.ok()) {
+//            auto r = result.ValueOrDie();
+//
+//            if (r->length() == 0) {
+//                // this is an empty array
+//            }
+//
+//            r->type_id()
+//            if (r->null_count() == 0) {
+//                // non empty array, with no nulls
+//            }
+//
+//
+//
+//        }
+//    }
 
     auto tmp_array = py::array::ensure(arr_like);
     if (!tmp_array)

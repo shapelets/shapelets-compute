@@ -14,10 +14,10 @@ struct matrix_profile {
     af::array index;
 };
 
-void gauss_matrix_bindings(py::module &m){
+void gauss_matrix_bindings(py::module_ &m){
 
     py::class_<matrix_profile>(m, "MatrixProfile")
-            .def(py::init<const af::array&, const af::array&>())
+            .def(py::init<af::array, af::array>())
             .def_readwrite("profile", &matrix_profile::profile)
             .def_readwrite("index", &matrix_profile::index);
 
@@ -47,7 +47,7 @@ void gauss_matrix_bindings(py::module &m){
 
               py::dict result;
               result["left"] = matrix_profile { left_profile, left_index };
-              result["right"] = matrix_profile {right_profile, right_index};
+              result["right"] = matrix_profile { right_profile, right_index };
 
               return result;
           },

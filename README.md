@@ -2,6 +2,12 @@
 mac
   - https://pypi.org/project/delocate/
 
+```shell
+DYLD_LIBRARY_PATH=/Users/justo.ruiz/Development/shapelets/solo_comprobacion/external/arrayfire/lib:/opt/arrayfire/lib/libaf:/Users/justo.ruiz/Development/shapelets/solo_comprobacion/temp/Developer/NVIDIA/CUDA-10.1/lib:$DYLD_LIBRARY_PATH delocate-listdeps --all dist/shapelets-0.1.1+5.g8dfcc89.dirty-cp37-cp37m-macosx_10_14_x86_64.whl 
+
+DYLD_LIBRARY_PATH=/Users/justo.ruiz/Development/shapelets/solo_comprobacion/external/arrayfire/lib:/opt/arrayfire/lib/libaf:/Users/justo.ruiz/Development/shapelets/solo_comprobacion/temp/Developer/NVIDIA/CUDA-10.1/lib:$DYLD_LIBRARY_PATH delocate-wheel -w ./dist/fixed_wheels ./dist/shapelets-0.1.1+5.g8dfcc89.dirty-cp37-cp37m-macosx_10_14_x86_64.whl 
+```
+
 windows
   - https://vinayak.io/2020/10/22/day-52-bundling-dlls-with-windows-wheels-the-dll-mangling-way/
   - https://vinayak.io/2020/10/21/day-51-bundling-dlls-with-windows-wheels-the-package-data-way/

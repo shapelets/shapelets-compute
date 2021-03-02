@@ -45,8 +45,6 @@ void extract_transform_bindings(py::module &m) {
           "Create a lower triangular matrix from input array\n"
           "The parameter unit_diag forces the diagonal elements to be one.");
 
-    // todo pad
-
     m.def("upper", [](const af::array &a, bool unit_diag) {
               return af::upper(a, unit_diag);
           },
@@ -108,16 +106,32 @@ void extract_transform_bindings(py::module &m) {
           "in dimensionality. The linear ordering of data within the array is preserved.");
 
     m.def("replace",
-          [](af::array &a, const af::array &cond, const std::variant<py::float_, af::array> &b) {
+          [](af::array &a, const af::array &keeping_cond, const std::variant<py::float_, af::array> &b) {
+              auto result = a.copy();
               if (auto pinfo = std::get_if<py::float_>(&b))
-                  af::replace(a, cond, (double) (*pinfo));
+                  af::replace(result, keeping_cond, (double) (*pinfo));
               else
-                  af::replace(a, cond, std::get<af::array>(b));
+                  af::replace(result, keeping_cond, std::get<af::array>(b));
+              return result;
           },
           py::arg("a").none(false),
-          py::arg("cond").none(false),
+          py::arg("keeping_condition").none(false),
           py::arg("b").none(false),
-          "Replace elements of an array based on a conditional array");
+          "Replace elements of an array based on a conditional array.  The elements kept will be those"
+          "matching the condition (this could be a little bit counterintuitive.");
+
+    m.def("replaceInPlace",
+          [](af::array &a, const af::array &keeping_cond, const std::variant<py::float_, af::array> &b) {
+              if (auto pinfo = std::get_if<py::float_>(&b))
+                  af::replace(a, keeping_cond, (double) (*pinfo));
+              else
+                  af::replace(a, keeping_cond, std::get<af::array>(b));
+          },
+          py::arg("a").none(false),
+          py::arg("keeping_condition").none(false),
+          py::arg("b").none(false),
+          "Replace elements of an array based on a conditional array.  The elements kept will be those"
+          "matching the condition (this could be a little bit counterintuitive.");
 
     m.def("shift",
           [](const af::array &a, const int x, const int y, const int z, const int w) {

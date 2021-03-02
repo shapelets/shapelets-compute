@@ -50,7 +50,10 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
                        return self;                                                                     \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
+                                                                                                        \
 
+
+int array_priority = 30;
 
 void array_obj_bindings(py::module &m) {
 
@@ -73,22 +76,6 @@ void array_obj_bindings(py::module &m) {
 //               return result;
 //           },
 //           py::arg("slice").none(false));
-
-
-
-    ka.def("__getitem__",
-           [](const af::array &self, const py::object &selector) {
-               af_array out = nullptr;
-               //af_moddims() af_reorder()
-               auto[index_dim, index] = build_index(selector, self.dims());
-               check_af_error(af_index_gen(&out, self.get(), self.numdims(), index));
-               check_af_error(af_release_indexers(index));
-               return af::array(out);
-           },
-           py::arg("selector").none(false),
-           "");
-
-
 
     ka.def("same_as",
            [](const af::array &self, const py::object &arr_like, const py::float_ eps) {
@@ -117,15 +104,35 @@ void array_obj_bindings(py::module &m) {
            "Performs a element wise comparison between the arrays and returns "
            "True if the two arrays are the same (same dimensions, same values).");
 
+    ka.def_readonly_static("__array_priority__", &array_priority,
+                           "Ensure priority in resolved in favour of our built-in methods");
+
+    ka.def("__getitem__",
+           [](const af::array &self, const py::object &selector) {
+               af_array out = nullptr;
+               auto[res_dim, index_dim, index] = build_index(selector, self.dims());
+               check_af_error(af_index_gen(&out, self.get(), res_dim, index));
+               check_af_error(af_release_indexers(index));
+               return af::array(out);
+           },
+           py::arg("selector").none(false),
+           "");
 
     ka.def("__setitem__",
            [](af::array &self, const py::object &selector, const py::object &value) {
                auto value_is_array = py::isinstance<af::array>(value);
-               auto[index_dim, index] = build_index(selector, self.dims());
+               auto[res_dim, index_dim, index] = build_index(selector, self.dims());
 
                af_array rhs = nullptr;
-               if (value_is_array)
+               if (value_is_array) {
+                   auto rhsa = py::cast<af::array>(value);
+                   if (rhsa.dims() != index_dim) {
+                       std::ostringstream msg;
+                       msg << "Not the same dimensions: expected " << index_dim << " vs given " << rhsa.dims();
+                       throw std::runtime_error(msg.str());
+                   }
                    rhs = py::cast<af::array>(value).get();
+               }
                else {
                    spd::debug("Creating constant array for __setitem__ operation with dimensions {}, {}, {}, {}",
                               index_dim[0], index_dim[1], index_dim[2], index_dim[3]);
@@ -133,7 +140,8 @@ void array_obj_bindings(py::module &m) {
                }
 
                af_array out = nullptr;
-               auto err = af_assign_gen(&out, self.get(), self.numdims(), index, rhs);
+               auto err = af_assign_gen(&out, self.get(), res_dim, index, rhs);
+               spd::debug("The error code for af_assign_gen is {}", err);
 
                // ensure rhs is removed before checking for errors...
                if (!value_is_array) check_af_error(af_release_array(rhs));
@@ -302,7 +310,7 @@ void array_obj_bindings(py::module &m) {
                   if (!obj.is_none() && py::isinstance<af::array>(obj))
                       lst.push_back(py::cast<af::array>(obj).get());
               }
-              if (lst.size() > 0) {
+              if (!lst.empty()) {
                   check_af_error(af_eval_multiple(lst.size(), lst.data()));
               }
           },

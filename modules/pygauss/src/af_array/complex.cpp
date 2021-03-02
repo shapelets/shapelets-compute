@@ -11,7 +11,7 @@ void complex_bindings(py::module &m) {
     // as it takes profit of the c implementation with
     // the parallel flag.
 
-    m.def("confg",
+    m.def("conjg",
           [](const af::array &a) {
               return af::conjg(a);
           },

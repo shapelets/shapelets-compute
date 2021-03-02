@@ -14,7 +14,7 @@ include(LocalArrayFire)
 
 # VCPKG to install dependencies
 include(AutoVcpkg)
-vcpkg_install(pybind11 gtest eigen3 benchmark boost spdlog)
+vcpkg_install(pybind11 gtest eigen3 benchmark boost spdlog arrow)
 
 ####
 # END: Pre-Project Setup
