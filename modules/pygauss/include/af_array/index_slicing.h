@@ -57,6 +57,10 @@ public:
     ssize_t getStop() const  { return stop; }
     ssize_t getStep() const { return step;}
 
+    operator af::array() const {
+        return af::seq(start, stop, step);
+    }
+
 private:
     ssize_t start;
     ssize_t stop;

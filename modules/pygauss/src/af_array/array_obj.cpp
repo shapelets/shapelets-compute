@@ -10,15 +10,15 @@ namespace spd = spdlog;
 typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs, const bool batch);
 
 af::array binary_function(const af::array &self, const py::object &other, bool reverse, binaryFn fn) {
-    af_array rhs = py::isinstance<af::array>(other) ?
-                   py::cast<af::array>(other).get() :
-                   constant_array(other, self.dims());
+    af::array rhs = py::isinstance<af::array>(other) ? py::cast<af::array>(other) :
+                    py::isinstance<ParallelFor>(other) ? (af::array)(py::cast<ParallelFor>(other)) :
+                    af::array(constant_array(other, self.dims()));
 
     af_array out = nullptr;
     if (!reverse)
-        check_af_error((*fn)(&out, self.get(), rhs, GForStatus::get()));
+        check_af_error((*fn)(&out, self.get(), rhs.get(), GForStatus::get()));
     else
-        check_af_error((*fn)(&out, rhs, self.get(), GForStatus::get()));
+        check_af_error((*fn)(&out, rhs.get(), self.get(), GForStatus::get()));
 
     return af::array(out);
 }

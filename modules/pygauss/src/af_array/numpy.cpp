@@ -104,35 +104,10 @@ af::array af_from_array_like(const py::object &arr_like,
                              const std::optional<af::dim4> &shape,
                              const std::optional<af::dtype> &dtype) {
 
-//    if (arrow::py::is_tensor(arr_like.ptr())) {
-//        std::shared_ptr<arrow::Tensor> tensor;
-//        auto result = arrow::py::unwrap_tensor(arr_like.ptr());
-//        if (result.ok()) {
-//            auto t = result.ValueOrDie();
-//            t->type()->id()
-//        }
-//
-//    }
-
-//    if (arrow::py::is_array(arr_like.ptr()))
-//    {
-//        arrow::Result<std::shared_ptr<arrow::Array>> result = arrow::py::unwrap_array(arr_like.ptr());
-//        if (result.ok()) {
-//            auto r = result.ValueOrDie();
-//
-//            if (r->length() == 0) {
-//                // this is an empty array
-//            }
-//
-//            r->type_id()
-//            if (r->null_count() == 0) {
-//                // non empty array, with no nulls
-//            }
-//
-//
-//
-//        }
-//    }
+//    if (py::isinstance<af::array>(arr_like))
+//        return py::cast<af::array>(arr_like);
+//    else if (py::isinstance<ParallelFor>(arr_like))
+//        return py::cast<ParallelFor>(arr_like);
 
     auto tmp_array = py::array::ensure(arr_like);
     if (!tmp_array)
@@ -147,6 +122,14 @@ af::array af_from_array_like(const py::object &arr_like,
         i += 1;
     }
 
+//    int singular_dims     = 0;
+//    int non_singular_dims = 0;
+//    for (i = 0; i < AF_MAX_DIMS; i++) {
+//        non_singular_dims += (dims[i] != 0 && dims[i] != 1);
+//        singular_dims += (dims[i] == 1);
+//    }
+//    auto is_vector = singular_dims == AF_MAX_DIMS - 1 && non_singular_dims == 1;
+
     auto arr_type = py::cast<af::dtype>(tmp_array.dtype());
     arr_type = dtype.value_or(arr_type);
 
@@ -157,6 +140,16 @@ af::array af_from_array_like(const py::object &arr_like,
             arr_type = af::dtype::c32;
         }
     }
+
+
+    /*
+     * TODO
+     *
+     * At the moment the code below doesn't check for:
+     * a) if the data is a vector, it is not necessary to request a f_style
+     * b) the data taken from host memory, which implies always a copy; for cpu and cuda
+     *    devices, we may be able to just put the data in the devices memory.
+     */
 
     af::array result;
     switch (arr_type) {
