@@ -178,7 +178,7 @@ def test_batch_parallel_range():
     b = sh.constant((n, m), 0, dtype="float32")
 
     for ii in sh.parallel_range(m):
-        b[..., ii] = sh.sin(ii) + a[..., ii]
+        b[..., ii] = ii + a[..., ii]
 
     assert (b - a).same_as([
         [0., 0., 0., 0., 0.],

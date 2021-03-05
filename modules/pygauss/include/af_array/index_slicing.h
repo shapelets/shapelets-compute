@@ -2,11 +2,11 @@
 #define AF_ARRAY_INDEX__H
 
 #include <arrayfire.h>
-#include <spdlog/spdlog.h>
 #include <pybind11/pybind11.h>
+#include <spdlog/spdlog.h>
 
-namespace py = pybind11;
 namespace spd = spdlog;
+namespace py = pybind11;
 
 class GForStatus {
 private:

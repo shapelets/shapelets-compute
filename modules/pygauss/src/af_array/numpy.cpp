@@ -104,11 +104,6 @@ af::array af_from_array_like(const py::object &arr_like,
                              const std::optional<af::dim4> &shape,
                              const std::optional<af::dtype> &dtype) {
 
-//    if (py::isinstance<af::array>(arr_like))
-//        return py::cast<af::array>(arr_like);
-//    else if (py::isinstance<ParallelFor>(arr_like))
-//        return py::cast<ParallelFor>(arr_like);
-
     auto tmp_array = py::array::ensure(arr_like);
     if (!tmp_array)
         throw std::runtime_error("Unable to interpret input as an array");

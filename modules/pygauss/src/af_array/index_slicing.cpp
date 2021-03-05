@@ -100,7 +100,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index_internal(const py::object 
 
     dim_t result_dimensions = 0;
     af_index_t *afIndex = nullptr;
-    check_af_error(af_create_indexers(&afIndex));
+    throw_on_error(af_create_indexers(&afIndex));
 
     auto result_dim = af::dim4(1);
 
@@ -185,7 +185,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index_internal(const py::object 
         if (py::isinstance<py::int_>(item)) {
             auto v = py::cast<int>(item);
             spd::trace("Preprocessed selector: found a integer at pos {} interpreted as {}, {}, {}", i, v, v, 1);
-            check_af_error(af_set_seq_param_indexer(afIndex, v, v, 1, i, false));
+            throw_on_error(af_set_seq_param_indexer(afIndex, v, v, 1, i, false));
             spd::trace("Preprocessed selector: resulting dimension at pos {} is 1", i);
             result_dim[i] = 1;
             continue;
@@ -194,7 +194,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index_internal(const py::object 
         if (py::isinstance<py::slice>(item)) {
             auto[start, stop, step] = interpret_slice(py::cast<py::slice>(item));
             spd::trace("Preprocessed selector: found a slice at pos {} interpreted as {}, {}, {}", i, start, stop, step);
-            check_af_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, false));
+            throw_on_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, false));
             auto v1 = start < 0 ? arr_dim[i] + start : start;
             auto v2 = stop < 0 ? arr_dim[i] + stop : stop;
             auto span = (long) abs(v1-v2) + 1;
@@ -211,7 +211,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index_internal(const py::object 
             auto stop = pf.getStop();
             auto step = pf.getStep();
             spd::trace("Preprocessed selector: found a parallel for at pos {} interpreted as {}, {}, {}", i, start, stop, step);
-            check_af_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, true));
+            throw_on_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, true));
             auto v1 = start < 0 ? arr_dim[i] + start : start;
             auto v2 = stop < 0 ? arr_dim[i] + stop : stop;
             auto span = (long) abs(v1-v2) + 1;
@@ -226,7 +226,7 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index_internal(const py::object 
             auto ind_arr = py::cast<af::array>(item);
             af_array out;
             if (ind_arr.type() == af::dtype::b8) {
-                check_af_error(af_where(&out, ind_arr.get()));
+                throw_on_error(af_where(&out, ind_arr.get()));
                 spd::trace("Preprocessed selector: found boolean array at pos {}", i);
             }
             else {
@@ -235,8 +235,8 @@ std::tuple<dim_t, af::dim4, af_index_t *> build_index_internal(const py::object 
             }
 
             // store the number of elements as the dimension size
-            check_af_error(af_get_elements(&result_dim[i], out));
-            check_af_error(af_set_array_indexer(afIndex, out, i));
+            throw_on_error(af_get_elements(&result_dim[i], out));
+            throw_on_error(af_set_array_indexer(afIndex, out, i));
             spd::trace("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i, result_dim[i], arr_dim[i]);
             continue;
         }

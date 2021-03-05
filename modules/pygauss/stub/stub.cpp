@@ -6,8 +6,9 @@
 PYBIND11_MODULE(STUB_NAME, m) {
     m.def("stub",
           []() {
-              auto arr = af::constant(1.0f, 3);
-              return af::sum<float>(arr);
+              auto arr = af::constant(1.0f, 3, 3);
+              arr = af::ifft(af::fft(arr));
+              return af::sum<float>(af::matmul(arr, arr));
           },
           "Stub function");
 }

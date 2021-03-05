@@ -12,7 +12,20 @@ std::string get_last_error() {
     return std::string(msg, msgl);
 }
 
-void check_af_error(const af_err &err) {
+void warn_if_error(const af_err &err) {
+    if (err == AF_SUCCESS) return;
+
+    auto last_error = get_last_error();
+    std::stringstream ss;
+    ss << af_err_to_string(err) << ".  Error Code: " << err << std::endl << std::endl;
+    ss << "Last Error Message:" << std::endl;
+    ss << last_error << std::endl;
+
+    auto err_msg = ss.str();
+    spd::error(err_msg);
+}
+
+void throw_on_error(const af_err &err) {
     if (err == AF_SUCCESS) return;
 
     auto last_error = get_last_error();

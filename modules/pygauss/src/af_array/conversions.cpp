@@ -155,18 +155,18 @@ af_array constant_array(const py::object &value, const af::dim4 &shape, const st
 
     if (py::isinstance<py::bool_>(value)) {
         auto v = py::cast<bool>(value) ? 1.0 : 0.0;
-        check_af_error(af_constant(&handle, v, shape.ndims(), shape.get(), type.value_or(af::dtype::b8)));
+        throw_on_error(af_constant(&handle, v, shape.ndims(), shape.get(), type.value_or(af::dtype::b8)));
     } else if (py::isinstance<py::int_>(value)) {
         auto actual_dtype = value_or_default(type, af::dtype::s64, af::dtype::s32);
-        check_af_error(af_constant(&handle, (double) py::cast<long>(value), shape.ndims(), shape.get(), actual_dtype));
+        throw_on_error(af_constant(&handle, (double) py::cast<long>(value), shape.ndims(), shape.get(), actual_dtype));
     } else if (py::isinstance<py::float_>(value)) {
         auto actual_dtype = value_or_default(type, af::dtype::f64, af::dtype::f32);
-        check_af_error(af_constant(&handle, py::cast<double>(value), shape.ndims(), shape.get(), actual_dtype));
+        throw_on_error(af_constant(&handle, py::cast<double>(value), shape.ndims(), shape.get(), actual_dtype));
     } else {
         try {
             auto c = py::cast<std::complex<double>>(value);
             auto actual_dtype = value_or_default(type, af::dtype::c64, af::dtype::c32);
-            check_af_error(af_constant_complex(&handle, c.real(), c.imag(), shape.ndims(), shape.get(), actual_dtype));
+            throw_on_error(af_constant_complex(&handle, c.real(), c.imag(), shape.ndims(), shape.get(), actual_dtype));
         }
         catch (...) {
             throw std::runtime_error(

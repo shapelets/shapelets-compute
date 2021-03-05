@@ -1,388 +1,303 @@
 #include <arrayfire.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
+#include <spdlog/spdlog.h>
 #include <af_array/af_array.h>
 
+namespace spd = spdlog;
 namespace py = pybind11;
 
-typedef af_err (binary_arith_fn)(af_array *out, const af_array lhs, const af_array rhs, const bool batch);
+af::array rad2deg(const af::array &in) {
+    return in * (180.0 / 3.14159265358979323846);
+}
 
-af::array binary_arith(const std::variant<af::array, py::float_> &left,
-                       const std::variant<af::array, py::float_> &right,
-                       binary_arith_fn op) {
+af::array deg2rad(const af::array &in) {
+    return in * (3.14159265358979323846 / 180.0);
+}
 
-    af_array out = nullptr;
+af::array signbit(const af::array &in) {
+    return in < 0;
+}
 
-    if (left.index() != 0 && right.index() != 0)
-        throw std::runtime_error("At least one parameter must be an array");
+af::array reciprocal(const af::array &in) {
+    return 1.0 / in;
+}
 
-    if (left.index() == 0 && right.index() == 0) {
-        // both are an array
-        check_af_error((*op)(&out,
-                             std::get<af::array>(left).get(),
-                             std::get<af::array>(right).get(),
-                             GForStatus::get()));
-    }
+af::array positive(const af::array &in) {
+    return in.copy();
+}
 
-    auto shape = left.index() == 0 ?
-                 std::get<af::array>(left).dims() :
-                 std::get<af::array>(right).dims();
+af::array negative(const af::array &in) {
+    return -in;
+}
 
-    auto value = left.index() != 0 ?
-                 std::get<py::float_>(left) :
-                 std::get<py::float_>(right);
-
-    auto constant = constant_array(value, shape);
-
-    if (left.index() == 0)
-        check_af_error((*op)(&out, std::get<af::array>(left).get(), constant, GForStatus::get()));
-    else
-        check_af_error((*op)(&out, constant, std::get<af::array>(right).get(), GForStatus::get()));
-
-    return af::array(out);
+af::array angle_deg(const af::array &in) {
+    return rad2deg(af::arg(in));
 }
 
 
-void math_bindings(py::module &left) {
+af::array floor_divide(const af::array& left, const af::array& right, bool broadcast) {
+    auto previous = af::gforGet();
+    if (!previous && broadcast)
+        af::gforSet(true);
+    auto result = af::floor(left / right);
+    if (!previous && broadcast)
+        af::gforSet(false);
+    return result;
+}
 
-    left.def("cbrt",
-             [](const af::array &a) {
-                 return af::cbrt(a);
-             },
-             py::arg("a").none(false),
-             "Computes the cube root");
 
-    left.def("erf",
-             [](const af::array &a) {
-                 return af::erf(a);
-             },
-             py::arg("a").none(false),
-             "Computes the error function value");
+void math_bindings(py::module &m) {
 
-    left.def("erfc",
-             [](const af::array &a) {
-                 return af::erfc(a);
-             },
-             py::arg("a").none(false),
-             "Complementary Error function value");
+//
+// Trigonometric Functions
+//
+    UNARY_TEMPLATE_FN(sin, af_sin, "Trigonometric sine element-wise")
+    UNARY_TEMPLATE_FN(cos, af_cos, "Trigonometric cosine element-wise")
+    UNARY_TEMPLATE_FN(tan, af_tan, "Trigonometric tangent element-wise")
+    UNARY_TEMPLATE_FN(arcsin, af_asin, "Trigonometric inverse sine element-wise")
+    UNARY_TEMPLATE_FN(arccos, af_acos, "Trigonometric inverse cosine element-wise")
+    UNARY_TEMPLATE_FN(arctan, af_atan, "Trigonometric inverse tangent element-wise")
+    BINARY_TEMPLATE_FN(hypot, af_hypot, "Given the sides of a triangle, returns the hypotenuse")
+    BINARY_TEMPLATE_FN(arctan2, af_atan2, "Element-wise arc tangent of the inputs")
+    UNARY_TEMPLATE_FN_LAMBDA(degrees, rad2deg, "Radians to degrees, element-wise")
+    UNARY_TEMPLATE_FN_LAMBDA(rad2deg, rad2deg, "Radians to degrees, element-wise")
+    UNARY_TEMPLATE_FN_LAMBDA(radians, deg2rad, "Degrees to radians, element-wise")
+    UNARY_TEMPLATE_FN_LAMBDA(deg2rad, deg2rad, "Degrees to radians, element-wise")
+    // missing unwrap https://numpy.org/doc/stable/reference/generated/numpy.unwrap.html#numpy.unwrap
 
-    left.def("exp",
-             [](const af::array &a) {
-                 return af::exp(a);
-             },
-             py::arg("a").none(false),
-             "Exponential of input");
+//
+// Hyperbolic functions
+    UNARY_TEMPLATE_FN(sinh, af_sinh, "Hyperbolic sine, element-wise.")
+    UNARY_TEMPLATE_FN(cosh, af_cosh, "Hyperbolic cosine, element-wise.")
+    UNARY_TEMPLATE_FN(tanh, af_tanh, "Hyperbolic tangent element-wise.")
+    UNARY_TEMPLATE_FN(arcsinh, af_asinh, "Inverse hyperbolic sine, element-wise.")
+    UNARY_TEMPLATE_FN(arccosh, af_acosh, "Inverse hyperbolic cosine, element-wise.")
+    UNARY_TEMPLATE_FN(arctanh, af_atanh, "Inverse hyperbolic tangent, element-wise.")
 
-    left.def("expm1",
-             [](const af::array &a) {
-                 return af::expm1(a);
-             },
-             py::arg("a").none(false),
-             "Exponential of input - 1");
+//
+// Rounding
+//
+    UNARY_TEMPLATE_FN(trunc, af_trunc, "Return the truncated value of the input, element-wise.")
+    UNARY_TEMPLATE_FN(floor, af_floor, "Return the floor of the input, element-wise.")
+    UNARY_TEMPLATE_FN(ceil, af_ceil, "Return the ceiling of the input, element-wise.")
+    UNARY_TEMPLATE_FN(rint, af_round, "Round elements of the array to the nearest integer.")
+    UNARY_TEMPLATE_FN(fix, af_trunc, "Round to nearest integer towards zero.")
 
-    left.def("factorial",
-             [](const af::array &a) {
-                 return af::factorial(a);
-             },
-             py::arg("a").none(false),
-             "Factorial function");
+    m.def("round",
+          [](const py::object &array_like,
+             const int decimals,
+             const std::optional<af::dim4> &shape,
+             const std::optional<af::dtype> &dtype) {
 
-    left.def("lgamma",
-             [](const af::array &a) {
-                 return af::lgamma(a);
-             },
-             py::arg("a").none(false),
-             "Logarithm of absolute values of Gamma function");
+              std::optional<af::array> result = std::nullopt;
 
-    left.def("log",
-             [](const af::array &a) {
-                 return af::log(a);
-             },
-             py::arg("a").none(false),
-             "Natural logarithm");
+              auto arr = array_like::to_array(array_like, shape, dtype);
+              if (arr.has_value()) {
+                auto a = arr.value();
+                if (decimals == 0) {
+                    result = af::round(a);
+                }
+                else {
+                    auto scale = pow(10, decimals);
+                    result = af::round((a * scale) / scale);
+                }
+              }
+              return result;
+          },
+          py::arg("array_like").none(false),
+          py::arg("decimals") = 0,
+          py::kw_only(),
+          py::arg("shape") = std::nullopt,
+          py::arg("dtype") = std::nullopt,
+          "Evenly round to the given number of decimals.");
 
-    left.def("log10",
-             [](const af::array &a) {
-                 return af::log10(a);
-             },
-             py::arg("a").none(false),
-             "logarithm base 10");
+//
+// Sums, products, differences
+//
+//  prod        -> see algorithms
+//  sum         -> see algorithms
+//  nanprod     -> see algorithms
+//  nansum      -> see algorithms
+//  cumprod     -> see algorithms
+//  cumsum      -> see algorithms
+//  nancumprod  -> see algorithms
+//  nancumsum   -> see algorithms
+//  diff        -> see algorithms
+//  ediff1d     -> see algorithms
+//
+//  gradient    -> missing
+//  cross       -> missing
+//  trapz       -> missing
 
-    left.def("log1p",
-             [](const af::array &a) {
-                 return af::log1p(a);
-             },
-             py::arg("a").none(false),
-             "Natural logarithm of (1 + in)");
+//
+// Exponents and logarithms
+//
+// logaddexp    --> missing
+// logaddexp2   --> missing
 
-    left.def("sqrt",
-             [](const af::array &a) {
-                 return af::sqrt(a);
-             },
-             py::arg("a").none(false),
-             "Square Root");
 
-    left.def("rsqrt",
-             [](const af::array &a) {
-                 return af::rsqrt(a);
-             },
-             py::arg("a").none(false),
-             "The reciprocal or inverse square root of input arrays (1/sqrt(x))");
+    UNARY_TEMPLATE_FN(exp, af_exp, "Calculate the exponential of all elements in the input array")
+    UNARY_TEMPLATE_FN(expm1, af_expm1, "Calculate exp(x) - 1 for all elements in the array")
+    UNARY_TEMPLATE_FN(exp2, af_pow2, "Calculate 2**p for all p in the input array.")
+    UNARY_TEMPLATE_FN(log, af_log, "Natural logarithm")
+    UNARY_TEMPLATE_FN(log10, af_log10, "Logarithm base 10")
+    UNARY_TEMPLATE_FN(log2, af_log10, "Logarithm base 2")
+    UNARY_TEMPLATE_FN(log1p, af_log1p, "Natural logarithm of (1 + in)")
 
-    left.def("tgamma",
-             [](const af::array &a) {
-                 return af::tgamma(a);
-             },
-             py::arg("a").none(false),
-             "The gamma function");
 
-    left.def("arccosh",
-             [](const af::array &a) {
-                 return af::acosh(a);
-             },
-             py::arg("a").none(false),
-             "Inverse hyperbolic cosine");
+//
+// Other special functions
+//
+// i0x  --> missing
+// sinc --> missing
 
-    left.def("arcsinh",
-             [](const af::array &a) {
-                 return af::asinh(a);
-             },
-             py::arg("a").none(false),
-             "Inverse hyperbolic sine");
+//
+// Floating point routines
+//
+// copysign -> missing
+// frexp -> missing
+// ldexp -> missing
+// nextafter -> missing
+// spacing -> missing
 
-    left.def("arctanh",
-             [](const af::array &a) {
-                 return af::atanh(a);
-             },
-             py::arg("a").none(false),
-             "Inverse hyperbolic tangent");
+    UNARY_TEMPLATE_FN_LAMBDA(signbit, signbit, "Returns element-wise True where signbit is set (less than zero)")
 
-    left.def("cosh",
-             [](const af::array &a) {
-                 return af::cosh(a);
-             },
-             py::arg("a").none(false),
-             "Hyperbolic cosine");
+//
+// Rational routines
+//
+// lcm -> missing
+// gcd -> missing
 
-    left.def("sinh",
-             [](const af::array &a) {
-                 return af::sinh(a);
-             },
-             py::arg("a").none(false),
-             "Hyperbolic sine");
 
-    left.def("tanh",
-             [](const af::array &a) {
-                 return af::tanh(a);
-             },
-             py::arg("a").none(false),
-             "Hyperbolic tangent");
+//
+// Arithmetic operations
+//
+// float_power  --> missing
+// fmod         --> missing
+// modf         --> missing
+// divmod       --> missing
 
-    left.def("abs",
-             [](const af::array &a) {
-                 return af::abs(a);
-             },
-             py::arg("a").none(false),
-             "Absolute value");
+    BINARY_TEMPLATE_FN(add, af_add, "Add arguments element-wise ")
+    UNARY_TEMPLATE_FN_LAMBDA(reciprocal, reciprocal, "Returns the reciprocal of the argument (1/x), element wise")
+    UNARY_TEMPLATE_FN_LAMBDA(positive, positive, "Numerical positive, element-wise.")
+    UNARY_TEMPLATE_FN_LAMBDA(negative, negative, "Numerical negative, element-wise.")
+    BINARY_TEMPLATE_FN(multiply, af_mul, "Multiply arguments element-wise.")
+    BINARY_TEMPLATE_FN(divide, af_div, "Returns a true division of the inputs, element-wise.")
+    BINARY_TEMPLATE_FN(true_divide, af_div, "Returns a true division of the inputs, element-wise.")
+    BINARY_TEMPLATE_FN(power, af_pow, "First array elements raised to powers from second array, element-wise.")
+    BINARY_TEMPLATE_FN(substract, af_sub, "Subtract arguments, element-wise.")
+    BINARY_TEMPLATE_FN_LAMBDA(floor_divide, floor_divide, "Return the largest integer smaller or equal to the division of the inputs.")
+    BINARY_TEMPLATE_FN(mod, af_mod, "Return element-wise remainder of division.")
+    BINARY_TEMPLATE_FN(rem, af_rem, "Return element-wise remainder of division.")
 
-    left.def("arg",
-             [](const af::array &a) {
-                 return af::arg(a);
-             },
-             py::arg("a").none(false),
-             "Phase of a number in the complex plane");
+//
+// Handling complex numbers
+//
+//  angle --> missing
 
-    left.def("ceil",
-             [](const af::array &a) {
-                 return af::ceil(a);
-             },
-             py::arg("a").none(false),
-             "Round to integer greater than equal to current value");
+    UNARY_TEMPLATE_FN(real, af_real, "Extracts the real part of a complex array or matrix")
+    UNARY_TEMPLATE_FN(imag, af_imag, "Extracts the imaginary part of a complex array or matrix")
+    UNARY_TEMPLATE_FN(conj, af_conjg, "Gets the complex conjugate")
+    UNARY_TEMPLATE_FN(conjugate, af_conjg, "Gets the complex conjugate")
+    UNARY_TEMPLATE_FN(complex, af_cplx, "Builds a complex tensor from a real one.")
+    UNARY_TEMPLATE_FN(angle, af_arg, "Returns the angle in radians")
+    UNARY_TEMPLATE_FN_LAMBDA(angle_deg, angle_deg, "Returns the angle in degrees")
+    // this one is not in np
+    BINARY_TEMPLATE_FN(complex, af_cplx2, "Constructs a new complex array two independent sources")
 
-    left.def("floor",
-             [](const af::array &a) {
-                 return af::floor(a);
-             },
-             py::arg("a").none(false),
-             "Round to integer less than equal to current value");
 
-    left.def("round",
-             [](const af::array &a) {
-                 return af::round(a);
-             },
-             py::arg("a").none(false),
-             "Round to nearest integer");
+//
+// Miscellaneous
+//
+//  convolve --> see signal processing
+// clip
+// heavyside
+// real_if_close
 
-    left.def("sign",
-             [](const af::array &a) {
-                 return af::sign(a);
-             },
-             py::arg("a").none(false),
-             "Checks inputs are negative");
+    UNARY_TEMPLATE_FN(sqrt, af_sqrt, "Return the non-negative square-root of an array, element-wise.")
+    UNARY_TEMPLATE_FN(cbrt, af_cbrt, "Return the cube-root of an array, element-wise.")
+    UNARY_TEMPLATE_FN(square, af_pow2, "Return the element-wise square of the input.")
+    UNARY_TEMPLATE_FN(absolute, af_abs, "Calculate the absolute value element-wise.")
+    UNARY_TEMPLATE_FN(fabs, af_abs, "Calculate the absolute value element-wise.")
+    UNARY_TEMPLATE_FN(sign, af_sign, "Returns an element-wise indication of the sign of a number.")
 
-    left.def("trunc",
-             [](const af::array &a) {
-                 return af::trunc(a);
-             },
-             py::arg("a").none(false),
-             "Truncate float values.");
+    m.def("clip",
+          [](const py::object &array_like,
+             const py::object &lo,
+             const py::object &up,
+             const std::optional<af::dim4> &shape,
+             const std::optional<af::dtype> &dtype) {
 
-    left.def("arccos",
-             [](const af::array &a) {
-                 return af::acos(a);
-             },
-             py::arg("a").none(false),
-             "Inverse cosine");
+             auto a = array_like::to_array(array_like);
+             if (up.is_none() && lo.is_none())
+                 return a.value();
 
-    left.def("arcsin",
-             [](const af::array &a) {
-                 return af::asin(a);
-             },
-             py::arg("a").none(false),
-             "Inverse sine");
+             if (!up.is_none() && !lo.is_none()) {
+                 auto u = array_like::is_scalar(up) ?
+                         array_like::to_array(up, a->dims(), a->type()) :
+                         array_like::to_array(up);
 
-    left.def("arctan",
-             [](const af::array &a) {
-                 return af::atan(a);
-             },
-             py::arg("a").none(false),
-             "Inverse tangent");
-
-    left.def("cos",
-             [](const af::array &a) {
-                 return af::cos(a);
-             },
-             py::arg("a").none(false),
-             "Cosine fn");
-
-    left.def("sin",
-             [](const af::array &a) {
-                 return af::sin(a);
-             },
-             py::arg("a").none(false),
-             "Sine fn");
-
-    left.def("tan",
-             [](const af::array &a) {
-                 return af::tan(a);
-             },
-             py::arg("a").none(false),
-             "Tangent fn");
-
-    left.def("atan2",
-             [](const af::array &left, const std::variant<af::array, py::float_> &right) {
-                 return binary_arith(left, right, af_atan2);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Arc tan of the inputs.");
-
-    left.def("atan2",
-             [](const py::float_ &left, const af::array &right) {
-                 return binary_arith(left, right, af_atan2);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Arc tan of the inputs.");
-
-    left.def("hypot",
-             [](const af::array &left, const std::variant<af::array, py::float_> &right) {
-                 return binary_arith(left, right, af_hypot);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Hypotenuse of the two inputs.");
-
-    left.def("hypot",
-             [](const py::float_ &left, const af::array &right) {
-                 return binary_arith(left, right, af_hypot);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Hypotenuse of the two inputs.");
-
-    left.def("root",
-             [](const af::array &left, const std::variant<af::array, py::float_> &right) {
-                 return binary_arith(left, right, af_root);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "This function supports real inputs only. Complex inputs are not yet supported..");
-
-    left.def("root",
-             [](const py::float_ &left, const af::array &right) {
-                 return binary_arith(left, right, af_root);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "This function supports real inputs only. Complex inputs are not yet supported..");
-
-    left.def("complex",
-             [](const af::array &left, const std::variant<af::array, py::float_> &right) {
-                 return binary_arith(left, right, af_cplx2);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Constructs a new complex array two independent sources.");
-
-    left.def("complex",
-             [](const py::float_ &left, const af::array &right) {
-                 return binary_arith(left, right, af_cplx2);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Constructs a new complex array two independent sources.");
-
-    left.def("max_of",
-             [](const af::array &left, const std::variant<af::array, py::float_> &right) {
-                 return binary_arith(left, right, af_maxof);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Maximum of two inputs.");
-
-    left.def("max_of",
-             [](const py::float_ &left, const af::array &right) {
-                 return binary_arith(left, right, af_maxof);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Maximum of two inputs.");
-
-    left.def("min_of",
-             [](const af::array &left, const std::variant<af::array, py::float_> &right) {
-                 return binary_arith(left, right, af_minof);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Minimum of two inputs.");
-
-    left.def("min_of",
-             [](const py::float_ &left, const af::array &right) {
-                 return binary_arith(left, right, af_minof);
-             },
-             py::arg("left").none(false),
-             py::arg("right").none(false),
-             "Minimum of two inputs.");
-
-    left.def("clamp",
-             [](const af::array &a, const std::variant<af::array, py::float_> &lo,
-                const std::variant<af::array, py::float_> &up) {
-                 auto lo_a = lo.index() == 0 ?
-                             std::get<af::array>(lo).get() :
-                             constant_array(std::get<py::float_>(lo), a.dims());
-                 auto up_a = up.index() == 0 ?
-                             std::get<af::array>(up).get() :
-                             constant_array(std::get<py::float_>(up), a.dims());
+                 auto l = array_like::is_scalar(lo) ?
+                          array_like::to_array(lo, a->dims(), a->type()) :
+                          array_like::to_array(lo);
 
                  af_array out = nullptr;
-                 check_af_error(af_clamp(&out, a.get(), lo_a, up_a, GForStatus::get()));
+                 throw_on_error(af_clamp(&out, a->get(), l->get(), u->get(), GForStatus::get()));
                  return af::array(out);
-             },
-             py::arg("a").none(false),
-             py::arg("lo").none(false),
-             py::arg("up").none(false),
-             "Clamps the array between two values");
+             }
 
+             if (!up.is_none()) {
+                 auto u = array_like::is_scalar(up) ?
+                          array_like::to_array(up, a->dims(), a->type()) :
+                          array_like::to_array(up);
+
+                 af_array out = nullptr;
+                 throw_on_error(af_maxof(&out, a->get(), u->get(), GForStatus::get()));
+                 return af::array(out);
+             }
+
+              auto l = array_like::is_scalar(lo) ?
+                       array_like::to_array(lo, a->dims(), a->type()) :
+                       array_like::to_array(lo);
+
+              af_array out = nullptr;
+              throw_on_error(af_minof(&out, a->get(), l->get(), GForStatus::get()));
+              return af::array(out);
+          },
+          py::arg("array_like").none(false),
+          py::arg("lo") = py::none(),
+          py::arg("up") = py::none(),
+          py::kw_only(),
+          py::arg("shape") = std::nullopt,
+          py::arg("dtype") = std::nullopt,
+          "Clip (limit) the values in an array.");
+
+
+//
+// Additional Fns
+//
+
+    UNARY_TEMPLATE_FN(sigmoid, af_sigmoid, "Sigmoid function")
+    UNARY_TEMPLATE_FN(erf, af_erf, "Computes the error function value")
+    UNARY_TEMPLATE_FN(erfc, af_erfc, "Complementary Error function value")
+    UNARY_TEMPLATE_FN(rsqrt, af_rsqrt, "The reciprocal or inverse square root of input arrays (1/sqrt(x))")
+    UNARY_TEMPLATE_FN(factorial, af_factorial, "Factorial function")
+    UNARY_TEMPLATE_FN(tgamma, af_tgamma, "Gamma function")
+    UNARY_TEMPLATE_FN(lgamma, af_lgamma, "Logarithm of absolute values of Gamma function")
+    BINARY_TEMPLATE_FN(root, af_root, "Root function")
+
+
+//
+// Elementwise bit operations
+//
+
+
+    BINARY_TEMPLATE_FN(bitwise_and, af_bitand, "Element-wise bitwise and.")
+    BINARY_TEMPLATE_FN(bitwise_or, af_bitor, "Element-wise bitwise or")
+    BINARY_TEMPLATE_FN(bitwise_xor, af_bitxor, "Element-wise bitwise xor")
+    BINARY_TEMPLATE_FN(left_shift, af_bitshiftl, "Element-wise shift to the left")
+    BINARY_TEMPLATE_FN(right_shift, af_bitshiftr, "Element-wise shift to the right")
+//  Missing in my mac build
+//  UNARY_TEMPLATE_FN(invert, af_bitnot, "Compute bit-wise inversion, or bit-wise NOT, element-wise.")
 }

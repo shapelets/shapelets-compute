@@ -92,9 +92,13 @@ struct fmt::formatter<af_err> {
 };
 
 pybind11::dtype to_python(const af::dtype &value);
+
 std::optional<af::dim4> to_af_dim4(const pybind11::handle& src);
+
 af::dtype to_af_dtype(const pybind11::handle& src);
+
 int scalar_size(const af::dtype& dtype);
+
 af_array constant_array(const pybind11::object& src, const af::dim4 &shape, const std::optional<af::dtype> &type = std::nullopt);
 
 namespace pybind11::detail {

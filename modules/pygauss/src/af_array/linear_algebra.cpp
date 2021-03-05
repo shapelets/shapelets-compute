@@ -14,7 +14,7 @@ void linear_algebra_bindings(py::module &m) {
 
               if (a.iscomplex()) {
                   double real, img = 0.0;
-                  check_af_error(af_det(&real, &img, a.get()));
+                  throw_on_error(af_det(&real, &img, a.get()));
                   result = std::complex<double>(real, img);
               } else {
                   auto checked = a;
@@ -217,7 +217,7 @@ void linear_algebra_bindings(py::module &m) {
 
               auto lhs_options = conj_lhs ? af::matProp::AF_MAT_CONJ : af::matProp::AF_MAT_NONE;
               auto rhs_options = conj_rhs ? af::matProp::AF_MAT_CONJ : af::matProp::AF_MAT_NONE;
-              check_af_error(af_dot_all(&real, &imag, lhs.get(), rhs.get(), lhs_options, rhs_options));
+              throw_on_error(af_dot_all(&real, &imag, lhs.get(), rhs.get(), lhs_options, rhs_options));
               if (lhs.iscomplex() || rhs.iscomplex())
                   result = std::complex(real, imag);
               else
@@ -252,7 +252,7 @@ void linear_algebra_bindings(py::module &m) {
                   err = af_gemm(&out, a_options, b_options, &alpha_d, a.get(), b.get(), &beta_d);
               }
 
-              check_af_error(err);
+              throw_on_error(err);
 
               if (c.has_value())
                   return c.value();

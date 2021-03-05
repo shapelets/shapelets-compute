@@ -16,9 +16,9 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
 
     af_array out = nullptr;
     if (!reverse)
-        check_af_error((*fn)(&out, self.get(), rhs.get(), GForStatus::get()));
+        throw_on_error((*fn)(&out, self.get(), rhs.get(), GForStatus::get()));
     else
-        check_af_error((*fn)(&out, rhs.get(), self.get(), GForStatus::get()));
+        throw_on_error((*fn)(&out, rhs.get(), self.get(), GForStatus::get()));
 
     return af::array(out);
 }
@@ -33,8 +33,8 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
                    py::arg("other").none(false));                                                       \
 
 
-#define BINARY_OPR(OP, PYTHONFN)                                                                        \
-    ka.def(#PYTHONFN,                                                                                   \
+#define BINARY_OPR(OP, PYTHON_FN)                                                                        \
+    ka.def(#PYTHON_FN,                                                                                   \
                    [](const af::array &self, const py::object &other){                                  \
                        spd::debug("Binary reverse operation {}", #OP);                                  \
                        return binary_function(self, other, true, OP);                                   \
@@ -61,24 +61,8 @@ void array_obj_bindings(py::module &m) {
 
     ka.def_buffer(&af_buffer_protocol);
 
-//    ka.def("__array__",
-//           [](const af::array &self){
-//               return py::memoryview(af_buffer_protocol(self));
-//           });
-
-//    ka.def("interpret_slice",
-//           [](const af::array &self, const py::slice& slice){
-//               auto [start, end, step] = interpret_slice(slice);
-//               py::tuple result(3);
-//               result[0] = start;
-//               result[1] = end;
-//               result[2] = step;
-//               return result;
-//           },
-//           py::arg("slice").none(false));
-
     ka.def("same_as",
-           [](const af::array &self, const py::object &arr_like, const py::float_ eps) {
+           [](const af::array &self, const py::object &arr_like, const py::float_ &eps) {
 
                auto other = py::isinstance<af::array>(arr_like) ?
                             py::cast<af::array>(arr_like) :
@@ -95,7 +79,7 @@ void array_obj_bindings(py::module &m) {
                auto non_nan_other = other.copy();
 
                non_nan_self(af::where(af::isNaN(self))) = 0.0;
-               non_nan_other(af::where(af::isNaN(other))) = 0.0;
+               non_nan_other(af::where(af::isNaN(typed))) = 0.0;
 
                return af::allTrue<bool>(af::abs(non_nan_self - non_nan_other) < (double) eps);
            },
@@ -111,8 +95,8 @@ void array_obj_bindings(py::module &m) {
            [](const af::array &self, const py::object &selector) {
                af_array out = nullptr;
                auto[res_dim, index_dim, index] = build_index(selector, self.dims());
-               check_af_error(af_index_gen(&out, self.get(), res_dim, index));
-               check_af_error(af_release_indexers(index));
+               throw_on_error(af_index_gen(&out, self.get(), res_dim, index));
+               throw_on_error(af_release_indexers(index));
                return af::array(out);
            },
            py::arg("selector").none(false),
@@ -128,32 +112,32 @@ void array_obj_bindings(py::module &m) {
                    spd::debug("Set Operation: Value is array");
                    rhs = py::cast<af::array>(value);
                    if (rhs.dims() != index_dim) {
-                       spd::debug("Set Operation: Value has different dimensions {} as implied by selector {}", rhs.dims(), index_dim);
+                       spd::debug("Set Operation: Value has different dimensions {} as implied by selector {}",
+                                  rhs.dims(), index_dim);
                        if (index_dim.elements() != rhs.elements()) {
                            std::ostringstream msg;
                            msg << "Not the same dimensions: expected " << index_dim << " vs given " << rhs.dims();
                            throw std::runtime_error(msg.str());
-                       }
-                       else {
+                       } else {
                            spd::debug("Set Operation: Since the number of elements is the same, adjusting dimensions");
                            rhs = af::moddims(rhs, index_dim.ndims(), index_dim.get());
                        }
                    }
 
                    if (self.type() != rhs.type()) {
-                       spd::debug("Set Operation: Changing the type of the value array from {} to {}", rhs.type(), self.type());
+                       spd::debug("Set Operation: Changing the type of the value array from {} to {}", rhs.type(),
+                                  self.type());
                        rhs = rhs.as(self.type());
                    }
-               }
-               else {
-                   spd::debug("Set Operation: Creating constant array with dimensions {}",index_dim);
+               } else {
+                   spd::debug("Set Operation: Creating constant array with dimensions {}", index_dim);
                    rhs = af::array(constant_array(value, index_dim, self.type()));
                }
 
                af_array out = nullptr;
                auto err = af_assign_gen(&out, self.get(), self.numdims(), index, rhs.get());
-               check_af_error(af_release_indexers(index));
-               check_af_error(err);
+               throw_on_error(af_release_indexers(index));
+               throw_on_error(err);
                self = af::array(out);
                return self;
            },
@@ -173,7 +157,7 @@ void array_obj_bindings(py::module &m) {
     ka.def_property_readonly("backend",
                              [](const af::array &self) {
                                  af_backend result;
-                                 check_af_error(af_get_backend_id(&result, self.get()));
+                                 throw_on_error(af_get_backend_id(&result, self.get()));
                                  return static_cast<af::Backend>(result);
                              });
 
@@ -185,6 +169,16 @@ void array_obj_bindings(py::module &m) {
     ka.def_property_readonly("is_row",
                              [](const af::array &self) {
                                  return self.isrow();
+                             });
+
+    ka.def_property_readonly("is_vector",
+                             [](const af::array &self) {
+                                 return self.isvector();
+                             });
+
+    ka.def_property_readonly("is_single",
+                             [](const af::array &self) {
+                                 return self.issingle();
                              });
 
     ka.def_property_readonly("shape",
@@ -249,6 +243,32 @@ void array_obj_bindings(py::module &m) {
            py::arg("precision") = 4,
            py::arg("transpose") = true);
 
+    ka.def("__matmul__",
+           [](const af::array &self, const py::object &other) {
+               af::array rhs = py::isinstance<af::array>(other) ? py::cast<af::array>(other) :
+                               py::isinstance<ParallelFor>(other) ? (af::array) (py::cast<ParallelFor>(other)) :
+                               af::array(constant_array(other, self.dims()));
+
+               af_array out = nullptr;
+               throw_on_error(af_matmul(&out, self.get(), rhs.get(), AF_MAT_NONE, AF_MAT_NONE));
+               return af::array(out);
+           },
+           py::arg("other").none(false),
+           "Matrix multiplication");
+
+    ka.def("__rmatmul__",
+           [](const af::array &self, const py::object &other) {
+               af::array rhs = py::isinstance<af::array>(other) ? py::cast<af::array>(other) :
+                               py::isinstance<ParallelFor>(other) ? (af::array) (py::cast<ParallelFor>(other)) :
+                               af::array(constant_array(other, self.dims()));
+
+               af_array out = nullptr;
+               throw_on_error(af_matmul(&out, rhs.get(), self.get(), AF_MAT_NONE, AF_MAT_NONE));
+               return af::array(out);
+           },
+           py::arg("other").none(false),
+           "Matrix multiplication");
+
     BINARY_OP(af_add, __add__)
     BINARY_OPR(af_add, __radd__)
     BINARY_IOP(af_add, __iadd__)
@@ -292,7 +312,6 @@ void array_obj_bindings(py::module &m) {
     BINARY_OPR(af_bitxor, __rxor__)
     BINARY_IOP(af_bitxor, __ixor__)
 
-
     BINARY_OP(af_bitshiftl, __lshift__)
     BINARY_OPR(af_bitshiftl, __rlshift__)
     BINARY_IOP(af_bitshiftl, __ilshift__)
@@ -318,7 +337,7 @@ void array_obj_bindings(py::module &m) {
                       lst.push_back(py::cast<af::array>(obj).get());
               }
               if (!lst.empty()) {
-                  check_af_error(af_eval_multiple(lst.size(), lst.data()));
+                  throw_on_error(af_eval_multiple(lst.size(), lst.data()));
               }
           },
           "Forces the evaluation of all the arrays");

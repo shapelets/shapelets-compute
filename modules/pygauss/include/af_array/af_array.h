@@ -1,6 +1,7 @@
 #ifndef AF_ARRAY__H
 #define AF_ARRAY__H
 
+#include "templates.h"
 #include "array_obj.h"
 #include "index_slicing.h"
 #include "errors.h"
@@ -19,6 +20,8 @@
 #include "statistics.h"
 #include "device.h"
 #include "signal_processing.h"
+#include "array_like.h"
+#include "logic.h"
 
 void af_array_bindings(py::module &m);
 

@@ -41,9 +41,11 @@ void af_array_bindings(py::module_ &m) {
     extract_transform_bindings(m);
     linear_algebra_bindings(m);
     complex_bindings(m);
+    logic_bindings(m);
     math_bindings(m);
     statistic_bindings(m);
     algorithm_bindings(m);
     batch_bindings(m);
     signal_processing_bindings(m);
+
 }

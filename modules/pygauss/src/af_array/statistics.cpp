@@ -31,7 +31,7 @@ void statistic_bindings(py::module &m) {
               if (a.iscomplex() || b.iscomplex()) {
                   double real;
                   double imag;
-                  check_af_error(af_corrcoef(&real, &imag, a.get(), b.get()));
+                  throw_on_error(af_corrcoef(&real, &imag, a.get(), b.get()));
                   result = std::complex<double>(real, imag);
               } else {
                   result = af::corrcoef<double>(a, b);
@@ -87,7 +87,7 @@ void statistic_bindings(py::module &m) {
                   else
                       err = af_mean_all(&real, &imag, a.get());
 
-                  check_af_error(err);
+                  throw_on_error(err);
 
                   if (a.iscomplex())
                       result = std::complex<double>(real, imag);
@@ -121,7 +121,7 @@ void statistic_bindings(py::module &m) {
 
               if (isAggregated) {
                   double real, imag;
-                  check_af_error(af_median_all(&real, &imag, a.get()));
+                  throw_on_error(af_median_all(&real, &imag, a.get()));
 
                   if (a.iscomplex())
                       result = std::complex<double>(real, imag);
@@ -150,7 +150,7 @@ void statistic_bindings(py::module &m) {
 
               if (isAggregated) {
                   double real, imag;
-                  check_af_error(af_stdev_all(&real, &imag, a.get()));
+                  throw_on_error(af_stdev_all(&real, &imag, a.get()));
 
                   if (a.iscomplex())
                       result = std::complex<double>(real, imag);
@@ -181,7 +181,7 @@ void statistic_bindings(py::module &m) {
                   else
                       err = af_var_all(&real, &imag, a.get(), false);
 
-                  check_af_error(err);
+                  throw_on_error(err);
 
                   if (a.iscomplex())
                       result = std::complex<double>(real, imag);
@@ -214,7 +214,7 @@ void statistic_bindings(py::module &m) {
                   else
                       err = af_var_all(&real, &imag, a.get(), true);
 
-                  check_af_error(err);
+                  throw_on_error(err);
 
                   if (a.iscomplex())
                       result = std::complex<double>(real, imag);

@@ -105,7 +105,7 @@ void extract_transform_bindings(py::module &m) {
           "It modifies the order of data within an array by exchanging data according to the change "
           "in dimensionality. The linear ordering of data within the array is preserved.");
 
-    m.def("replace",
+    m.def("where",
           [](af::array &a, const af::array &keeping_cond, const std::variant<py::float_, af::array> &b) {
               auto result = a.copy();
               if (auto pinfo = std::get_if<py::float_>(&b))
@@ -120,7 +120,7 @@ void extract_transform_bindings(py::module &m) {
           "Replace elements of an array based on a conditional array.  The elements kept will be those"
           "matching the condition (this could be a little bit counterintuitive.");
 
-    m.def("replaceInPlace",
+    m.def("whereInPlace",
           [](af::array &a, const af::array &keeping_cond, const std::variant<py::float_, af::array> &b) {
               if (auto pinfo = std::get_if<py::float_>(&b))
                   af::replace(a, keeping_cond, (double) (*pinfo));
