@@ -159,6 +159,7 @@ set(GAUSSLIB_SOURCES ${GAUSSLIB_SRC}/clustering.cpp
                      ${GAUSSLIB_SRC}/matrixInternal.cpp
                      ${GAUSSLIB_SRC}/normalization.cpp
                      ${GAUSSLIB_SRC}/polynomial.cpp
+                     ${GAUSSLIB_SRC}/random.cpp
                      ${GAUSSLIB_SRC}/regression.cpp
                      ${GAUSSLIB_SRC}/regularization.cpp
                      ${GAUSSLIB_SRC}/statistics.cpp
@@ -215,4 +216,3 @@ set_target_properties(gauss
         CXX_VISIBILITY_PRESET "hidden"
         INTERFACE_INCLUDE_DIRECTORIES "${GAUSSLIB_INC}"
         PUBLIC_HEADER "${GAUSSLIB_INC}/gauss.h")
-

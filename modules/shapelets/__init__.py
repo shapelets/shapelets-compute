@@ -14,5 +14,6 @@ if __SHAPELETS_SETUP__:
     stderr.write("Running from source directory.\n")
 else:
     # Normal initialization here
+    from .compute import *
     pass
 del stderr

@@ -2,7 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <spdlog/spdlog.h>
-#include <af_array/af_array.h>
+#include <pygauss.h>
 
 namespace spd = spdlog;
 namespace py = pybind11;
@@ -36,7 +36,7 @@ af::array angle_deg(const af::array &in) {
 }
 
 
-af::array floor_divide(const af::array& left, const af::array& right, bool broadcast) {
+af::array floor_divide(const af::array &left, const af::array &right, bool broadcast) {
     auto previous = af::gforGet();
     if (!previous && broadcast)
         af::gforSet(true);
@@ -47,7 +47,7 @@ af::array floor_divide(const af::array& left, const af::array& right, bool broad
 }
 
 
-void math_bindings(py::module &m) {
+void pygauss::bindings::math_operations(py::module_ &m) {
 
 //
 // Trigonometric Functions
@@ -92,16 +92,15 @@ void math_bindings(py::module &m) {
 
               std::optional<af::array> result = std::nullopt;
 
-              auto arr = array_like::to_array(array_like, shape, dtype);
+              auto arr = pygauss::arraylike::try_cast(array_like, shape, dtype);
               if (arr.has_value()) {
-                auto a = arr.value();
-                if (decimals == 0) {
-                    result = af::round(a);
-                }
-                else {
-                    auto scale = pow(10, decimals);
-                    result = af::round((a * scale) / scale);
-                }
+                  auto a = arr.value();
+                  if (decimals == 0) {
+                      result = af::round(a);
+                  } else {
+                      auto scale = pow(10, decimals);
+                      result = af::round((a * scale) / scale);
+                  }
               }
               return result;
           },
@@ -187,7 +186,8 @@ void math_bindings(py::module &m) {
     BINARY_TEMPLATE_FN(true_divide, af_div, "Returns a true division of the inputs, element-wise.")
     BINARY_TEMPLATE_FN(power, af_pow, "First array elements raised to powers from second array, element-wise.")
     BINARY_TEMPLATE_FN(substract, af_sub, "Subtract arguments, element-wise.")
-    BINARY_TEMPLATE_FN_LAMBDA(floor_divide, floor_divide, "Return the largest integer smaller or equal to the division of the inputs.")
+    BINARY_TEMPLATE_FN_LAMBDA(floor_divide, floor_divide,
+                              "Return the largest integer smaller or equal to the division of the inputs.")
     BINARY_TEMPLATE_FN(mod, af_mod, "Return element-wise remainder of division.")
     BINARY_TEMPLATE_FN(rem, af_rem, "Return element-wise remainder of division.")
 
@@ -229,37 +229,37 @@ void math_bindings(py::module &m) {
              const std::optional<af::dim4> &shape,
              const std::optional<af::dtype> &dtype) {
 
-             auto a = array_like::to_array(array_like);
-             if (up.is_none() && lo.is_none())
-                 return a.value();
+              auto a = pygauss::arraylike::try_cast(array_like);
+              if (up.is_none() && lo.is_none())
+                  return a.value();
 
-             if (!up.is_none() && !lo.is_none()) {
-                 auto u = array_like::is_scalar(up) ?
-                         array_like::to_array(up, a->dims(), a->type()) :
-                         array_like::to_array(up);
+              if (!up.is_none() && !lo.is_none()) {
+                  auto u = pygauss::arraylike::is_scalar(up) ?
+                           pygauss::arraylike::try_cast(up, a->dims(), a->type()) :
+                           pygauss::arraylike::try_cast(up);
 
-                 auto l = array_like::is_scalar(lo) ?
-                          array_like::to_array(lo, a->dims(), a->type()) :
-                          array_like::to_array(lo);
+                  auto l = pygauss::arraylike::is_scalar(lo) ?
+                           pygauss::arraylike::try_cast(lo, a->dims(), a->type()) :
+                           pygauss::arraylike::try_cast(lo);
 
-                 af_array out = nullptr;
-                 throw_on_error(af_clamp(&out, a->get(), l->get(), u->get(), GForStatus::get()));
-                 return af::array(out);
-             }
+                  af_array out = nullptr;
+                  throw_on_error(af_clamp(&out, a->get(), l->get(), u->get(), GForStatus::get()));
+                  return af::array(out);
+              }
 
-             if (!up.is_none()) {
-                 auto u = array_like::is_scalar(up) ?
-                          array_like::to_array(up, a->dims(), a->type()) :
-                          array_like::to_array(up);
+              if (!up.is_none()) {
+                  auto u = pygauss::arraylike::is_scalar(up) ?
+                           pygauss::arraylike::try_cast(up, a->dims(), a->type()) :
+                           pygauss::arraylike::try_cast(up);
 
-                 af_array out = nullptr;
-                 throw_on_error(af_maxof(&out, a->get(), u->get(), GForStatus::get()));
-                 return af::array(out);
-             }
+                  af_array out = nullptr;
+                  throw_on_error(af_maxof(&out, a->get(), u->get(), GForStatus::get()));
+                  return af::array(out);
+              }
 
-              auto l = array_like::is_scalar(lo) ?
-                       array_like::to_array(lo, a->dims(), a->type()) :
-                       array_like::to_array(lo);
+              auto l = pygauss::arraylike::is_scalar(lo) ?
+                       pygauss::arraylike::try_cast(lo, a->dims(), a->type()) :
+                       pygauss::arraylike::try_cast(lo);
 
               af_array out = nullptr;
               throw_on_error(af_minof(&out, a->get(), l->get(), GForStatus::get()));

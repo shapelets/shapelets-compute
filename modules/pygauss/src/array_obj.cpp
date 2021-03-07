@@ -2,23 +2,22 @@
 #include <spdlog/spdlog.h>
 #include <pybind11/pybind11.h>
 
-#include <af_array/af_array.h>
+#include <pygauss.h>
 
 namespace py = pybind11;
 namespace spd = spdlog;
 
 typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs, const bool batch);
 
+
 af::array binary_function(const af::array &self, const py::object &other, bool reverse, binaryFn fn) {
-    af::array rhs = py::isinstance<af::array>(other) ? py::cast<af::array>(other) :
-                    py::isinstance<ParallelFor>(other) ? (af::array)(py::cast<ParallelFor>(other)) :
-                    af::array(constant_array(other, self.dims()));
+    af::array rhs = pygauss::arraylike::cast(other, self.dims(), self.type());
 
     af_array out = nullptr;
     if (!reverse)
-        throw_on_error((*fn)(&out, self.get(), rhs.get(), GForStatus::get()));
+        pygauss::throw_on_error((*fn)(&out, self.get(), rhs.get(), pygauss::GForStatus::get()));
     else
-        throw_on_error((*fn)(&out, rhs.get(), self.get(), GForStatus::get()));
+        pygauss::throw_on_error((*fn)(&out, rhs.get(), self.get(), pygauss::GForStatus::get()));
 
     return af::array(out);
 }
@@ -55,18 +54,16 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
 
 int array_priority = 30;
 
-void array_obj_bindings(py::module &m) {
+void pygauss::bindings::array_obj(py::module &m) {
 
     py::class_<af::array> ka(m, "ShapeletsArray", py::buffer_protocol());
 
-    ka.def_buffer(&af_buffer_protocol);
+    ka.def_buffer(&pygauss::arraylike::buffer_protocol);
 
     ka.def("same_as",
            [](const af::array &self, const py::object &arr_like, const py::float_ &eps) {
 
-               auto other = py::isinstance<af::array>(arr_like) ?
-                            py::cast<af::array>(arr_like) :
-                            af_from_array_like(arr_like, std::nullopt, self.type());
+               auto other = pygauss::arraylike::cast(arr_like, std::nullopt, self.type());
 
                if (self.dims() != other.dims())
                    return false;
@@ -94,7 +91,7 @@ void array_obj_bindings(py::module &m) {
     ka.def("__getitem__",
            [](const af::array &self, const py::object &selector) {
                af_array out = nullptr;
-               auto[res_dim, index_dim, index] = build_index(selector, self.dims());
+               auto[res_dim, index_dim, index] = pygauss::arraylike::build_index(selector, self.dims());
                throw_on_error(af_index_gen(&out, self.get(), res_dim, index));
                throw_on_error(af_release_indexers(index));
                return af::array(out);
@@ -105,33 +102,34 @@ void array_obj_bindings(py::module &m) {
     ka.def("__setitem__",
            [](af::array &self, const py::object &selector, const py::object &value) {
 
-               auto[res_dim, index_dim, index] = build_index(selector, self.dims());
+               auto[res_dim, index_dim, index] = pygauss::arraylike::build_index(selector, self.dims());
                af::array rhs;
 
-               if (py::isinstance<af::array>(value)) {
-                   spd::debug("Set Operation: Value is array");
-                   rhs = py::cast<af::array>(value);
-                   if (rhs.dims() != index_dim) {
-                       spd::debug("Set Operation: Value has different dimensions {} as implied by selector {}",
-                                  rhs.dims(), index_dim);
-                       if (index_dim.elements() != rhs.elements()) {
-                           std::ostringstream msg;
-                           msg << "Not the same dimensions: expected " << index_dim << " vs given " << rhs.dims();
-                           throw std::runtime_error(msg.str());
-                       } else {
-                           spd::debug("Set Operation: Since the number of elements is the same, adjusting dimensions");
-                           rhs = af::moddims(rhs, index_dim.ndims(), index_dim.get());
-                       }
-                   }
-
-                   if (self.type() != rhs.type()) {
-                       spd::debug("Set Operation: Changing the type of the value array from {} to {}", rhs.type(),
-                                  self.type());
-                       rhs = rhs.as(self.type());
-                   }
-               } else {
+               if (arraylike::is_scalar(value)) {
                    spd::debug("Set Operation: Creating constant array with dimensions {}", index_dim);
-                   rhs = af::array(constant_array(value, index_dim, self.type()));
+                   rhs = arraylike::cast(value, index_dim, self.type());
+               } else {
+                   spd::debug("Set Operation: Value is array");
+                   rhs = arraylike::cast(value);
+
+//                   if (rhs.dims() != index_dim) {
+//                       spd::debug("Set Operation: Value has different dimensions {} as implied by selector {}",
+//                                  rhs.dims(), index_dim);
+//                       if (index_dim.elements() != rhs.elements()) {
+//                           std::ostringstream msg;
+//                           msg << "Not the same dimensions: expected " << index_dim << " vs given " << rhs.dims();
+//                           throw std::runtime_error(msg.str());
+//                       } else {
+//                           spd::debug("Set Operation: Since the number of elements is the same, adjusting dimensions");
+//                           rhs = af::moddims(rhs, index_dim.ndims(), index_dim.get());
+//                       }
+//                   }
+//
+//                   if (self.type() != rhs.type()) {
+//                       spd::debug("Set Operation: Changing the type of the value array from {} to {}", rhs.type(),
+//                                  self.type());
+//                       rhs = rhs.as(self.type());
+//                   }
                }
 
                af_array out = nullptr;
@@ -150,9 +148,9 @@ void array_obj_bindings(py::module &m) {
            }, "Shallow copy");
 
     ka.def("__deepcopy__",
-           [](const af::array &self) {
+           [](const af::array &self, const py::object& memo) {
                return self.copy();
-           }, "Deep copy");
+           }, py::arg("memo"), "Deep copy");
 
     ka.def_property_readonly("backend",
                              [](const af::array &self) {
@@ -199,7 +197,7 @@ void array_obj_bindings(py::module &m) {
 
     ka.def_property_readonly("itemsize",
                              [](const af::array &self) {
-                                 return scalar_size(self.type());
+                                 return arraylike::scalar_size(self.type());
                              }, "Returns the size in bytes of each individual item held by this array");
 
     ka.def_property_readonly("dtype",
@@ -245,9 +243,7 @@ void array_obj_bindings(py::module &m) {
 
     ka.def("__matmul__",
            [](const af::array &self, const py::object &other) {
-               af::array rhs = py::isinstance<af::array>(other) ? py::cast<af::array>(other) :
-                               py::isinstance<ParallelFor>(other) ? (af::array) (py::cast<ParallelFor>(other)) :
-                               af::array(constant_array(other, self.dims()));
+               af::array rhs = pygauss::arraylike::cast(other);
 
                af_array out = nullptr;
                throw_on_error(af_matmul(&out, self.get(), rhs.get(), AF_MAT_NONE, AF_MAT_NONE));
@@ -258,9 +254,7 @@ void array_obj_bindings(py::module &m) {
 
     ka.def("__rmatmul__",
            [](const af::array &self, const py::object &other) {
-               af::array rhs = py::isinstance<af::array>(other) ? py::cast<af::array>(other) :
-                               py::isinstance<ParallelFor>(other) ? (af::array) (py::cast<ParallelFor>(other)) :
-                               af::array(constant_array(other, self.dims()));
+               af::array rhs = pygauss::arraylike::cast(other);
 
                af_array out = nullptr;
                throw_on_error(af_matmul(&out, rhs.get(), self.get(), AF_MAT_NONE, AF_MAT_NONE));
@@ -321,10 +315,10 @@ void array_obj_bindings(py::module &m) {
     BINARY_IOP(af_bitshiftr, __irshift__)
 
     ka.def("__neg__",
-           [](const af::array &self, const py::object &other) {
+           [](const af::array &self) {
                auto zero = py::float_(0.0);
                return binary_function(self, zero, true, af_sub);
-           }, py::arg("other").none(false));
+           });
 
     m.def("eval",
           [](const py::args &args) {

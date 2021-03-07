@@ -1,7 +1,7 @@
 #include <arrayfire.h>
 #include <pybind11/pybind11.h>
 
-#include <af_array/af_array.h>
+#include <pygauss.h>
 
 namespace py = pybind11;
 
@@ -10,7 +10,7 @@ namespace py = pybind11;
  *
  * @param m
  */
-void enum_bindings(py::module &m) {
+void pygauss::bindings::shared_enum_types(py::module &m) {
 
     py::enum_<af::binaryOp>(m, "ScanOp", "Scan binary operations")
             .value("Add", af::binaryOp::AF_BINARY_ADD, "")
@@ -62,7 +62,7 @@ void enum_bindings(py::module &m) {
 
     py::enum_<af::borderType>(m, "BorderType", "Border type")
             .value("Zero", af::borderType::AF_PAD_ZERO, "Values are 0")
-            .value("Symmetric", af::borderType ::AF_PAD_SYM, "Values are symmetric over the edge.")
+            .value("Symmetric", af::borderType::AF_PAD_SYM, "Values are symmetric over the edge.")
             .value("ClampEdge", af::borderType::AF_PAD_CLAMP_TO_EDGE, "Values are clamped to the edge.")
             .value("Periodic", af::borderType::AF_PAD_PERIODIC,
                    "Values are mapped to range of the dimension in cyclic fashion.")

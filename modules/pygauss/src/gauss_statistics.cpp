@@ -6,8 +6,7 @@
 #include <utility>
 
 namespace py = pybind11;
-namespace gmatrix = gauss::matrix;
 
-void gauss_statistic_bindings(py::module &m) {
+void pygauss::bindings::gauss_statistic_bindings(py::module &m) {
 
 }

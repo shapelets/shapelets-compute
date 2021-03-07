@@ -3,11 +3,12 @@
 #include <pybind11/stl.h>
 #include <pybind11/iostream.h>
 
-#include <af_array/af_array.h>
+#include <pygauss.h>
 
 namespace py = pybind11;
 
-void statistic_bindings(py::module &m) {
+
+void pygauss::bindings::statistic_functions(py::module &m) {
 
     m.def("covs",
           [](const af::array &a, const af::array &b) {

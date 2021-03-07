@@ -1,13 +1,12 @@
 #include <arrayfire.h>
 #include <spdlog/spdlog.h>
 #include <pybind11/pybind11.h>
-#include "af_array/af_array.h"
-#include "array_like.h"
+#include "pygauss.h"
 
 namespace spd = spdlog;
 namespace py = pybind11;
 
-namespace array_like::detail {
+namespace pygauss::arraylike::detail {
 
     bool is_af_array(const py::object &value) {
         return py::isinstance<af::array>(value) || py::isinstance<ParallelFor>(value);

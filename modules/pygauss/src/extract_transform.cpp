@@ -2,26 +2,17 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <af_array/af_array.h>
+#include <pygauss.h>
 
 namespace py = pybind11;
 
 
-void extract_transform_bindings(py::module &m) {
+void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
-    m.def("diag",
-          [](const af::array &a, int index = 0, bool extract = false) {
-              return af::diag(a, index, extract);
-          },
-          py::arg("a").none(false),
-          py::arg("index") = 0,
-          py::arg("extract") = 0,
-          "Operates with diagonals\n"
-          "Using extract parameter one is able to either create a diagonal matrix from a vector (false) or "
-          "extract a diagonal from a matrix to a vector (true)");
+
 
     m.def("pad",
-          [](const af::array &a, const af::dim4& begin, const af::dim4& end, const af::borderType fill_type){
+          [](const af::array &a, const af::dim4 &begin, const af::dim4 &end, const af::borderType fill_type) {
               return af::pad(a, begin, end, fill_type);
           },
           py::arg("a").none(false),

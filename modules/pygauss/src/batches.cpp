@@ -1,14 +1,14 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "af_array/af_array.h"
+#include "pygauss.h"
 
 namespace py = pybind11;
 
-typedef struct scoped_batch {
+typedef struct {
 } scoped_batch;
 
-void batch_bindings(py::module &m) {
+void pygauss::bindings::batch_api(py::module &m) {
     py::class_<ParallelFor> pf(m, "ParallelFor");
 
     pf.def("__iter__",
@@ -40,7 +40,7 @@ void batch_bindings(py::module &m) {
     m.def("batch", []() { return scoped_batch{}; });
 
     m.def("batch", [](const py::function &usrFn) {
-        auto block = gfor_adquire();
+        auto block = gfor_acquire();
         return usrFn();
     });
 
@@ -50,8 +50,9 @@ void batch_bindings(py::module &m) {
                   return ParallelFor((ssize_t) *p);
               }
 
-              auto p = std::get<py::slice>(arg);
-              return ParallelFor(p);
+              auto ps = std::get<py::slice>(arg);
+              auto s = pygauss::Slice::from_python(ps);
+              return pygauss::ParallelFor(s);
           },
           py::arg("arg").none(false));
 

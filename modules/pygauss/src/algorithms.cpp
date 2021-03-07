@@ -2,7 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <af_array/af_array.h>
+#include <pygauss.h>
 
 namespace py = pybind11;
 
@@ -16,54 +16,42 @@ typedef af_err (*reduce_dim_nan_op)(af_array *, af_array, const int, const doubl
 
 std::complex<double> reduce_all_complex(const af::array &a, const reduce_all_op op) {
     double real, imag;
-    throw_on_error((*op)(&real, &imag, a.get()));
+    pygauss::throw_on_error((*op)(&real, &imag, a.get()));
     return std::complex<double>(real, imag);
 }
 
 std::complex<double> reduce_all_complex_nan(const af::array &a, const double nan, const reduce_all_nan_op op) {
     double real, imag;
-    throw_on_error((*op)(&real, &imag, a.get(), nan));
+    pygauss::throw_on_error((*op)(&real, &imag, a.get(), nan));
     return std::complex<double>(real, imag);
 }
 
 
 double reduce_all_real(const af::array &a, const reduce_all_op op) {
     double real, imag;
-    throw_on_error((*op)(&real, &imag, a.get()));
+    pygauss::throw_on_error((*op)(&real, &imag, a.get()));
     return real;
 }
 
 double reduce_all_real_nan(const af::array &a, const double nan, const reduce_all_nan_op op) {
     double real, imag;
-    throw_on_error((*op)(&real, &imag, a.get(), nan));
+    pygauss::throw_on_error((*op)(&real, &imag, a.get(), nan));
     return real;
 }
 
 af::array reduce_dim(const af::array &a, const int dim, const reduce_dim_op op) {
     af_array result = nullptr;
-    throw_on_error((*op)(&result, a.get(), dim));
+    pygauss::throw_on_error((*op)(&result, a.get(), dim));
     return af::array(result);
 }
 
 af::array reduce_dim_nan(const af::array &a, const int dim, double nan, const reduce_dim_nan_op op) {
     af_array result = nullptr;
-    throw_on_error((*op)(&result, a.get(), dim, nan));
+    pygauss::throw_on_error((*op)(&result, a.get(), dim, nan));
     return af::array(result);
 }
 
-af::array to_array(const py::object& array_like) {
-    auto a = array_like::to_array(array_like);
-    if (!a.has_value()) {
-        std::ostringstream stm;
-        stm << "Unable to process " << py::repr(array_like) << "as a valid tensor.";
-        auto err_msg = stm.str();
-        spd::error(err_msg);
-        throw std::runtime_error(err_msg);
-    }
-    return a.value();
-}
-
-af::array minof_no_nan(af::array& a, af::array& b, bool broadcast) {
+af::array minof_no_nan(af::array &a, af::array &b, bool broadcast) {
     // choose a sensible max value to replace the nans
     double max = std::numeric_limits<float>::max();
     if (a.isdouble())
@@ -75,11 +63,11 @@ af::array minof_no_nan(af::array& a, af::array& b, bool broadcast) {
     af::replace(a, !af::isNaN(a), max);
     af::replace(b, !af::isNaN(b), max);
     af_array out = nullptr;
-    throw_on_error(af_minof(&out, a.get(), b.get(), broadcast));
+    pygauss::throw_on_error(af_minof(&out, a.get(), b.get(), broadcast));
     return af::array(out);
 }
 
-af::array maxof_no_nan(af::array& a, af::array& b, bool broadcast) {
+af::array maxof_no_nan(af::array &a, af::array &b, bool broadcast) {
     // choose a sensible max value to replace the nans
     double min = -std::numeric_limits<float>::max();
     if (a.isdouble())
@@ -91,12 +79,12 @@ af::array maxof_no_nan(af::array& a, af::array& b, bool broadcast) {
     af::replace(a, !af::isNaN(a), min);
     af::replace(b, !af::isNaN(b), min);
     af_array out = nullptr;
-    throw_on_error(af_maxof(&out, a.get(), b.get(), broadcast));
+    pygauss::throw_on_error(af_maxof(&out, a.get(), b.get(), broadcast));
     return af::array(out);
 }
 
 
-void algorithm_bindings(py::module &m) {
+void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     //
     // all and any from logic
@@ -104,7 +92,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("any",
           [](const py::object &array_like, const std::optional<int> &dim) {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
 
               std::variant<bool, af::array> result;
               if (!dim.has_value())
@@ -120,7 +108,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("all",
           [](const py::object &array_like, const std::optional<int> &dim) {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
 
               std::variant<bool, af::array> result;
               if (!dim.has_value())
@@ -141,8 +129,8 @@ void algorithm_bindings(py::module &m) {
 
 
     m.def("nan_to_num",
-          [](const py::object &array_like, double nan, double inf) -> af::array {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, double nan, double inf) {
+              auto a = pygauss::arraylike::cast(array_like);
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with corresponding values of nan, when cond is false.
@@ -176,12 +164,12 @@ void algorithm_bindings(py::module &m) {
 
     m.def("amin",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
 
               if (!dim.has_value())                         // NOLINT(bugprone-branch-clone)
                   return a.iscomplex() ?
-                           reduce_all_complex(a, af_min_all):
-                           reduce_all_real(a, af_min_all);
+                         reduce_all_complex(a, af_min_all) :
+                         reduce_all_real(a, af_min_all);
               return reduce_dim(a, dim.value(), af_min);
           },
           py::arg("array_like").none(false),
@@ -190,7 +178,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("nanmin",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
 
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
@@ -206,7 +194,7 @@ void algorithm_bindings(py::module &m) {
 
               if (!dim.has_value())                         // NOLINT(bugprone-branch-clone)
                   return a.iscomplex() ?
-                         reduce_all_complex(a, af_min_all):
+                         reduce_all_complex(a, af_min_all) :
                          reduce_all_real(a, af_min_all);
 
               return reduce_dim(a, dim.value(), af_min);
@@ -220,8 +208,8 @@ void algorithm_bindings(py::module &m) {
     BINARY_TEMPLATE_FN_LAMBDA(fmin, minof_no_nan, "Minimum of two inputs, ignoring NaNs")
 
     m.def("argmin",
-          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues  {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
+              auto a = pygauss::arraylike::cast(array_like);
               if (!dim.has_value()) {
                   double real, imag;
                   unsigned int index;
@@ -239,9 +227,9 @@ void algorithm_bindings(py::module &m) {
           py::arg("dim") = py::none(),
           "Returns the indices and values of the minimum values along an axis, propagating NaNs");
 
-    m.def("argmin",
-          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues  {
-              auto a = to_array(array_like);
+    m.def("nanargmin",
+          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
+              auto a = pygauss::arraylike::cast(array_like);
 
               // choose a sensible max value to replace the nans
               double min = -std::numeric_limits<float>::max();
@@ -282,11 +270,11 @@ void algorithm_bindings(py::module &m) {
 
     m.def("amax",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
 
               if (!dim.has_value())                         // NOLINT(bugprone-branch-clone)
                   return a.iscomplex() ?
-                         reduce_all_complex(a, af_max_all):
+                         reduce_all_complex(a, af_max_all) :
                          reduce_all_real(a, af_max_all);
               return reduce_dim(a, dim.value(), af_max);
           },
@@ -296,7 +284,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("nanmax",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
 
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
@@ -312,7 +300,7 @@ void algorithm_bindings(py::module &m) {
 
               if (!dim.has_value())                         // NOLINT(bugprone-branch-clone)
                   return a.iscomplex() ?
-                         reduce_all_complex(a, af_max_all):
+                         reduce_all_complex(a, af_max_all) :
                          reduce_all_real(a, af_max_all);
 
               return reduce_dim(a, dim.value(), af_max);
@@ -326,8 +314,8 @@ void algorithm_bindings(py::module &m) {
     BINARY_TEMPLATE_FN_LAMBDA(fmin, maxof_no_nan, "Maximum of two inputs, ignoring NaNs")
 
     m.def("argmax",
-          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues  {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
+              auto a = pygauss::arraylike::cast(array_like);
 
               if (!dim.has_value()) {
                   double real, imag;
@@ -348,8 +336,8 @@ void algorithm_bindings(py::module &m) {
           "Returns the indices and values of the maximum values along an axis, with NaNs propagated.");
 
     m.def("nanargmax",
-          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues  {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
+              auto a = pygauss::arraylike::cast(array_like);
 
               // choose a sensible max value to replace the nans
               double min = -std::numeric_limits<float>::max();
@@ -385,7 +373,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("count_nonzero",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
 
               if (!dim.has_value())
                   return reduce_all_real(a, af_count_all);
@@ -396,8 +384,9 @@ void algorithm_bindings(py::module &m) {
           "Count the number of non zero elements in an array along a specified dimension");
 
     m.def("sum",
-          [](const py::object &array_like, const std::optional<int> &dim, const std::optional<double> &nan_value) -> numberOrArray {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, const std::optional<int> &dim,
+             const std::optional<double> &nan_value) -> numberOrArray {
+              auto a = pygauss::arraylike::cast(array_like);
 
               if (!dim.has_value()) {
                   if (!nan_value.has_value())
@@ -425,8 +414,9 @@ void algorithm_bindings(py::module &m) {
 
 
     m.def("product",
-          [](const py::object &array_like, const std::optional<int> &dim, const std::optional<double> &nan_value) -> numberOrArray {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, const std::optional<int> &dim,
+             const std::optional<double> &nan_value) -> numberOrArray {
+              auto a = pygauss::arraylike::cast(array_like);
 
               if (!dim.has_value()) {
                   if (!nan_value.has_value())
@@ -455,29 +445,29 @@ void algorithm_bindings(py::module &m) {
 
     m.def("cumsum",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               return reduce_dim(a, dim, af_accum);
           },
-          py::arg("a").none(false),
+          py::arg("array_like").none(false),
           py::arg("dim") = 0,
           "Cumulative sum of an array along a specified dimension, propagating NaNs");
 
     m.def("nancumsum",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with zero, when cond is false.
               af::replace(a, !nanLocations, 0.0);
               return reduce_dim(a, dim, af_accum);
           },
-          py::arg("a").none(false),
+          py::arg("array_like").none(false),
           py::arg("dim") = 0,
           "Cumulative sum of an array along a specified dimension, ignoring NaNs");
 
     m.def("cumprod",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               return af::scan(a, dim, AF_BINARY_MUL, true);
           },
           py::arg("array_like").none(false),
@@ -486,7 +476,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("nancumprod",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with zero, when cond is false.
@@ -499,8 +489,8 @@ void algorithm_bindings(py::module &m) {
           "Cumulative product of an array along a specified dimension, ignoring NaNs");
 
     m.def("scan",
-          [](const py::object &array_like, int dim, const af::binaryOp &op, const bool &inclusive_scan) -> af::array {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, int dim, const af::binaryOp &op, const bool &inclusive_scan) {
+              auto a = pygauss::arraylike::cast(array_like);
               return af::scan(a, dim, op, inclusive_scan);
           },
           py::arg("array_like").none(false),
@@ -508,10 +498,10 @@ void algorithm_bindings(py::module &m) {
           py::arg("op") = af::binaryOp::AF_BINARY_ADD,
           py::arg("inclusive_scan") = true,
           "Generalized scan of an array, which can the operations defined in ScanOp.");
-
+//
     m.def("nanscan",
-          [](const py::object &array_like, int dim, double nan, const af::binaryOp &op, const bool &inclusive_scan) -> af::array {
-              auto a = to_array(array_like);
+          [](const py::object &array_like, int dim, double nan, const af::binaryOp &op, const bool &inclusive_scan) {
+              auto a = pygauss::arraylike::cast(array_like);
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with zero, when cond is false.
@@ -529,7 +519,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("diff1",
           [](const py::object &array_like, int dim) {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               return reduce_dim(a, dim, af_diff1);
           },
           py::arg("array_like").none(false),
@@ -538,7 +528,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("diff2",
           [](const py::object &array_like, int dim) {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               return reduce_dim(a, dim, af_diff2);
           },
           py::arg("array_like").none(false),
@@ -547,7 +537,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("sort",
           [](const py::object &array_like, int dim, const bool &asc) -> std::tuple<af::array, af::array> {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               af::array indices, data;
               af::sort(data, indices, a, dim, asc);
 
@@ -560,9 +550,10 @@ void algorithm_bindings(py::module &m) {
           "indices that would have sort the array (sort and argsort)");
 
     m.def("sort_keys",
-          [](const py::object &data, const py::object &keys, int dim, const bool &asc) -> std::tuple<af::array, af::array> {
-              auto a = to_array(data);
-              auto k = to_array(keys);
+          [](const py::object &data, const py::object &keys, int dim,
+             const bool &asc) -> std::tuple<af::array, af::array> {
+              auto a = pygauss::arraylike::cast(data);
+              auto k = pygauss::arraylike::cast(keys);
 
               af::array sorted_keys, sorted_data;
               af::sort(sorted_keys, sorted_data, k, a, dim, asc);
@@ -578,7 +569,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("flatnonzero",
           [](const py::object &array_like) -> af::array {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               return af::where(a);
           },
           py::arg("array_like").none(false),
@@ -587,7 +578,7 @@ void algorithm_bindings(py::module &m) {
 
     m.def("unique",
           [](const py::object &array_like, const bool &is_sorted) {
-              auto a = to_array(array_like);
+              auto a = pygauss::arraylike::cast(array_like);
               return af::setUnique(a, is_sorted);
           },
           py::arg("array_like").none(false),
@@ -596,8 +587,8 @@ void algorithm_bindings(py::module &m) {
 
     m.def("union",
           [](const py::object &x1, const py::object &x2, const bool &is_unique) {
-              auto a = to_array(x1);
-              auto b = to_array(x2);
+              auto a = pygauss::arraylike::cast(x1);
+              auto b = pygauss::arraylike::cast(x2);
               return af::setUnion(a, b, is_unique);
           },
           py::arg("x1").none(false),
@@ -607,8 +598,8 @@ void algorithm_bindings(py::module &m) {
 
     m.def("intersect",
           [](const py::object &x1, const py::object &x2, const bool &is_unique) {
-              auto a = to_array(x1);
-              auto b = to_array(x2);
+              auto a = pygauss::arraylike::cast(x1);
+              auto b = pygauss::arraylike::cast(x2);
               return af::setIntersect(a, b, is_unique);
           },
           py::arg("x1").none(false),

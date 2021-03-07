@@ -15,7 +15,9 @@ namespace {
  * @param k         The number of centroids.
  * @return          The new centroids.
  */
-af::array calculateInitialMeans(const af::array &tss, int k) { return af::constant(0, tss.dims(0), k, tss.type()); }
+af::array calculateInitialMeans(const af::array &tss, int k) {
+    return af::constant(0, tss.dims(0), k, tss.type());
+}
 
 /**
  * Computes The euclidean distance for a tiled time series agains k-means.

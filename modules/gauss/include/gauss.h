@@ -11,3 +11,4 @@
 #include <gauss/regression.h>
 #include <gauss/regularization.h>
 #include <gauss/statistics.h>
+#include <gauss/random.h>

@@ -1,2 +1,2 @@
 
-from . pygauss import *
+from .pygauss.math import *

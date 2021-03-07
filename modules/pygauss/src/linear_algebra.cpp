@@ -2,11 +2,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <af_array/af_array.h>
+#include <pygauss.h>
 
 namespace py = pybind11;
 
-void linear_algebra_bindings(py::module &m) {
+void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("det",
           [](const af::array &a) {

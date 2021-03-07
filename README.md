@@ -38,3 +38,6 @@ check out git clone --recurse-submodules
 si se te olvida
 git submodule update --init --recursive.
 
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+pybind11-stubgen shapelets.compute --ignore-invalid all  -o ./out 

@@ -21,7 +21,7 @@ set(PYGAUSS_INC "${PYGAUSS_BASE_DIR}/include")
 # Files to add to compilation
 file(GLOB_RECURSE PYGAUSS_CODE
         "${PYGAUSS_SRC}/*.cpp"
-        "${PYGAUSS_INC}/*.h" )
+        "${PYGAUSS_INC}/*.h")
 
 # modules and files
 pybind11_add_module(PyGauss ${PYGAUSS_CODE})
@@ -29,21 +29,21 @@ pybind11_add_module(PyGauss ${PYGAUSS_CODE})
 # ensure the name is properly et
 # VERSION ${VERSION_SHORT} cannot be applied since the output is a dynamic library.
 set_target_properties(PyGauss
-    PROPERTIES
+        PROPERTIES
         INTERPROCEDURAL_OPTIMIZATION TRUE
         CXX_VISIBILITY_PRESET "hidden"
         OUTPUT_NAME "pygauss")
 
 ## Declare include directories
 target_include_directories(PyGauss
-    PRIVATE
+        PRIVATE
         ${PYGAUSS_INC})
 
 # Add compile definitions
 target_compile_definitions(PyGauss PRIVATE AF_UNIFIED)
 
 target_link_libraries(PyGauss
-    PRIVATE
+        PRIVATE
         ArrayFire::af
         gauss
         spdlog::spdlog
@@ -58,34 +58,34 @@ target_link_libraries(PyGauss
 ## capturing run time dependencies with array fire.
 #########
 
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ## cpu
-pybind11_add_module(stubcpu "${PYGAUSS_BASE_DIR}/stub/stub.cpp")
-target_compile_definitions(stubcpu PRIVATE STUB_NAME=stubcpu)
-target_link_libraries(stubcpu
-        PRIVATE ${CMAKE_DL_LIBS}
-        PUBLIC  ArrayFire::afcpu)
-set_target_properties(stubcpu
-        PROPERTIES
-        OUTPUT_NAME "stubcpu")
+# pybind11_add_module(stubcpu "${PYGAUSS_BASE_DIR}/stub/stub.cpp")
+# target_compile_definitions(stubcpu PRIVATE STUB_NAME=stubcpu)
+# target_link_libraries(stubcpu
+#         PRIVATE ${CMAKE_DL_LIBS}
+#         PUBLIC ArrayFire::afcpu)
+# set_target_properties(stubcpu
+#         PROPERTIES
+#         OUTPUT_NAME "stubcpu")
 
 ## cuda
-pybind11_add_module(stubcuda "${PYGAUSS_BASE_DIR}/stub/stub.cpp")
-target_compile_definitions(stubcuda PRIVATE STUB_NAME=stubcuda)
-target_link_libraries(stubcuda
-        PRIVATE ${CMAKE_DL_LIBS}
-        PUBLIC  ArrayFire::afcuda)
-set_target_properties(stubcuda
-        PROPERTIES
-        OUTPUT_NAME "stubcuda")
+# pybind11_add_module(stubcuda "${PYGAUSS_BASE_DIR}/stub/stub.cpp")
+# target_compile_definitions(stubcuda PRIVATE STUB_NAME=stubcuda)
+# target_link_libraries(stubcuda
+#         PRIVATE ${CMAKE_DL_LIBS}
+#         PUBLIC ArrayFire::afcuda)
+# set_target_properties(stubcuda
+#         PROPERTIES
+#         OUTPUT_NAME "stubcuda")
 
 ## opencl
-pybind11_add_module(stubcl "${PYGAUSS_BASE_DIR}/stub/stub.cpp")
-target_compile_definitions(stubcl PRIVATE STUB_NAME=stubcl)
-target_link_libraries(stubcl
-        PRIVATE ${CMAKE_DL_LIBS}
-        PUBLIC  ArrayFire::afopencl)
-set_target_properties(stubcl
-        PROPERTIES
-        OUTPUT_NAME "stubcl")
+# pybind11_add_module(stubcl "${PYGAUSS_BASE_DIR}/stub/stub.cpp")
+# target_compile_definitions(stubcl PRIVATE STUB_NAME=stubcl)
+# target_link_libraries(stubcl
+#         PRIVATE ${CMAKE_DL_LIBS}
+#         PUBLIC ArrayFire::afopencl)
+# set_target_properties(stubcl
+#         PROPERTIES
+#         OUTPUT_NAME "stubcl")

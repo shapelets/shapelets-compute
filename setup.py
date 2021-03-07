@@ -148,7 +148,8 @@ def create_metadata(full_version, doc_url):
         ext_modules=[CMakeExtension("pygauss",
                                     debug=True,
                                     output_dir='shapelets/compute',
-                                    target=["PyGauss", "stubcpu", "stubcuda", "stubcl"])],
+                                    target=["PyGauss"])],
+                                    # target=["PyGauss", "stubcpu", "stubcuda", "stubcl"])],
         python_requires='>=3.7',
         package_data={
             'shapelets': ['*.pyi', 'py.typed'],
