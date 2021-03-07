@@ -9,6 +9,7 @@ typedef struct {
 } scoped_batch;
 
 void pygauss::bindings::batch_api(py::module &m) {
+
     py::class_<ParallelFor> pf(m, "ParallelFor");
 
     pf.def("__iter__",

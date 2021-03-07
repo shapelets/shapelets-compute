@@ -89,7 +89,7 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
 
     m.def("full",
           [](const af::dim4 &shape, const py::object &fill_value, const af::dtype &dtype) {
-              return pygauss::arraylike::cast(fill_value, shape, dtype);
+              return pygauss::arraylike::cast(fill_value, false, shape, dtype);
           },
           py::arg("shape").none(false),
           py::arg("fill_value").none(false),
@@ -125,40 +125,53 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
           "Creates an array with the given dimensions with all its elements set to zero.");
 
     m.def("diag",
-          [](const af::array &a, int index = 0, bool extract = false) {
+          [](const py::object &arr_like, int index = 0, bool extract = false) {
+              auto a = arraylike::cast(arr_like);
               return af::diag(a, index, extract);
           },
           py::arg("a").none(false),
           py::arg("index") = 0,
-          py::arg("extract") = 0,
+          py::arg("extract") = false,
           "Operates with diagonals\n"
           "Using extract parameter one is able to either create a diagonal matrix from a vector (false) or "
           "extract a diagonal from a matrix to a vector (true)");
 
-//
-//    while (it != py::iterator::sentinel()) {
-//        // use `*it`
-//        ++it;
-//    }
-
     m.def("array",
-          &pygauss::arraylike::cast,
+          &pygauss::arraylike::cast_and_adjust,
           py::arg("array_like").none(false),
-          py::arg("shape").none(true) = py::none(),
-          py::arg("dtype").none(true) = py::none());
+          py::arg("shape") = py::none(),
+          py::arg("dtype") = py::none(),
+          R"_(
+    Converts and interprets the input as an array or tensor.
+
+    Possible inputs are native Python constructs like lists and tuples, but also numpy arrays or
+    arrow constructs.  Basically, it will process any object that has array semantics either through
+    array methods or buffer protocols.
+
+    Parameters
+    ----------
+    array_like: ArrayLike construct
+    shape: Int or Tuple of ints. Defaults to None
+         When shape is set, array_like object will be adjusted to match the given dimensionality.
+    dtype: A compatible expression numpy dtype.
+         When dtype is not set, the type will be inferred from the actual array_like object
+
+    Examples
+    --------
+    Create a two dimensional array:
+
+    >>> import shapelets.compute as sh
+    >>> a = sh.array([[1,2],[3,4]])
+
+    )_");
 
     m.def("transpose",
           [](const py::object &arr_like, const std::optional<af::dim4> &shape, const std::optional<af::dtype> &dtype) {
-              return pygauss::arraylike::cast(arr_like, shape, dtype).T();
+              return pygauss::arraylike::cast_and_adjust(arr_like, shape, dtype).T();
           }, py::arg("array_like").none(false),
           py::arg("shape").none(true) = py::none(),
           py::arg("dtype").none(true) = py::none()
     );
-
-
-
-
-
 
     m.def("iota",
           [](const af::dim4 &shape, const af::dim4 &tile, const af::dtype &dtype) {
@@ -177,6 +190,5 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
           py::arg("seq_dim") = -1,
           py::arg("dtype") = af::dtype::f32,
           "Creates an array with [0, n] values along the seq_dim which is tiled across other dimensions.");
-
 
 }

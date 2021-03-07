@@ -179,12 +179,12 @@ void pygauss::bindings::random_numbers(py::module &m) {
                        af::randu(shape, af::dtype::f32, engine.value()) :
                        af::randu(shape, af::dtype::f32);
 
-              u = af::min(u, 1.0 - FLOAT32_EPS) / divisor;
+              u = l + (af::min(u, 1.0 - FLOAT32_EPS) / divisor);
               return u.as(dtype);
           },
           py::arg("low").none(false),
           py::arg("high") = py::none(),
-          py::arg("shape").none(false),
+          py::arg("shape") = af::dim4(1, 1),
           py::arg("dtype") = af::dtype::s32,
           py::arg("engine") = py::none(),
           "Return random integers from low (inclusive) to high (exclusive).\n"

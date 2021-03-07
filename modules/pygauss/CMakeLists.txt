@@ -32,7 +32,7 @@ set_target_properties(PyGauss
         PROPERTIES
         INTERPROCEDURAL_OPTIMIZATION TRUE
         CXX_VISIBILITY_PRESET "hidden"
-        OUTPUT_NAME "pygauss")
+        OUTPUT_NAME "_pygauss")
 
 ## Declare include directories
 target_include_directories(PyGauss

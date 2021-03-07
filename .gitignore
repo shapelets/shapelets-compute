@@ -11,3 +11,4 @@
 /modules/shapelets/compute/*.so
 /.mypy_cache
 __pycache__
+/out

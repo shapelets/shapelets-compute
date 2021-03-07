@@ -83,13 +83,13 @@ af::array maxof_no_nan(af::array &a, af::array &b, bool broadcast) {
     return af::array(out);
 }
 
+typedef std::variant<int, float, std::complex<float>, std::complex<double>, py::array> MyType;
 
 void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     //
     // all and any from logic
     //
-
     m.def("any",
           [](const py::object &array_like, const std::optional<int> &dim) {
               auto a = pygauss::arraylike::cast(array_like);

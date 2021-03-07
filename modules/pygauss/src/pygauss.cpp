@@ -9,19 +9,9 @@ namespace spd = spdlog;
 
 using namespace pygauss::bindings;
 
-//Symbol not found: __ZN7 pygauss 9 arraylike 6 detail 10 from_numpy ERKN8 pybind116objectE
 
-PYBIND11_MODULE(pygauss, m) {
-    m.doc() = R"(
-        Khiva module
-        ------------
+PYBIND11_MODULE(_pygauss, m) {
 
-        .. currentmodule:: khiva
-
-        .. autosummary::
-            :toctree: _generate
-        
-    )";
     spd::set_level(spd::level::level_enum::debug);
 #ifndef NDEBUG
     spd::set_level(spd::level::level_enum::debug);
@@ -34,10 +24,11 @@ PYBIND11_MODULE(pygauss, m) {
           "Informs if computations would only be triggered when a eval is directly requested.");
 
     m.def("enable_manual_eval",
-          [](const bool &newValue) {
-              spd::debug("Manual Evaluation is now {}", newValue ? "ENABLED" : "DISABLED");
-              return af::setManualEvalFlag(newValue);
+          [](const bool &new_value) {
+              spd::debug("Manual Evaluation is now {}", new_value ? "ENABLED" : "DISABLED");
+              return af::setManualEvalFlag(new_value);
           },
+          py::arg("new_value").none(false),
           "Changes the way results are computed.  "
           "\n"
           "When manually evaluation is disabled, the system will compute as soon as possible, "

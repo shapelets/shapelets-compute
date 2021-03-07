@@ -49,41 +49,64 @@ namespace pygauss::arraylike {
                                       const std::optional<af::dim4> &shape,
                                       const std::optional<af::dtype> &dtype) {
 
-        std::optional<af::array> result = std::nullopt;
+        if (value.is_none())
+            return std::nullopt;
+
         if (detail::is_af_array(value)) {
             spd::debug("is_af_array OK");
-            result = detail::from_af_array(value);
-        } else if (detail::is_arrow(value)) {
-            spd::debug("is_arrow OK");
-            result = detail::from_arrow(value);
-        } else if (detail::is_numpy(value)) {
-            spd::debug("is_numpy OK");
-            result = detail::from_numpy(value);
-        } else if (is_scalar(value) && shape.has_value()) {
-            spd::debug("is_scalar and shape OK");
-            result = detail::from_scalar(value, shape.value());
+            return detail::from_af_array(value);
         }
 
-        if (!result.has_value())
-            return result;
+        if (detail::is_arrow(value)) {
+            spd::debug("is_arrow OK");
+            return detail::from_arrow(value);
+        }
 
-        // Adjust to spec
-        auto candidate = result.value();
-        if (shape.has_value()) {
-            auto given_shape = shape.value();
-            if (candidate.dims() != given_shape && candidate.elements() == given_shape.elements()) {
-                candidate = af::moddims(candidate, given_shape);
-            } else {
-                std::stringstream err_msg;
-                err_msg << "Unable to change tensor geometry from " << candidate.dims() << " to " << given_shape;
-                throw std::runtime_error(err_msg.str());
+        if (detail::is_numpy(value)) {
+            spd::debug("is_numpy OK");
+            return detail::from_numpy(value);
+        }
+
+        if (is_scalar(value) && shape.has_value()) {
+            spd::debug("is_scalar and shape OK");
+            return detail::from_scalar(value, shape.value(), dtype);
+        }
+
+        return std::nullopt;
+    }
+
+    af::array cast_and_adjust(const py::object &array_like,
+                              const std::optional<af::dim4> &shape,
+                              const std::optional<af::dtype> &dtype) {
+        auto a = try_cast(array_like, shape, dtype);
+        if (!a.has_value()) {
+            std::ostringstream stm;
+            stm << "Unable to process " << py::repr(array_like) << "as a valid tensor.";
+            auto err_msg = stm.str();
+            spd::error(err_msg);
+            throw std::runtime_error(err_msg);
+        }
+
+        auto candidate = a.value();
+        if (dtype.has_value()) {
+            if (candidate.type() != dtype.value()) {
+                candidate = candidate.as(dtype.value());
             }
         }
 
-        if (dtype.has_value()) {
-            auto given_type = dtype.value();
-            if (candidate.type() != given_type) {
-                candidate = candidate.as(given_type);
+        if (shape.has_value()) {
+            if (candidate.dims() != shape.value()) {
+                if (candidate.elements() == shape.value().elements()) {
+                    candidate = af::moddims(candidate, shape.value());
+                }
+                else {
+                    std::ostringstream stm;
+                    stm << "Unable to adjust shape of tensor since the number of elements are different. ";
+                    stm << "Source has " << candidate.elements() << " and target requires " << shape.value().elements();
+                    auto err_msg = stm.str();
+                    spd::error(err_msg);
+                    throw std::runtime_error(err_msg);
+                }
             }
         }
 
@@ -91,17 +114,31 @@ namespace pygauss::arraylike {
     }
 
     af::array cast(const py::object &array_like,
+                   bool floating,
                    const std::optional<af::dim4> &shape,
                    const std::optional<af::dtype> &dtype) {
 
         auto a = try_cast(array_like, shape, dtype);
-        if (a.has_value())
-            return a.value();
+        if (a.has_value()) {
+            auto result = a.value();
+            if (floating)
+                result = ensure_floating(result);
+            return result;
+        }
 
         std::ostringstream stm;
         stm << "Unable to process " << py::repr(array_like) << "as a valid tensor.";
         auto err_msg = stm.str();
         spd::error(err_msg);
         throw std::runtime_error(err_msg);
+    }
+
+    af::array ensure_floating(const af::array& src) {
+        if (src.isfloating())
+            return src;
+
+        auto safe_conversion = af::isDoubleAvailable(af::getDevice()) ? af::dtype::f64 : af::dtype::f32;
+        PyErr_WarnEx(PyExc_UserWarning, "Automatic conversion to floating array", 1);
+        return src.as(safe_conversion);
     }
 }

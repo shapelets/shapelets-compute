@@ -7,11 +7,8 @@
           [](const py::object &array_like,                                          \
              const std::optional<af::dim4> &shape,                                  \
              const std::optional<af::dtype> &dtype) {                               \
-                 auto arr = pygauss::arraylike::try_cast(array_like, shape, dtype); \
-                 std::optional<af::array> result = std::nullopt;                    \
-                 if (arr.has_value())                                               \
-                    result = OP(arr.value());                                       \
-                 return result;                                                     \
+                 auto arr = pygauss::arraylike::cast(array_like, false, shape, dtype); \
+                 return OP(arr);                                                    \
           },                                                                        \
           py::arg("array_like").none(false),                                        \
           py::arg("shape") = std::nullopt,                                          \
@@ -23,14 +20,10 @@
           [](const py::object &array_like,                                          \
              const std::optional<af::dim4> &shape,                                  \
              const std::optional<af::dtype> &dtype) {                               \
-                 auto arr = pygauss::arraylike::try_cast(array_like, shape, dtype); \
-                 std::optional<af::array> result = std::nullopt;                    \
-                 if (arr.has_value()) {                                             \
-                    af_array out = nullptr;                                         \
-                    throw_on_error(OP(&out, arr->get()));                           \
-                    result = af::array(out);                                        \
-                 }                                                                  \
-                 return result;                                                     \
+                 auto arr = pygauss::arraylike::cast(array_like, false, shape, dtype); \
+                 af_array out = nullptr;                                            \
+                 throw_on_error(OP(&out, arr.get()));                               \
+                 return af::array(out);                                             \
           },                                                                        \
           py::arg("array_like").none(false),                                        \
           py::arg("shape") = std::nullopt,                                          \

@@ -11,7 +11,7 @@ typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs
 
 
 af::array binary_function(const af::array &self, const py::object &other, bool reverse, binaryFn fn) {
-    af::array rhs = pygauss::arraylike::cast(other, self.dims(), self.type());
+    af::array rhs = pygauss::arraylike::cast(other, false, self.dims(), self.type());
 
     af_array out = nullptr;
     if (!reverse)
@@ -63,7 +63,7 @@ void pygauss::bindings::array_obj(py::module &m) {
     ka.def("same_as",
            [](const af::array &self, const py::object &arr_like, const py::float_ &eps) {
 
-               auto other = pygauss::arraylike::cast(arr_like, std::nullopt, self.type());
+               auto other = pygauss::arraylike::cast(arr_like, false, std::nullopt, self.type());
 
                if (self.dims() != other.dims())
                    return false;
@@ -102,36 +102,15 @@ void pygauss::bindings::array_obj(py::module &m) {
     ka.def("__setitem__",
            [](af::array &self, const py::object &selector, const py::object &value) {
 
+               // Interpret the index expression...
                auto[res_dim, index_dim, index] = pygauss::arraylike::build_index(selector, self.dims());
-               af::array rhs;
-
-               if (arraylike::is_scalar(value)) {
-                   spd::debug("Set Operation: Creating constant array with dimensions {}", index_dim);
-                   rhs = arraylike::cast(value, index_dim, self.type());
-               } else {
-                   spd::debug("Set Operation: Value is array");
-                   rhs = arraylike::cast(value);
-
-//                   if (rhs.dims() != index_dim) {
-//                       spd::debug("Set Operation: Value has different dimensions {} as implied by selector {}",
-//                                  rhs.dims(), index_dim);
-//                       if (index_dim.elements() != rhs.elements()) {
-//                           std::ostringstream msg;
-//                           msg << "Not the same dimensions: expected " << index_dim << " vs given " << rhs.dims();
-//                           throw std::runtime_error(msg.str());
-//                       } else {
-//                           spd::debug("Set Operation: Since the number of elements is the same, adjusting dimensions");
-//                           rhs = af::moddims(rhs, index_dim.ndims(), index_dim.get());
-//                       }
-//                   }
-//
-//                   if (self.type() != rhs.type()) {
-//                       spd::debug("Set Operation: Changing the type of the value array from {} to {}", rhs.type(),
-//                                  self.type());
-//                       rhs = rhs.as(self.type());
-//                   }
-               }
-
+               // Interpret the assigment; if it is an array like expression, it will
+               // ignore index_dim and self.type(), leaving the final checks to
+               // arrayfire itself;  however, should it be a constant, index_dim and
+               // self.type() will be used to model the assigment to the dimensions
+               // of the operation.
+               af::array rhs = arraylike::cast(value, false, index_dim, self.type());
+               // do the assigment...
                af_array out = nullptr;
                auto err = af_assign_gen(&out, self.get(), self.numdims(), index, rhs.get());
                throw_on_error(af_release_indexers(index));
