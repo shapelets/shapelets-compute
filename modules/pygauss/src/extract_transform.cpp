@@ -11,7 +11,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("pad",
           [](const py::object& array_like, const af::dim4 &begin, const af::dim4 &end, const af::borderType fill_type) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::pad(a, begin, end, fill_type);
           },
           py::arg("array_like").none(false),
@@ -28,7 +28,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("lower",
           [](const py::object& array_like, bool unit_diag) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::lower(a, unit_diag);
           },
           py::arg("array_like").none(false),
@@ -38,7 +38,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("upper",
           [](const py::object& array_like, bool unit_diag) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::upper(a, unit_diag);
           },
           py::arg("array_like").none(false),
@@ -48,7 +48,8 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("moddims",
           [](const py::object& array_like, const af::dim4 &shape) {
-              return arraylike::cast_and_adjust(array_like, shape, std::nullopt);
+              auto a = arraylike::as_array_checked(array_like);
+              return af::moddims(a, shape);
           },
           py::arg("array_like").none(false),
           py::arg("shape").none(false),
@@ -56,7 +57,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("flat",
           [](const py::object& array_like) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::flat(a);
           },
           py::arg("array_like").none(false),
@@ -64,7 +65,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("flip",
           [](const py::object& array_like, const uint dimension) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::flip(a, dimension);
           },
           py::arg("array_like").none(false),
@@ -73,7 +74,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("reorder",
           [](const py::object& array_like, const uint x, const uint y, const uint z, const uint w) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::reorder(a, x, y, z);
           },
           py::arg("array_like").none(false),
@@ -86,7 +87,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("shift",
           [](const py::object& array_like, const int x, const int y, const int z, const int w) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::shift(a, x, y, z, w);
           },
           py::arg("array_like").none(false),
@@ -98,7 +99,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("tile",
           [](const py::object& array_like, const uint x, const uint y, const uint z, const uint w) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::tile(a, x, y, z, w);
           },
           py::arg("array_like").none(false),
@@ -110,7 +111,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("tile",
           [](const py::object& array_like, const af::dim4 &dims) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::tile(a, dims);
           },
           py::arg("array_like").none(false),
@@ -119,7 +120,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("transpose",
           [](const py::object& array_like, const bool conjugate) {
-              auto a = arraylike::cast(array_like);
+              auto a = arraylike::as_array_checked(array_like);
               return af::transpose(a, conjugate);
           },
           py::arg("array_like").none(false),
@@ -128,52 +129,43 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("cast",
           [](const py::object& array_like, const af::dtype &dtype) {
-              return arraylike::cast_and_adjust(array_like, std::nullopt, dtype);
+              auto a = arraylike::as_array_checked(array_like);
+              return a.as(dtype);
           },
           py::arg("array_like").none(false),
           py::arg("dtype").none(false),
           "Creates a new array by casting the original array");
 
     m.def("join",
-          [](const py::list& lst, const int dimension,
-                  const std::optional<af::dim4>& shape,
-                  const std::optional<af::dtype>& dtype) {
+          [](const py::list& lst, const int dimension) {
 
-              std::optional<af::dim4> use_shape = shape;
-              std::optional<af::dtype> use_type = dtype;
-
-              auto arrays = std::vector<af::array>(lst.size());
+              auto arr_objs = std::vector<af::array>();
               for (auto entry: lst) {
                   auto obj = entry.cast<py::object>();
-                  auto converted = arraylike::try_cast(obj, use_shape, use_type);
-                  if (converted.has_value()) {
-                      arrays.push_back(converted.value());
-                      if (!use_shape.has_value()) {
-                          use_shape = converted->dims();
-                      }
-                      if (!use_type.has_value()) {
-                          use_type = converted->type();
-                      }
+                  auto converted = arraylike::as_array_checked(obj);
+                  arr_objs.push_back(converted);
+              }
+
+              af::array acc = arr_objs[0];
+              auto i = 1;
+              while (i < arr_objs.size()) {
+                  auto left = arr_objs.size() - i;
+                  if (left >= 3) {
+                      acc = af::join(dimension, acc, arr_objs[i], arr_objs[i+1], arr_objs[i+2]);
+                      i += 3;
+                  } else if (left >= 2) {
+                      acc = af::join(dimension, acc, arr_objs[i], arr_objs[i+1]);
+                      i += 2;
+                  } else {
+                      acc = af::join(dimension, acc, arr_objs[i]);
+                      i += 1;
                   }
               }
 
-              auto handles = std::vector<af_array>(arrays.size());
-              for (auto entry: arrays) {
-                  handles.push_back(entry.get());
-              }
-
-              af_array out = nullptr;
-              auto err = af_join_many(&out, dimension, handles.size(), handles.data());
-
-              if (err != AF_SUCCESS)
-                  throw std::runtime_error("Unable to perform join");
-
-              return af::array(out);
+              return acc;
           },
           py::arg("lst").none(false),
           py::arg("dimension") = 0,
-          py::arg("shape") = std::nullopt,
-          py::arg("dtype") = std::nullopt,
           R"_(
     Joins up to 10 arrays along a particular dimension.
 
@@ -184,18 +176,23 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
     m.def("where",
           [](const py::object &condition, const py::object &x, const py::object &y) {
-              auto c = arraylike::cast(condition);
+              auto c = arraylike::as_array_checked(condition);
               if (x.is_none() || y.is_none()) {
                   return af::iszero(c);
               }
-              auto s = arraylike::cast(x, false, c.dims(), std::nullopt);
-              auto r = arraylike::cast(y, false, c.dims(), std::nullopt);
 
-              if (r.type() != s.type())
-                  r = r.as(s.type());
+              auto conversion = arraylike::as_array(x, y);
+              if (!conversion)
+                  throw std::invalid_argument("Unable to convert to array");
 
+              auto [s, r] = conversion.value();
               auto output = s.copy();
-              af::replace(output, !c, r);
+
+              //replace needs identical types.
+              if (s.type() != r.type())
+                output = output.as(r.type());
+
+              af::replace(output, c, r);
               return output;
           },
           py::arg("condition").none(false),

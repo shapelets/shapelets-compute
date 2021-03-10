@@ -13,8 +13,32 @@
 namespace py = pybind11;
 namespace spd = spdlog;
 
+using half = half_float::half;
 
 namespace pybind11::detail {
+
+    constexpr int NPY_FLOAT16 = 23;
+
+    template <>
+    struct npy_format_descriptor<half> {
+        static pybind11::dtype dtype() {
+            handle ptr = npy_api::get().PyArray_DescrFromType_(NPY_FLOAT16);
+            return reinterpret_borrow<pybind11::dtype>(ptr);
+        }
+        static std::string format() {
+            // following: https://docs.python.org/3/library/struct.html#format-characters
+            return "e";
+        }
+        static constexpr auto name() {
+            return _("float16");
+        }
+    };
+
+//    template <>
+//    struct type_caster<half> : npy_scalar_caster<half> {
+//        static constexpr auto name = _("float16");
+//    };
+
 
     template<>
     struct type_caster<af::dtype> {

@@ -1,7 +1,9 @@
-
-from . import _pygauss as native
+from . import random
 
 from ._pygauss import (
+    ShapeletsArray, ParallelFor, Backend, BorderType, ConvDomain, ConvMode, DeviceInfo, DeviceMemory, 
+    MatrixProfile, MatrixProperties, NormType, ScanOp, ScopedBatch,
+
     absolute, add, all, amax, amin, angle, angle_deg, any, arccos, arccosh, arcsin, 
     arcsinh, arctan, arctan2, arctanh, argmax, argmin, array, batch, bitwise_and, 
     bitwise_or, bitwise_xor, cast, cbrt, ceil, cholesky, clip, complex, conj, 
@@ -24,19 +26,10 @@ from ._pygauss import (
     tan, tanh, tgamma, tile, topk_max, topk_min, transpose, true_divide, trunc, union, 
     unique, upper, var_p, var_s, where, zeros)
 
-from .__base import (
-    Number, Shape, DataType, ArrayLike,
-    Backend, BorderType, ConvDomain, ConvMode, DeviceInfo, DeviceMemory, MatrixProfile,
-    MatrixProperties, NormType, ParallelFor, ScanOp, ScopedBatch, ShapeletsArray)
-
-from . import random
-
 __all__=[
-    "Number", "Shape", "DataType", "ArrayLike",
-
+    "ShapeletsArray", "ParallelFor",
     "Backend", "BorderType", "ConvDomain", "ConvMode", "DeviceInfo", "DeviceMemory", 
-    "MatrixProfile", "MatrixProperties", "NormType", "ParallelFor", "ScanOp", "ScopedBatch", "ShapeletsArray",
-
+    "MatrixProfile", "MatrixProperties", "NormType", "ScanOp", "ScopedBatch",
     "absolute", "add", "all", "amax", "amin", "angle", "angle_deg", "any", "arccos", "arccosh", "arcsin", 
     "arcsinh", "arctan", "arctan2", "arctanh", "argmax", "argmin", "array", "batch", "bitwise_and",
     "bitwise_or", "bitwise_xor", "cast", "cbrt", "ceil", "cholesky", "clip", "complex", "conj",

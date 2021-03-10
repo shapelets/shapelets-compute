@@ -10,7 +10,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("det",
           [](const py::object &array_like) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               std::variant<py::float_, std::complex<double>> result;
 
               if (a.iscomplex()) {
@@ -30,7 +32,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("inverse",
           [](const py::object &array_like, const af_mat_prop options = af_mat_prop::AF_MAT_NONE) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               return af::inverse(a, options);
           },
           py::arg("array_like").none(false),
@@ -39,7 +43,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("norm",
           [](const py::object &array_like, const af_norm_type type, const double p, const double q) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               return af::norm(a, type, p, q);
           },
           py::arg("array_like").none(false),
@@ -49,7 +55,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("pinverse",
           [](const py::object &array_like, const double tol) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               return af::pinverse(a, tol);
           },
           py::arg("array_like").none(false),
@@ -57,7 +65,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("rank",
           [](const py::object &array_like, const double tol) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               return af::rank(a, tol);
           },
           py::arg("array_like").none(false),
@@ -65,7 +75,8 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("cholesky",
           [](const py::object &array_like, const bool is_upper) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
 
               af::array out;
               auto errRank = af::cholesky(out, a, is_upper);
@@ -84,7 +95,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("lu",
           [](const py::object &array_like) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               af::array lower, upper, pivot;
               af::lu(lower, upper, pivot, a);
               py::tuple result(3);
@@ -97,7 +110,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("qr",
           [](const py::object &array_like) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               af::array q, r, tau;
               af::qr(q, r, tau, a);
               py::tuple result(3);
@@ -110,7 +125,9 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("svd",
           [](const py::object &array_like) {
-              auto a = arraylike::cast(array_like, true);
+              auto a = arraylike::as_array_checked(array_like);
+              arraylike::ensure_floating(a);
+
               af::array u, s, vt;
               af::svd(u, s, vt, a);
               py::tuple result(3);
@@ -123,8 +140,10 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("dot",
           [](const py::object &lhs, const py::object &rhs, const bool conj_lhs, const bool conj_rhs) {
-              auto l = arraylike::cast(lhs, true);
-              auto r = arraylike::cast(rhs, true);
+              auto l = arraylike::as_array_checked(lhs);
+              auto r = arraylike::as_array_checked(rhs);
+              arraylike::ensure_floating(l);
+              arraylike::ensure_floating(r);
 
               auto lhs_options = conj_lhs ? af::matProp::AF_MAT_CONJ : af::matProp::AF_MAT_NONE;
               auto rhs_options = conj_rhs ? af::matProp::AF_MAT_CONJ : af::matProp::AF_MAT_NONE;
@@ -139,11 +158,14 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("dot_scalar",
           [](const py::object &lhs, const py::object &rhs, const bool conj_lhs, const bool conj_rhs) {
-              auto l = arraylike::cast(lhs, true);
-              auto r = arraylike::cast(rhs, true);
+              auto l = arraylike::as_array_checked(lhs);
+              auto r = arraylike::as_array_checked(rhs);
+
+              arraylike::ensure_floating(l);
+              arraylike::ensure_floating(r);
+
               auto lhs_options = conj_lhs ? af::matProp::AF_MAT_CONJ : af::matProp::AF_MAT_NONE;
               auto rhs_options = conj_rhs ? af::matProp::AF_MAT_CONJ : af::matProp::AF_MAT_NONE;
-
 
               std::variant<double, std::complex<double>> result;
               double real, imag;
@@ -169,16 +191,16 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
               auto b_options = transB ? af::matProp::AF_MAT_TRANS : af::matProp::AF_MAT_NONE;
 
               // A drives the operation...
-              auto A = arraylike::cast(a, true);
+              auto A = arraylike::as_array_checked(a);
               auto is32BitsOp = A.type() == af::dtype::f32 || A.type() == af::dtype::c32;
 
               // Ensure B matches the type of A
-              auto B = arraylike::cast(a, true);
+              auto B = arraylike::as_array_checked(a);
               if (B.type() != A.type())
                   B = B.as(A.type());
 
-              // C is optional, but if present is the result
-              auto C = arraylike::try_cast(c);
+              // C is optional, but if present, it is the result
+              auto C = arraylike::as_array(c);
 
               af_array out = nullptr;
               // If it has value, ensure it matches the type of A
@@ -221,8 +243,11 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("matmulTT",
           [](const py::object &lhs, const py::object &rhs) {
-              auto l = arraylike::cast(lhs, true);
-              auto r = arraylike::cast(rhs, true);
+              auto l = arraylike::as_array_checked(lhs);
+              auto r = arraylike::as_array_checked(rhs);
+              arraylike::ensure_floating(l);
+              arraylike::ensure_floating(r);
+
               return af::matmulTT(l, r);
           },
           py::arg("lhs").none(false),
@@ -231,8 +256,11 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("matmulTN",
           [](const py::object &lhs, const py::object &rhs) {
-              auto l = arraylike::cast(lhs, true);
-              auto r = arraylike::cast(rhs, true);
+              auto l = arraylike::as_array_checked(lhs);
+              auto r = arraylike::as_array_checked(rhs);
+              arraylike::ensure_floating(l);
+              arraylike::ensure_floating(r);
+
               return af::matmulTN(l, r);
           },
           py::arg("lhs").none(false),
@@ -241,8 +269,11 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
     m.def("matmulNT",
           [](const py::object &lhs, const py::object &rhs) {
-              auto l = arraylike::cast(lhs, true);
-              auto r = arraylike::cast(rhs, true);
+              auto l = arraylike::as_array_checked(lhs);
+              auto r = arraylike::as_array_checked(rhs);
+              arraylike::ensure_floating(l);
+              arraylike::ensure_floating(r);
+
               return af::matmulNT(l, r);
           },
           py::arg("lhs").none(false),
@@ -252,8 +283,11 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
     m.def("matmul",
           [](const py::object &lhs, const py::object &rhs, const af::matProp lhs_options,
              const af::matProp rhs_options) {
-              auto l = arraylike::cast(lhs, true);
-              auto r = arraylike::cast(rhs, true);
+              auto l = arraylike::as_array_checked(lhs);
+              auto r = arraylike::as_array_checked(rhs);
+              arraylike::ensure_floating(l);
+              arraylike::ensure_floating(r);
+
               return af::matmul(l, r, lhs_options, rhs_options);
           },
           py::arg("lhs").none(false),
@@ -273,13 +307,10 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
               for (auto item: args) {
                   auto obj = py::cast<py::object>(item);
-                  auto arr = arraylike::try_cast(py::cast<py::object>(obj));
-                  if (!arr.has_value()) {
-                      std::string obj_as_str = py::repr(item);
-                      throw std::runtime_error("It wasn't possible to interpret entry as array: " + obj_as_str);
-                  }
+                  auto arr = arraylike::as_array_checked(py::cast<py::object>(obj));
+                  arraylike::ensure_floating(arr);
                   // The final check is to ensure the arrays are all floating point.
-                  checked.push_back(arraylike::ensure_floating(arr.value()));
+                  checked.push_back(arr);
               }
 
               auto first = checked[0];

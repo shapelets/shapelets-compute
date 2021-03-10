@@ -61,7 +61,7 @@ namespace pygauss {
         if (!py::isinstance<py::tuple>(selector)) {
             // we are dealing with a single entry,
             // which is not an ellipsis
-            items[0] = std::move(selector);
+            items[0] = selector;
             result_dimensions = 1;
             spd::trace("Selector is a tuple of only one element");
         } else {
@@ -175,14 +175,16 @@ namespace pygauss {
                 af_array out;
                 if (ind_arr.type() == af::dtype::b8) {
                     throw_on_error(af_where(&out, ind_arr.get()));
+                    double re,im;
+                    throw_on_error(af_sum_all(&re, &im, out));
+                    result_dim[i] = static_cast<dim_t>(re);
                     spd::trace("Preprocessed selector: found boolean array at pos {}", i);
                 } else {
                     out = ind_arr.get();
+                    throw_on_error(af_get_elements(&result_dim[i], out));
                     spd::trace("Preprocessed selector: found any array at pos {}", i);
                 }
 
-                // store the number of elements as the dimension size
-                throw_on_error(af_get_elements(&result_dim[i], out));
                 throw_on_error(af_set_array_indexer(afIndex, out, i));
                 spd::trace("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i,
                            result_dim[i], arr_dim[i]);
@@ -202,8 +204,6 @@ namespace pygauss {
         auto[res_dim, index_dim, index] = build_index_internal(selector, arr_dim);
 
         if (spd::get_level() == spd::level::debug) {
-            std::string str_selector = py::repr(selector);
-            spd::debug("Selector is {} over array {}", str_selector, arr_dim);
             for (auto i = 0; i < 4; i++) {
                 auto index_entry = index[i];
                 if (index_entry.isSeq) {
@@ -214,7 +214,7 @@ namespace pygauss {
                                index_entry.idx.seq.end, index_entry.idx.seq.step,
                                af::calcDim(index_entry.idx.seq, arr_dim[i]));
                 } else {
-                    spd::debug("\t{}: Array", i);
+                    spd::debug("\t\t{}: Array", i);
                 }
             }
         }

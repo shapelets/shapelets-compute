@@ -29,7 +29,7 @@ def test_create_iota():
 
 
 def test_create_constant():
-    a = sh.constant((5, 4, 3), 1.0, dtype="int32")
+    a = sh.ones((5, 4, 3), dtype="int32")
     b = np.ones((5, 4, 3), dtype="int32")
     a.same_as(b)
 
@@ -44,7 +44,7 @@ def test_dimension_conversion():
 
 
 def test_diagonal_creation():
-    ones = sh.constant(4, 1.0, dtype="float32")
+    ones = sh.ones(4, dtype="float32")
     diag_zero = sh.diag(ones, 0, False)
     assert diag_zero.same_as([
         [1., 0, 0, 0],
@@ -110,7 +110,7 @@ def test_range_creation():
 
 
 def test_lower_upper():
-    a = sh.randu((5, 5), dtype="float32")
+    a = sh.random.random((5, 5), dtype="float32")
     lower = sh.lower(a, True)
     upper = sh.upper(a, False)
     assert (lower + upper - sh.identity((5, 5))).same_as(a)
@@ -208,14 +208,16 @@ def test_reorder():
 
 
 def test_replace():
-    a = sh.iota((3, 3), 1)
-    # replaces those that are NOT a < 4
-    sh.replaceInPlace(a, a < 4, -1.0)
-    assert a.same_as([[0, 3, -1], [1, -1, -1], [2, -1, -1]])
+    a = sh.iota(10)
+    sh.where(a<5, a, 10*a).same_as([0., 1, 2, 3, 4, 50, 60, 70, 80, 90])
 
     a = sh.iota((3, 3), 1)
-    sh.replaceInPlace(a, a < 4, sh.constant((3, 3), -1))
-    assert a.same_as([[0, 3, -1], [1, -1, -1], [2, -1, -1]])
+    a = sh.where(a < 4, a, sh.full((3, 3), -1))
+    assert a.same_as([[0., 3, -1], [1, -1, -1], [2, -1, -1]])
+
+    a = sh.iota((3, 3), 1)
+    assert (a<4).same_as([[True, True, False], [True, False, False], [True, False, False]])
+
 
 
 def test_shift():
@@ -245,8 +247,7 @@ def test_tile():
 def test_transpose():
     a = sh.iota((3, 3), 1)
     b = sh.transpose(a)
-    sh.transposeInPlace(a)
-    assert b.same_as(a)
+    assert b.same_as(a.T)
     assert b.same_as([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 
 
@@ -274,9 +275,8 @@ def test_numpy_interface_n_s_n():
     assert np.allclose(a, c)
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
 def test_memory_view():
-    sh.set_backend(sh.Backend.CPU)
+
     a = sh.iota((3, 5, 7, 11), 1, dtype="float32")
     b = memoryview(a)
     assert b.shape == a.shape
@@ -285,12 +285,22 @@ def test_memory_view():
     assert b.ndim == a.ndim
     assert b.contiguous
     assert not b.c_contiguous
-    # set a row to -1
-    # but it doesn't work with memory views as it is not implemented
-    b[0:3:] = -1.0
-    a[::, 0, 0, 0].same_as([-1, -1, -1])
 
-
+    # data is shared for CPU backend.
+    sh.set_backend(sh.Backend.CPU)
+    # memoryview doesn't have indexing
+    # implemented
+    a = sh.iota(10)
+    b = memoryview(a)
+    assert b.shape[0] == a.shape[0]
+    assert b.f_contiguous
+    assert b.c_contiguous
+    assert not b.readonly
+    assert b.ndim == a.ndim
+    assert b.contiguous
+    b[3] = -3
+    assert a.same_as([0,1,2,-3,4,5,6,7,8,9])
+    
 def test_join():
     a = sh.array([1, 2, 3, 4])
     b = sh.array([5, 6, 7, 8])

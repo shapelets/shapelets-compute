@@ -227,6 +227,21 @@ namespace gauss::random {
                                            const af::array& mean,
                                            const af::array& cov,
                                            const std::optional<af::randomEngine> &engine = std::nullopt);
+
+
+    /**
+     * Randomly shuffles an array on a particular axis
+     *
+     * @param original   Original array
+     * @param axis       Which axis is to be randomly shuffled
+     * @param engine     Configured engine for seeding the generation.  Defaults to empty option
+     * @return           An array with the same data as original, but with all the contents on a
+     *                   particular axis randomly shuffled.
+     */
+    GAUSSAPI af::array permute(const af::array& original,
+                               dim_t axis = 0,
+                               const std::optional<af::randomEngine> &engine = std::nullopt);
+
 }
 
 

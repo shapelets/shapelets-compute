@@ -39,8 +39,8 @@ void pygauss::bindings::random_numbers(py::module &m) {
                  "Draw samples from an exponential distribution.  Scale is the inverse of lambda.")
 
             .def("gamma",
-                 [](af::randomEngine &self, const double alpha, const double scale, const af::dim4 &shape,
-                    const af::dtype &dtype) {
+                 [](af::randomEngine &self, const double alpha, const double scale,
+                    const af::dim4 &shape, const af::dtype &dtype) {
                      return gauss::random::gamma(alpha, 1.0 / scale, shape, dtype, self);
                  },
                  py::arg("alpha").none(false),
@@ -124,18 +124,32 @@ void pygauss::bindings::random_numbers(py::module &m) {
                  "Draw samples from a logistic distribution.")
 
             .def("multivariate_normal",
-                 [](af::randomEngine &self, const py::object &mean, const py::object &cov, const int64_t samples,
-                    const af::dtype &dtype) {
-                     auto m = pygauss::arraylike::cast(mean).as(dtype);
-                     auto cv = pygauss::arraylike::cast(cov).as(dtype);
+                 [](af::randomEngine &self, const py::object &mean, const py::object &cov,
+                    const int64_t samples, const af::dtype &dtype) {
+
+                     auto m = arraylike::as_array_checked(mean).as(dtype);
+                     auto cv = arraylike::as_array_checked(cov).as(dtype);
+
                      return gauss::random::multivariate_normal(samples, m, cv, self);
                  },
                  py::arg("mean").none(false),
                  py::arg("cov").none(false),
                  py::arg("samples").none(false),
                  py::arg("dtype") = af::dtype::f32,
-                 "Draw samples from a logistic distribution.");
+                 "Draw samples from a logistic distribution.")
+            .def("permutation",
+                 [](af::randomEngine &self, const py::object &x, const int32_t axis) -> af::array {
+                     auto is_scalar = arraylike::is_scalar(x);
+                     auto original = is_scalar ?
+                                     af::iota(af::dim4(py::cast<dim_t>(x)), af::dim4(1), af::dtype::s32) :
+                                     arraylike::as_array_checked(x);
 
+                     auto checked_axis = is_scalar ? 0 : axis;
+                     return gauss::random::permute(original, checked_axis, self);
+                 },
+                 py::arg("x").none(false),
+                 py::arg("axis") = 0,
+                 "Randomly permute a sequence, or return a permuted range");
 
     m.def("default_rng",
           [](const af::randomEngineType type, const unsigned long long seed) {
@@ -145,6 +159,20 @@ void pygauss::bindings::random_numbers(py::module &m) {
           py::arg("seed") = 0ULL,
           "Creates a new random engine");
 
+    m.def("permutation",
+          [](const py::object &x, const int32_t axis, std::optional<af::randomEngine> &engine) -> af::array {
+              auto is_scalar = arraylike::is_scalar(x);
+              auto original = is_scalar ?
+                              af::iota(af::dim4(py::cast<dim_t>(x)), af::dim4(1), af::dtype::s32) :
+                              arraylike::as_array_checked(x);
+
+              auto checked_axis = is_scalar ? 0 : axis;
+              return gauss::random::permute(original, checked_axis, engine);
+          },
+          py::arg("x").none(false),
+          py::arg("axis") = 0,
+          py::arg("engine") = py::none(),
+          "Randomly permute a sequence, or return a permuted range");
 
     m.def("random",
           [](const af::dim4 &shape, const af::dtype &dtype, std::optional<af::randomEngine> &engine) {
@@ -164,23 +192,9 @@ void pygauss::bindings::random_numbers(py::module &m) {
           "Creates a new array using random numbers drawn from a normal distribution");
 
     m.def("randint",
-          [](const int64_t low, const std::optional<int64_t> high,
-             const af::dim4 &shape, const af::dtype &dtype,
+          [](const int64_t low, const std::optional<int64_t> high, const af::dim4 &shape, const af::dtype &dtype,
              std::optional<af::randomEngine> &engine) {
-
-              auto l = 0.;
-              auto h = static_cast<double>(low);
-              if (high.has_value()) {
-                  l = static_cast<double>(low);
-                  h = static_cast<double>(high.value());
-              }
-              auto divisor = 1.0 / (h - l);
-              auto u = engine.has_value() ?
-                       af::randu(shape, af::dtype::f32, engine.value()) :
-                       af::randu(shape, af::dtype::f32);
-
-              u = l + (af::min(u, 1.0 - FLOAT32_EPS) / divisor);
-              return u.as(dtype);
+              return gauss::random::randint(low, high, shape, dtype, engine);
           },
           py::arg("low").none(false),
           py::arg("high") = py::none(),

@@ -6,8 +6,8 @@ import platform
 import subprocess
 import versioneer
 from typing import Union, List
-from distutils.version import LooseVersion
 from setuptools import setup, Extension, find_packages
+from distutils.version import LooseVersion
 import warnings
 import builtins
 

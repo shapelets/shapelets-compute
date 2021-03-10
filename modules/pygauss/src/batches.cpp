@@ -41,9 +41,11 @@ void pygauss::bindings::batch_api(py::module &m) {
     m.def("batch", []() { return scoped_batch{}; });
 
     m.def("batch", [](const py::function &usrFn) {
+        spd::debug("Batch Lambda");
         auto block = gfor_acquire();
         return usrFn();
-    });
+    },
+    py::arg("usrFn").none(false));
 
     m.def("parallel_range",
           [](const std::variant<py::int_, py::slice> &arg) {

@@ -2,17 +2,18 @@
 #include <spdlog/spdlog.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include <spdlog/spdlog.h>
+#include <optional>
 #include <pygauss.h>
 
 namespace spd = spdlog;
 namespace py = pybind11;
 
 using dtype_converter = py::detail::type_caster<af::dtype>;
+using half_float::half;
 
 namespace pygauss::arraylike {
 
-    py::buffer_info buffer_protocol(const af::array &self) {
+    py::buffer_info numpy_buffer_protocol(const af::array &self) {
 
         // Ensure all the computations have completed.
         af::eval(self);
@@ -55,7 +56,7 @@ namespace pygauss::arraylike {
                 data = isDirect ? self.device<uint16_t>() : self.host<uint16_t>();
                 break;
             case af::dtype::f16:
-                data = isDirect ? self.device<uint8_t>() : self.host<uint8_t>();
+                data = isDirect ? self.device<af::half>() : self.host<af::half>();
                 break;
             case af::dtype::f32:
                 data = isDirect ? self.device<float>() : self.host<float>();
@@ -103,59 +104,177 @@ namespace pygauss::arraylike {
     }
 
     namespace detail {
-        /**
-         * Checks if an object can be interpreted as a numpy arr_like
-         */
-        bool is_numpy(const py::object &value) {
-            // Try to access the data through py::array...
-            auto py_array = py::array::ensure(value);
-            if (!py_array)
-                return false;
 
-            // Ensure we are not reading a scalar through this method
-            // by checking at least one dimension is different to one
+        bool numpy_is_array(const py::object &value) {
+            // Can be understood as an array?
+            auto arr = py::array::ensure(value);
+            if (!arr) return false;
 
-            auto i = 0;
-            auto ndim = py_array.ndim();
-            auto implied_shape = py_array.shape();
-            auto all_ones = true;
-            while (i < ndim && all_ones) {
-                all_ones = (implied_shape[i] == 1);
-                i += 1;
-            }
+            // Got dimensions?
+            auto has_dimensions = arr.ndim() > 0 && arr.size() > 1;
+            if (!has_dimensions) return false;
 
-            // false if all_ones == true.
-            return !all_ones;
+            // supported array fire type?
+            auto type = dtype_converter::load(arr.dtype().cast<py::handle>());
+            return type.has_value();
         }
 
-        std::optional<af::array> from_numpy(const py::object &value) {
-            auto tmp_array = py::array::ensure(value);
-            if (!tmp_array)
-                return std::nullopt;
+        bool numpy_is_scalar(const py::object &value) {
+            // Can be understood and converted...
+            auto arr = py::array::ensure(value);
+            if (!arr) return false;
+
+            // Should not have dimensions
+            auto has_dimensions = arr.ndim() > 0 && arr.size() > 1;
+            if (has_dimensions) return false;
+
+            // is supported by an arrayfire type?
+            auto type = dtype_converter::load(arr.dtype().cast<py::handle>());
+            return type.has_value();
+        }
+
+        inline af::dtype choose_type(af::dtype _64, af::dtype _32) {
+            return af::isDoubleAvailable(af::getDevice()) ? _64 : _32;
+        }
+
+        af::array numpy_scalar_to_array(const py::object &value, const af::dim4 &shape) {
+            auto arr = py::array::ensure(value);
+            if (!arr) throw std::invalid_argument("Value not a valid numpy object");
+
+            auto has_dimensions = arr.ndim() > 0 && arr.size() > 1;
+            if (has_dimensions) throw std::invalid_argument("Value is not a numpy scalar");
+
+            auto type = dtype_converter::load(arr.dtype().cast<py::handle>());
+            if (!type.has_value()) throw std::invalid_argument("Unsupported value type.");
+
+            af_array handle = nullptr;
+            af_err err;
+            switch (type.value()) {
+                case af::dtype::c32: {
+                    auto ptr = arr.unchecked<std::complex<float>>()(0);
+                    auto real = static_cast<double>(ptr.real());
+                    auto imag = static_cast<double>(ptr.imag());
+                    err = af_constant_complex(&handle, real, imag, shape.ndims(), shape.get(), af::dtype::c32);
+                    break;
+                }
+                case af::dtype::c64: {
+                    auto ptr = arr.unchecked<std::complex<double>>()(0);
+                    err = af_constant_complex(&handle, ptr.real(), ptr.imag(), shape.ndims(), shape.get(),
+                                              choose_type(af::dtype::c64, af::dtype::c32));
+                    break;
+                }
+
+                case af::dtype::s16: {
+                    auto data = arr.unchecked<int16_t>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::s16);
+                    break;
+                }
+                case af::dtype::s32: {
+                    auto data = arr.unchecked<int32_t>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::s32);
+                    break;
+                }
+                case af::dtype::s64: {
+                    auto data = arr.unchecked<int64_t>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(),
+                                      choose_type(af::dtype::s64, af::dtype::s32));
+                    break;
+                }
+
+                case af::dtype::f16: {
+                    auto data = arr.unchecked<half>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(),
+                                      af::isHalfAvailable(af::getDevice()) ? af::dtype::f16 : af::dtype::f32);
+                    break;
+                }
+
+                case af::dtype::f32: {
+                    auto data = arr.unchecked<float>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::f32);
+                    break;
+                }
+
+                case af::dtype::f64: {
+                    auto data = arr.unchecked<double>()(0);
+                    err = af_constant(&handle, data, shape.ndims(), shape.get(),
+                                      choose_type(af::dtype::f64, af::dtype::f32));
+                    break;
+                }
+
+                case af::dtype::u8: {
+                    auto data = arr.unchecked<uint8_t>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::u8);
+                    break;
+                }
+
+                case af::dtype::u16: {
+                    auto data = arr.unchecked<uint16_t>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::u16);
+                    break;
+                }
+
+                case af::dtype::u32: {
+                    auto data = arr.unchecked<uint32_t>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::u32);
+                    break;
+                }
+
+                case af::dtype::u64: {
+                    auto data = arr.unchecked<uint64_t>()(0);
+                    auto casted = static_cast<double>(data);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(),
+                                      choose_type(af::dtype::u64, af::dtype::u32));
+                    break;
+                }
+
+                case af::dtype::b8: {
+                    auto data = arr.unchecked<uint8_t>()(0);
+                    auto casted = data == 1 ? 1.0 : 0.0;
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::b8);
+                    break;
+                }
+            }
+            // Throw if the operation failed to convert
+            throw_on_error(err);
+            // otherwise, return the new array.
+            return af::array(handle);
+        }
+
+
+        af::array numpy_array_to_array(const py::object &value) {
+            auto np_arr = py::array::ensure(value);
+            if (!np_arr) throw std::invalid_argument("Value not a valid numpy object");
 
             af::dim4 dims(1, 1, 1, 1);
             auto i = 0;
-            auto ndim = tmp_array.ndim();
-            auto implied_shape = tmp_array.shape();
+            auto ndim = np_arr.ndim();
+            auto implied_shape = np_arr.shape();
             while (i < ndim) {
                 dims[i] = implied_shape[i];
                 i += 1;
             }
 
             spd::debug("Dims are {}", dims);
-            auto arr_type = py::cast<af::dtype>(tmp_array.dtype());
+            auto arr_type = py::cast<af::dtype>(np_arr.dtype());
             spd::debug("ArrType is {}", arr_type);
 
-            if (!af::isDoubleAvailable(af::getDevice())) {
-                if (arr_type == af::dtype::f64)
-                    arr_type = af::dtype::f32;
-                else if (arr_type == af::dtype::c64) {
-                    arr_type = af::dtype::c32;
-                }
-            } else if (!af::isHalfAvailable(af::getDevice())) {
-                if (arr_type == af::dtype::f16)
-                    arr_type = af::dtype::f32;
-            }
+            auto isDblAvailable = af::isDoubleAvailable(af::getDevice());
+            auto isHalfAvailable = af::isHalfAvailable(af::getDevice());
+            if (arr_type == af::dtype::f64 && !isDblAvailable)
+                arr_type = af::dtype::f32;
+            if (arr_type == af::dtype::c64 && !isDblAvailable)
+                arr_type = af::dtype::c32;
+            if (arr_type == af::dtype::f16 && !isHalfAvailable)
+                arr_type = af::dtype::f32;
+
             spd::debug("Final arrType is {}", arr_type);
 
             /*
@@ -166,101 +285,83 @@ namespace pygauss::arraylike {
              * b) the data taken from host memory, which implies always a copy; for cpu and cuda
              *    devices, we may be able to just put the data in the devices memory.
              */
-
             af::array result;
             switch (arr_type) {
                 case af::dtype::f32: {
-                    auto arr = py::array_t<float, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<float, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<float *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<float *>(req.ptr));
                 }
                 case af::dtype::c32: {
                     auto arr = py::array_t<std::complex<float>, py::array::f_style | py::array::forcecast>::ensure(
-                            tmp_array);
+                            np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<af::cfloat *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<af::cfloat *>(req.ptr));
                 }
                 case af::dtype::f64: {
-                    auto arr = py::array_t<double, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<double, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<double *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<double *>(req.ptr));
                 }
                 case af::dtype::c64: {
                     auto arr = py::array_t<std::complex<double>, py::array::f_style | py::array::forcecast>::ensure(
-                            tmp_array);
+                            np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<af::cdouble *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<af::cdouble *>(req.ptr));
                 }
                 case af::dtype::b8: {
-                    auto arr = py::array_t<uint8_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<uint8_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
                     // missing symbols if bool is used as type param
-                    result = af::array(dims, static_cast<uint8_t *>(req.ptr)).as(af::dtype::b8);
-                    break;
+                    return af::array(dims, static_cast<uint8_t *>(req.ptr)).as(af::dtype::b8);
                 }
                 case af::dtype::s32: {
-                    auto arr = py::array_t<int32_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<int32_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<int32_t *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<int32_t *>(req.ptr));
                 }
                 case af::dtype::u32: {
-                    auto arr = py::array_t<uint32_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<uint32_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<uint32_t *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<uint32_t *>(req.ptr));
                 }
                 case af::dtype::u8: {
-                    auto arr = py::array_t<uint8_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<uint8_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<uint8_t *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<uint8_t *>(req.ptr));
                 }
                 case af::dtype::s64: {
-                    auto arr = py::array_t<int64_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<int64_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<int64_t *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<int64_t *>(req.ptr));
                 }
                 case af::dtype::u64: {
-                    auto arr = py::array_t<uint64_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<uint64_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<uint64_t *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<uint64_t *>(req.ptr));
                 }
                 case af::dtype::s16: {
-                    auto arr = py::array_t<int16_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<int16_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<int16_t *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<int16_t *>(req.ptr));
                 }
                 case af::dtype::u16: {
-                    auto arr = py::array_t<uint16_t, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<uint16_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<uint16_t *>(req.ptr));
-                    break;
+                    return af::array(dims, static_cast<uint16_t *>(req.ptr));
                 }
                 case af::dtype::f16: {
-                    if (!af::isHalfAvailable(af::getDevice()))
-                        throw std::runtime_error("Current device doesn't support half floats");
-
-                    // there is no way around at the moment.
-                    auto arr = py::array_t<float, py::array::f_style | py::array::forcecast>::ensure(tmp_array);
+                    auto arr = py::array_t<half, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    result = af::array(dims, static_cast<float *>(req.ptr)).as(af::dtype::f16);
-                    break;
+                    // note we are using af::half
+                    return af::array(dims, static_cast<af::half *>(req.ptr));
                 }
                 default: {
-                    spdlog::warn("Unsupported data type {}", arr_type);
-                    return std::nullopt;
+                    std::ostringstream msg;
+                    msg << "Unknown data type [" << arr_type << "]";
+                    throw std::runtime_error(msg.str());
                 }
-
             }
-            return result;
         }
     }
 }

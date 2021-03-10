@@ -13,6 +13,7 @@ using namespace pygauss::bindings;
 PYBIND11_MODULE(_pygauss, m) {
 
     spd::set_level(spd::level::level_enum::debug);
+
 #ifndef NDEBUG
     spd::set_level(spd::level::level_enum::debug);
 #endif

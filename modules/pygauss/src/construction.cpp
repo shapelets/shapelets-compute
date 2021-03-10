@@ -89,7 +89,14 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
 
     m.def("full",
           [](const af::dim4 &shape, const py::object &fill_value, const af::dtype &dtype) {
-              return pygauss::arraylike::cast(fill_value, false, shape, dtype);
+              auto candidate = arraylike::scalar_as_array(fill_value, shape);
+              if (!candidate)
+                  throw std::invalid_argument("Unable to create array");
+              auto result = candidate.value();
+              if (result.type() == dtype)
+                  return result;
+
+              return result.as(dtype);
           },
           py::arg("shape").none(false),
           py::arg("fill_value").none(false),
@@ -126,7 +133,7 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
 
     m.def("diag",
           [](const py::object &arr_like, int index = 0, bool extract = false) {
-              auto a = arraylike::cast(arr_like);
+              auto a = arraylike::as_array_checked(arr_like);
               return af::diag(a, index, extract);
           },
           py::arg("a").none(false),
@@ -137,7 +144,12 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
           "extract a diagonal from a matrix to a vector (true)");
 
     m.def("array",
-          &pygauss::arraylike::cast_and_adjust,
+          [](const py::object& array_like,
+             const std::optional<af::dim4> &shape,
+             const std::optional<af::dtype> &dtype) {
+
+              return arraylike::as_array_like(array_like, shape, dtype);
+          },
           py::arg("array_like").none(false),
           py::arg("shape") = py::none(),
           py::arg("dtype") = py::none(),
@@ -164,14 +176,6 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
     >>> a = sh.array([[1,2],[3,4]])
 
     )_");
-
-    m.def("transpose",
-          [](const py::object &arr_like, const std::optional<af::dim4> &shape, const std::optional<af::dtype> &dtype) {
-              return pygauss::arraylike::cast_and_adjust(arr_like, shape, dtype).T();
-          }, py::arg("array_like").none(false),
-          py::arg("shape").none(true) = py::none(),
-          py::arg("dtype").none(true) = py::none()
-    );
 
     m.def("iota",
           [](const af::dim4 &shape, const af::dim4 &tile, const af::dtype &dtype) {

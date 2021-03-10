@@ -85,30 +85,19 @@ void pygauss::bindings::math_operations(py::module_ &m) {
     UNARY_TEMPLATE_FN(fix, af_trunc, "Round to nearest integer towards zero.")
 
     m.def("round",
-          [](const py::object &array_like,
-             const int decimals,
-             const std::optional<af::dim4> &shape,
-             const std::optional<af::dtype> &dtype) {
+          [](const py::object &array_like, const int decimals) {
 
               std::optional<af::array> result = std::nullopt;
+              auto arr = arraylike::as_array_checked(array_like);
 
-              auto arr = pygauss::arraylike::try_cast(array_like, shape, dtype);
-              if (arr.has_value()) {
-                  auto a = arr.value();
-                  if (decimals == 0) {
-                      result = af::round(a);
-                  } else {
-                      auto scale = pow(10, decimals);
-                      result = af::round((a * scale) / scale);
-                  }
-              }
-              return result;
+              if (decimals == 0)
+                  return af::round(arr);
+
+              auto scale = pow(10, decimals);
+              return af::round((arr * scale) / scale);
           },
           py::arg("array_like").none(false),
           py::arg("decimals") = 0,
-          py::kw_only(),
-          py::arg("shape") = std::nullopt,
-          py::arg("dtype") = std::nullopt,
           "Evenly round to the given number of decimals.");
 
 //
@@ -211,7 +200,6 @@ void pygauss::bindings::math_operations(py::module_ &m) {
 // Miscellaneous
 //
 //  convolve --> see signal processing
-// clip
 // heavyside
 // real_if_close
 
@@ -223,54 +211,46 @@ void pygauss::bindings::math_operations(py::module_ &m) {
     UNARY_TEMPLATE_FN(sign, af_sign, "Returns an element-wise indication of the sign of a number.")
 
     m.def("clip",
-          [](const py::object &array_like,
-             const py::object &lo,
-             const py::object &up,
-             const std::optional<af::dim4> &shape,
-             const std::optional<af::dtype> &dtype) {
-
-              auto a = pygauss::arraylike::try_cast(array_like);
+          [](const py::object &array_like, const py::object &lo, const py::object &up) {
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               if (up.is_none() && lo.is_none())
-                  return a.value();
+                  return a;
 
               if (!up.is_none() && !lo.is_none()) {
                   auto u = pygauss::arraylike::is_scalar(up) ?
-                           pygauss::arraylike::try_cast(up, a->dims(), a->type()) :
-                           pygauss::arraylike::try_cast(up);
+                           pygauss::arraylike::scalar_as_array_checked(up, a.dims()) :
+                           pygauss::arraylike::as_array_checked(up);
 
                   auto l = pygauss::arraylike::is_scalar(lo) ?
-                           pygauss::arraylike::try_cast(lo, a->dims(), a->type()) :
-                           pygauss::arraylike::try_cast(lo);
+                           pygauss::arraylike::scalar_as_array_checked(lo, a.dims()) :
+                           pygauss::arraylike::as_array_checked(lo);
 
                   af_array out = nullptr;
-                  throw_on_error(af_clamp(&out, a->get(), l->get(), u->get(), GForStatus::get()));
+                  throw_on_error(af_clamp(&out, a.get(), l.get(), u.get(), GForStatus::get()));
                   return af::array(out);
               }
 
               if (!up.is_none()) {
                   auto u = pygauss::arraylike::is_scalar(up) ?
-                           pygauss::arraylike::try_cast(up, a->dims(), a->type()) :
-                           pygauss::arraylike::try_cast(up);
+                           pygauss::arraylike::scalar_as_array_checked(up, a.dims()) :
+                           pygauss::arraylike::as_array_checked(up);
 
                   af_array out = nullptr;
-                  throw_on_error(af_maxof(&out, a->get(), u->get(), GForStatus::get()));
+                  throw_on_error(af_maxof(&out, a.get(), u.get(), GForStatus::get()));
                   return af::array(out);
               }
 
               auto l = pygauss::arraylike::is_scalar(lo) ?
-                       pygauss::arraylike::try_cast(lo, a->dims(), a->type()) :
-                       pygauss::arraylike::try_cast(lo);
+                       pygauss::arraylike::scalar_as_array_checked(lo, a.dims()) :
+                       pygauss::arraylike::as_array_checked(lo);
 
               af_array out = nullptr;
-              throw_on_error(af_minof(&out, a->get(), l->get(), GForStatus::get()));
+              throw_on_error(af_minof(&out, a.get(), l.get(), GForStatus::get()));
               return af::array(out);
           },
           py::arg("array_like").none(false),
           py::arg("lo") = py::none(),
           py::arg("up") = py::none(),
-          py::kw_only(),
-          py::arg("shape") = std::nullopt,
-          py::arg("dtype") = std::nullopt,
           "Clip (limit) the values in an array.");
 
 

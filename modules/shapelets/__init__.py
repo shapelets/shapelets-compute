@@ -15,5 +15,6 @@ if __SHAPELETS_SETUP__:
 else:
     # Normal initialization here
     from . import compute
+    from . import generators
 
 del stderr

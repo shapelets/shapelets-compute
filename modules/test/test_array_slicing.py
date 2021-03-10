@@ -19,7 +19,7 @@ def test_slicing_ranges():
     # every tow rows from 1, backwards
     assert a[::-2, ::].same_as([[3, 7, 11, 15], [1, 5, 9, 13]])
     # just one element
-    assert a[0, 0].same_as(([0]))
+    assert a[0, 0].same_as([0])
 
 
 def test_equivalence_with_numpy():
@@ -33,9 +33,11 @@ def test_equivalence_with_numpy():
     assert a[1::2, ::].same_as(n[1::2, ::])
     # every tow rows from 1, backwards
     assert a[::-2, ::].same_as(n[::-2, ::])
+    # first three rows, all cols backwards
+    assert a[0:2, ::-1].same_as(n[0:2, ::-1])
     # just one element
     assert a[0, 0].same_as(n[0, 0])
-    assert a[0:2, ::-1].same_as(n[0:2, ::-1])
+    
 
 
 def test_ellipsis_operator():
@@ -83,11 +85,11 @@ def test_logical_filters():
     # you can use a combination of logical filtering and element wise operation to
     # adjust the array to you your needs, but, more often than not, replace should
     # be more adequate.
-    assert (a * (1 < a < 4)).same_as(sh.replace(a, 1 < a < 4, 0.))
+    assert (a * ((1 < a) & (a < 4))).same_as(sh.where(((1 < a) & (a < 4)), a, 0.))
 
 
 def test_assigment_scalar():
-    c = sh.constant((3, 3, 3), 0, dtype="complex64")
+    c = sh.zeros((3, 3, 3),dtype="complex64")
     c[1, ...] = 1 + 1j
     c[..., 1] = 1 - 1j
 
@@ -113,9 +115,9 @@ def test_assigment_scalar():
                        [0. + 0.j, 1. - 1.j, 0. + 0.j]]])
 
 
-def test_assigment_vector():
-    c = sh.constant((3, 3, 3), 0., dtype="float32")
-    d = sh.constant((3, 3, 3), 1., dtype="float32")
+def test_assignment_vector():
+    c = sh.zeros((3, 3, 3), dtype="float32")
+    d = sh.ones((3, 3, 3), dtype="float32")
     c[0, ..., 0] = 1.
     c[0, ..., 0] = d[0, ..., 0]
 
@@ -174,16 +176,16 @@ def test_batch_with():
 def test_batch_parallel_range():
     n = 5
     m = 5
-    a = sh.randu((n, m), dtype="float32")
-    b = sh.constant((n, m), 0, dtype="float32")
+    a = sh.random.random((n, m), dtype="float32")
+    b = sh.zeros((n, m), dtype="float32")
 
     for ii in sh.parallel_range(m):
-        b[..., ii] = ii + a[..., ii]
+        b[..., ii] = sh.sin(ii) + a[..., ii]
 
     assert (b - a).same_as([
-        [0., 0., 0., 0., 0.],
-        [1., 1., 1., 1., 1.],
-        [2., 2., 2., 2., 2.],
-        [3., 3., 3., 3., 3.],
-        [4., 4., 4., 4., 4.]
+        [ 0.0000,  0.0000,  0.0000,  0.0000,  0.0000],
+        [ 0.8415,  0.8415,  0.8415,  0.8415,  0.8415],
+        [ 0.9093,  0.9093,  0.9093,  0.9093,  0.9093],
+        [ 0.1411,  0.1411,  0.1411,  0.1411,  0.1411],
+        [-0.7568, -0.7568, -0.7568, -0.7568, -0.7568]
     ])

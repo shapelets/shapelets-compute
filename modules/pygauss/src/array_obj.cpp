@@ -11,13 +11,19 @@ typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs
 
 
 af::array binary_function(const af::array &self, const py::object &other, bool reverse, binaryFn fn) {
-    af::array rhs = pygauss::arraylike::cast(other, false, self.dims(), self.type());
+    af::array rhs = pygauss::arraylike::as_itself_or_promote(other, self.dims());
+
+    auto batch = pygauss::GForStatus::get();
+    if (!batch) {
+        // check if we can broadcast by either tiling or setting the batch flag.
+        // TODO
+    }
 
     af_array out = nullptr;
     if (!reverse)
-        pygauss::throw_on_error((*fn)(&out, self.get(), rhs.get(), pygauss::GForStatus::get()));
+        pygauss::throw_on_error((*fn)(&out, self.get(), rhs.get(), batch));
     else
-        pygauss::throw_on_error((*fn)(&out, rhs.get(), self.get(), pygauss::GForStatus::get()));
+        pygauss::throw_on_error((*fn)(&out, rhs.get(), self.get(), batch));
 
     return af::array(out);
 }
@@ -26,7 +32,7 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
 #define BINARY_OP(OP, PYTHON_FN)                                                                        \
     ka.def(#PYTHON_FN,                                                                                  \
                    [](const af::array &self, const py::object &other){                                  \
-                       spd::debug("Binary operation {}", #OP);                                          \
+                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, false, OP);                                  \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
@@ -35,7 +41,7 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
 #define BINARY_OPR(OP, PYTHON_FN)                                                                        \
     ka.def(#PYTHON_FN,                                                                                   \
                    [](const af::array &self, const py::object &other){                                  \
-                       spd::debug("Binary reverse operation {}", #OP);                                  \
+                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, true, OP);                                   \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
@@ -45,7 +51,7 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
     ka.def(#PYTHON_FN,                                                                                  \
                    [](af::array &self, const py::object &other){                                        \
                        spd::debug("Binary inplace operation {}", #OP);                                  \
-                       self = binary_function(self, other, false, OP);                                  \
+                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return self;                                                                     \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
@@ -58,26 +64,15 @@ void pygauss::bindings::array_obj(py::module &m) {
 
     py::class_<af::array> ka(m, "ShapeletsArray", py::buffer_protocol());
 
-    ka.def_buffer(&pygauss::arraylike::buffer_protocol);
+    ka.def_buffer(&pygauss::arraylike::numpy_buffer_protocol);
 
     ka.def("same_as",
            [](const af::array &self, const py::object &arr_like, const py::float_ &eps) {
-
-               auto other = pygauss::arraylike::cast(arr_like, false, std::nullopt, self.type());
-
-               if (self.dims() != other.dims())
-                   return false;
-
-               auto typed = other;
-               if (other.type() != self.type())
-                   typed = other.as(self.type());
-
+               auto other = pygauss::arraylike::as_array_like(arr_like, self);
                auto non_nan_self = self.copy();
                auto non_nan_other = other.copy();
-
                non_nan_self(af::where(af::isNaN(self))) = 0.0;
-               non_nan_other(af::where(af::isNaN(typed))) = 0.0;
-
+               non_nan_other(af::where(af::isNaN(other))) = 0.0;
                return af::allTrue<bool>(af::abs(non_nan_self - non_nan_other) < (double) eps);
            },
            py::arg("arr_like").none(false),
@@ -101,15 +96,12 @@ void pygauss::bindings::array_obj(py::module &m) {
 
     ka.def("__setitem__",
            [](af::array &self, const py::object &selector, const py::object &value) {
-
                // Interpret the index expression...
                auto[res_dim, index_dim, index] = pygauss::arraylike::build_index(selector, self.dims());
-               // Interpret the assigment; if it is an array like expression, it will
-               // ignore index_dim and self.type(), leaving the final checks to
-               // arrayfire itself;  however, should it be a constant, index_dim and
-               // self.type() will be used to model the assigment to the dimensions
-               // of the operation.
-               af::array rhs = arraylike::cast(value, false, index_dim, self.type());
+               af::array rhs = arraylike::as_itself_or_promote(value, index_dim);
+               if (rhs.type() != self.type())
+                   rhs = rhs.as(self.type());
+
                // do the assigment...
                af_array out = nullptr;
                auto err = af_assign_gen(&out, self.get(), self.numdims(), index, rhs.get());
@@ -205,24 +197,24 @@ void pygauss::bindings::array_obj(py::module &m) {
 
     ka.def("__repr__",
            [](const af::array &self) {
+               self.eval();
                char *out = nullptr;
-               af_array_to_string(&out, "", self.get(), 4, true);
+               af_array_to_string(&out, "", self.get(), 4, !self.isvector());
                return std::string(out);
            });
 
     ka.def("display",
-           [](const af::array &self, int precision, bool transpose) {
+           [](const af::array &self, int precision) {
                self.eval();
                char *out = nullptr;
-               af_array_to_string(&out, "", self.get(), precision, transpose);
+               af_array_to_string(&out, "", self.get(), precision, !self.isvector());
                py::print(py::str(out));
            },
-           py::arg("precision") = 4,
-           py::arg("transpose") = true);
+           py::arg("precision") = 4);
 
     ka.def("__matmul__",
            [](const af::array &self, const py::object &other) {
-               af::array rhs = pygauss::arraylike::cast(other);
+               af::array rhs = pygauss::arraylike::as_array_checked(other);
 
                af_array out = nullptr;
                throw_on_error(af_matmul(&out, self.get(), rhs.get(), AF_MAT_NONE, AF_MAT_NONE));
@@ -233,7 +225,7 @@ void pygauss::bindings::array_obj(py::module &m) {
 
     ka.def("__rmatmul__",
            [](const af::array &self, const py::object &other) {
-               af::array rhs = pygauss::arraylike::cast(other);
+               af::array rhs = pygauss::arraylike::as_array_checked(other);
 
                af_array out = nullptr;
                throw_on_error(af_matmul(&out, rhs.get(), self.get(), AF_MAT_NONE, AF_MAT_NONE));
@@ -303,12 +295,14 @@ void pygauss::bindings::array_obj(py::module &m) {
           [](const py::args &args) {
               if (args.is_none() || args.empty())
                   return;
+
               std::vector<af_array> lst;
               for (size_t i = 0; i < args.size(); i++) {
                   auto obj = args[i];
                   if (!obj.is_none() && py::isinstance<af::array>(obj))
                       lst.push_back(py::cast<af::array>(obj).get());
               }
+
               if (!lst.empty()) {
                   throw_on_error(af_eval_multiple(lst.size(), lst.data()));
               }

@@ -1,6 +1,7 @@
 #ifndef __PYGAUSS_H__
 #define __PYGAUSS_H__
 
+#include <half.hpp>
 #include <arrayfire.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -64,7 +65,7 @@ namespace pygauss {
         bool already_enabled;
     public:
         gfor_acquire() {
-            already_enabled = !GForStatus::get();
+            already_enabled = GForStatus::get();
             if (!already_enabled)
                 GForStatus::set(true);
         }
@@ -228,7 +229,7 @@ namespace pygauss {
         /**
          * Exposes an af array through the buffer protocol
          */
-        py::buffer_info buffer_protocol(const af::array &self);
+        py::buffer_info numpy_buffer_protocol(const af::array &self);
 
         /**
          * Returns true if the object is a scalar, that is, if the
@@ -237,99 +238,89 @@ namespace pygauss {
          */
         bool is_scalar(const py::object &value);
 
-        /**
-         * Returns true if the object can be interpreted as an array by
-         * checking internal representations
-         */
-        bool is_array(const py::object &value);
-
-        /**
-         * Returns an af::array instance based on the python object received.
-         *
-         * This implementation tests first if the actual object itself represents
-         * an af::array or a ParallelFor before testing other possible conversions.
-         *
-         * `shape` and `dtype` parameters are only used if `array_like` represents
-         * a constant value.  If you wish to ensure the shape / type of the cast,
-         * use `cast_and_adjust`.
-         *
-         * @return   An empty optional container if the conversion cannot be executed; otherwise,
-         * a valid arrayfire instance.
-         */
-        std::optional<af::array> try_cast(const py::object &value,
-                                          const std::optional<af::dim4> &shape = std::nullopt,
-                                          const std::optional<af::dtype> &dtype = std::nullopt);
-
-        /**
-         * Same version as try_cast, but with no optionality.  `shape` and `dtype` parameters
-         * are only used if `array_like` represents a constant value.
-         *
-         * @return   Throws an exception if the conversion cannot be performed; otherwise, it
-         * returns a valid arrayfire instance.
-         */
-        af::array cast(const py::object &array_like,
-                       bool floating = false,
-                       const std::optional<af::dim4> &shape = std::nullopt,
-                       const std::optional<af::dtype> &dtype = std::nullopt);
-
-        /**
-         * This method is useful when interfacing with Python as it parses the object using
-         * `try_cast` method, but it will later on try to adjust the shape and type as given.
-         */
-        af::array cast_and_adjust(const py::object &array_like,
-                                  const std::optional<af::dim4> &shape,
-                                  const std::optional<af::dtype> &dtype);
+//        /**
+//         * Returns true if the object can be interpreted as an array by
+//         * checking internal representations
+//         */
+//        bool is_array(const py::object &value);
+//
+//        /**
+//         * Returns an af::array instance based on the python object received.
+//         *
+//         * This implementation tests first if the actual object itself represents
+//         * an af::array or a ParallelFor before testing other possible conversions.
+//         *
+//         * `shape` and `dtype` parameters are only used if `array_like` represents
+//         * a constant value.  If you wish to ensure the shape / type of the cast,
+//         * use `cast_and_adjust`.
+//         *
+//         * @return   An empty optional container if the conversion cannot be executed; otherwise,
+//         * a valid arrayfire instance.
+//         */
+//        std::optional<af::array> try_cast(const py::object &value,
+//                                          const std::optional<af::dim4> &shape = std::nullopt,
+//                                          const std::optional<af::dtype> &dtype = std::nullopt);
+//
+//        /**
+//         * Same version as try_cast, but with no optionality.  `shape` and `dtype` parameters
+//         * are only used if `array_like` represents a constant value.
+//         *
+//         * @return   Throws an exception if the conversion cannot be performed; otherwise, it
+//         * returns a valid arrayfire instance.
+//         */
+//        af::array cast(const py::object &array_like,
+//                       bool floating = false,
+//                       const std::optional<af::dim4> &shape = std::nullopt,
+//                       const std::optional<af::dtype> &dtype = std::nullopt);
+//
+//        /**
+//         * This method is useful when interfacing with Python as it parses the object using
+//         * `try_cast` method, but it will later on try to adjust the shape and type as given.
+//         */
+//        af::array cast_and_adjust(const py::object &array_like,
+//                                  const std::optional<af::dim4> &shape,
+//                                  const std::optional<af::dtype> &dtype);
 
 
         /**
          * Checks if src is of type floating (that is any floating or complex type).  If
-         * it is not, it returns a new array whose type is either f32 or f64 as a function
+         * it is not, it converts src to a new array whose type is either f32 or f64 as a function
          * of the currently selected device.
          */
-        af::array ensure_floating(const af::array& src);
+        void ensure_floating(af::array& src, bool warn_if_conversion = true);
+
+        std::optional<af::array> as_array(const py::object& obj);
+
+        af::array as_itself_or_promote(const py::object& obj, const af::dim4 &shape);
+
+        af::array as_array_like(const py::object& obj, const std::optional<af::dim4> &shape,
+                                const std::optional<af::dtype> &dtype);
+
+        af::array as_array_like(const py::object& obj, const af::array& like);
+
+        af::array as_array_checked(const py::object& obj);
+
+        std::optional<af::array> scalar_as_array(const py::object& obj, const af::dim4& shape);
+        af::array scalar_as_array_checked(const py::object& obj, const af::dim4& shape);
+
+        std::optional<std::pair<af::array, af::array>> as_array(const py::object &x, const py::object &y);
 
         /**
          * The inner detail namespace is where specializations happen
          */
         namespace detail {
 
-            /**
-             * Builds a constant array from a single value.  The resulting array
-             * has the dimensionality indicated in `shape`.
-             */
-            std::optional<af::array> from_scalar(const py::object &value, const af::dim4 &shape, const std::optional<af::dtype> &dtype);
+            bool numpy_is_scalar(const py::object& value);
+            af::array numpy_scalar_to_array(const py::object& value, const af::dim4 &shape);
 
-            /**
-             * Returns true if the object can be casted safely to an af::array.
-             */
-            bool is_af_array(const py::object &value);
+            bool python_is_scalar(const py::object& value);
+            af::array python_scalar_to_array(const py::object& value, const af::dim4 &shape);
 
-            /**
-             * Casts `value` to an arrayfire array.  This includes the scenario where the
-             * `value` is an instance of a ParallelFor
-             */
-            std::optional<af::array> from_af_array(const py::object &value);
+            bool numpy_is_array(const py::object& value);
+            af::array numpy_array_to_array(const py::object &value);
 
-            /**
-             * Returns true if the `value` can be processed safely as an arrow structure.
-             */
-            bool is_arrow(const py::object &value);
-
-            /**
-             * Casts `value` to an arrayfire array.
-             */
-            std::optional<af::array> from_arrow(const py::object &value);
-
-            /**
-             * Returns true if `value` can be processed by the numpy runtime and return
-             * an array abstraction (array-like)
-             */
-            bool is_numpy(const py::object &value);
-
-            /**
-             * Cast `value` to an array fire array.
-             */
-            std::optional<af::array> from_numpy(const py::object &value);
+            bool af_is_array(const py::object &value);
+            af::array from_af_array(const py::object &value);
         }
     }
 

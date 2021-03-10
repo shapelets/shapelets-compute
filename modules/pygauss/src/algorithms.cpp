@@ -92,7 +92,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
     //
     m.def("any",
           [](const py::object &array_like, const std::optional<int> &dim) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               std::variant<bool, af::array> result;
               if (!dim.has_value())
@@ -108,7 +108,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("all",
           [](const py::object &array_like, const std::optional<int> &dim) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               std::variant<bool, af::array> result;
               if (!dim.has_value())
@@ -130,7 +130,8 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("nan_to_num",
           [](const py::object &array_like, double nan, double inf) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
+
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with corresponding values of nan, when cond is false.
@@ -164,7 +165,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("amin",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               if (!dim.has_value())                         // NOLINT(bugprone-branch-clone)
                   return a.iscomplex() ?
@@ -178,7 +179,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("nanmin",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
@@ -209,7 +210,8 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("argmin",
           [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
+
               if (!dim.has_value()) {
                   double real, imag;
                   unsigned int index;
@@ -218,6 +220,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
                          std::make_tuple(index, std::complex<double>(real, imag)) :
                          std::make_tuple(index, real);
               }
+
               af_array out = nullptr;
               af_array index = nullptr;
               throw_on_error(af_imin(&out, &index, a.get(), dim.value()));
@@ -229,7 +232,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("nanargmin",
           [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               // choose a sensible max value to replace the nans
               double min = -std::numeric_limits<float>::max();
@@ -270,12 +273,13 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("amax",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               if (!dim.has_value())                         // NOLINT(bugprone-branch-clone)
                   return a.iscomplex() ?
                          reduce_all_complex(a, af_max_all) :
                          reduce_all_real(a, af_max_all);
+
               return reduce_dim(a, dim.value(), af_max);
           },
           py::arg("array_like").none(false),
@@ -284,7 +288,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("nanmax",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
@@ -315,7 +319,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("argmax",
           [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               if (!dim.has_value()) {
                   double real, imag;
@@ -337,7 +341,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("nanargmax",
           [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               // choose a sensible max value to replace the nans
               double min = -std::numeric_limits<float>::max();
@@ -373,7 +377,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("count_nonzero",
           [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               if (!dim.has_value())
                   return reduce_all_real(a, af_count_all);
@@ -386,7 +390,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
     m.def("sum",
           [](const py::object &array_like, const std::optional<int> &dim,
              const std::optional<double> &nan_value) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               if (!dim.has_value()) {
                   if (!nan_value.has_value())
@@ -416,7 +420,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
     m.def("product",
           [](const py::object &array_like, const std::optional<int> &dim,
              const std::optional<double> &nan_value) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
 
               if (!dim.has_value()) {
                   if (!nan_value.has_value())
@@ -445,7 +449,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("cumsum",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               return reduce_dim(a, dim, af_accum);
           },
           py::arg("array_like").none(false),
@@ -454,7 +458,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("nancumsum",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with zero, when cond is false.
@@ -467,7 +471,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("cumprod",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               return af::scan(a, dim, AF_BINARY_MUL, true);
           },
           py::arg("array_like").none(false),
@@ -476,7 +480,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("nancumprod",
           [](const py::object &array_like, int dim) -> numberOrArray {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with zero, when cond is false.
@@ -490,7 +494,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("scan",
           [](const py::object &array_like, int dim, const af::binaryOp &op, const bool &inclusive_scan) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               return af::scan(a, dim, op, inclusive_scan);
           },
           py::arg("array_like").none(false),
@@ -501,7 +505,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 //
     m.def("nanscan",
           [](const py::object &array_like, int dim, double nan, const af::binaryOp &op, const bool &inclusive_scan) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               // array containing 1's where input is NaN, and 0 otherwise.
               auto nanLocations = af::isNaN(a);
               // Values of "a" are replaced with zero, when cond is false.
@@ -519,7 +523,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("diff1",
           [](const py::object &array_like, int dim) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               return reduce_dim(a, dim, af_diff1);
           },
           py::arg("array_like").none(false),
@@ -528,7 +532,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("diff2",
           [](const py::object &array_like, int dim) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               return reduce_dim(a, dim, af_diff2);
           },
           py::arg("array_like").none(false),
@@ -537,7 +541,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("sort",
           [](const py::object &array_like, int dim, const bool &asc) -> std::tuple<af::array, af::array> {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               af::array indices, data;
               af::sort(data, indices, a, dim, asc);
 
@@ -551,9 +555,9 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("sort_keys",
           [](const py::object &data, const py::object &keys, int dim,
-             const bool &asc) -> std::tuple<af::array, af::array> {
-              auto a = pygauss::arraylike::cast(data);
-              auto k = pygauss::arraylike::cast(keys);
+             const bool asc) -> std::tuple<af::array, af::array> {
+              auto a = pygauss::arraylike::as_array_checked(data);
+              auto k = pygauss::arraylike::as_array_checked(keys);
 
               af::array sorted_keys, sorted_data;
               af::sort(sorted_keys, sorted_data, k, a, dim, asc);
@@ -563,13 +567,13 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
           py::arg("data").none(false),
           py::arg("keys").none(false),
           py::arg("dim") = 0,
-          py::arg("asc") = py::bool_(true),
+          py::arg("asc") = true,
           "Sort the array along a specified dimension using an auxiliary array containing the indexing keys.  "
           "This method returns a tuple with the data and the keys sorted");
 
     m.def("flatnonzero",
           [](const py::object &array_like) -> af::array {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               return af::where(a);
           },
           py::arg("array_like").none(false),
@@ -578,7 +582,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("unique",
           [](const py::object &array_like, const bool &is_sorted) {
-              auto a = pygauss::arraylike::cast(array_like);
+              auto a = pygauss::arraylike::as_array_checked(array_like);
               return af::setUnique(a, is_sorted);
           },
           py::arg("array_like").none(false),
@@ -587,8 +591,8 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("union",
           [](const py::object &x1, const py::object &x2, const bool &is_unique) {
-              auto a = pygauss::arraylike::cast(x1);
-              auto b = pygauss::arraylike::cast(x2);
+              auto a = pygauss::arraylike::as_array_checked(x1);
+              auto b = pygauss::arraylike::as_array_checked(x2);
               return af::setUnion(a, b, is_unique);
           },
           py::arg("x1").none(false),
@@ -598,8 +602,8 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     m.def("intersect",
           [](const py::object &x1, const py::object &x2, const bool &is_unique) {
-              auto a = pygauss::arraylike::cast(x1);
-              auto b = pygauss::arraylike::cast(x2);
+              auto a = pygauss::arraylike::as_array_checked(x1);
+              auto b = pygauss::arraylike::as_array_checked(x2);
               return af::setIntersect(a, b, is_unique);
           },
           py::arg("x1").none(false),

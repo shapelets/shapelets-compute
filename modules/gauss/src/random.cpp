@@ -162,6 +162,26 @@ af::array gauss::random::gamma(double alpha,
     return af::moddims(result, shape);
 }
 
+af::array gauss::random::permute(const af::array& original,
+                                 const dim_t axis,
+                                 const std::optional<af::randomEngine> &engine) {
+
+    auto re = engine.value_or(af::getDefaultRandomEngine());
+    auto len = original.dims(axis);
+    auto tmp = af::randu(af::dim4(len, 1, 1, 1), af::dtype::f32, re);
+    af::array val, idx;
+    af::sort(val, idx, tmp);
+    switch (axis) {
+        case 0:
+            return original(idx, af::span, af::span, af::span);
+        case 1:
+            return original(af::span, idx, af::span, af::span);
+        case 2:
+            return original(af::span, af::span, idx, af::span);
+        default:
+            return original(af::span, af::span, af::span, idx);
+    }
+}
 
 af::array gauss::random::uniform(double low,
                                  double high,
