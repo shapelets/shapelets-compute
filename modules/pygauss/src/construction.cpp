@@ -89,9 +89,10 @@ void pygauss::bindings::array_construction_operations(py::module &m) {
 
     m.def("full",
           [](const af::dim4 &shape, const py::object &fill_value, const af::dtype &dtype) {
-              auto candidate = arraylike::scalar_as_array(fill_value, shape);
+              auto candidate = arraylike::scalar_as_array(fill_value, shape, dtype);
               if (!candidate)
                   throw std::invalid_argument("Unable to create array");
+
               auto result = candidate.value();
               if (result.type() == dtype)
                   return result;

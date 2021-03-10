@@ -70,7 +70,7 @@ namespace pygauss::arraylike {
         return std::nullopt;
     }
 
-    af::array as_itself_or_promote(const py::object& obj, const af::dim4 &shape) {
+    af::array as_itself_or_promote(const py::object& obj, const af::dim4 &shape, const af::dtype& ref_type) {
         std::optional<af::array> candidate = std::nullopt;
         if (detail::af_is_array(obj))
             candidate = detail::from_af_array(obj);
@@ -81,9 +81,9 @@ namespace pygauss::arraylike {
             return candidate.value();
 
         if (detail::python_is_scalar(obj))
-            candidate = detail::python_scalar_to_array(obj, shape);
+            candidate = detail::python_scalar_to_array(obj, shape, ref_type);
         else if (detail::numpy_is_scalar(obj))
-            candidate = detail::numpy_scalar_to_array(obj, shape);
+            candidate = detail::numpy_scalar_to_array(obj, shape, ref_type);
 
         if (!candidate)
             throw std::invalid_argument("Unable to process object as valid scalar or tensor");
@@ -93,6 +93,7 @@ namespace pygauss::arraylike {
 
     af::array as_array_like(const py::object& obj, const std::optional<af::dim4> &shape,
                             const std::optional<af::dtype> &dtype) {
+
         std::optional<af::array> candidate = std::nullopt;
         if (detail::af_is_array(obj))
             candidate = detail::from_af_array(obj);
@@ -110,6 +111,7 @@ namespace pygauss::arraylike {
 
             if (dtype && (result.type() != dtype.value()))
                 result = result.as(dtype.value());
+
             return result;
         }
 
@@ -117,9 +119,9 @@ namespace pygauss::arraylike {
             throw std::invalid_argument("Shape is required to promote a scalar to tensor");
 
         if (detail::python_is_scalar(obj))
-            candidate = detail::python_scalar_to_array(obj, shape.value());
+            candidate = detail::python_scalar_to_array(obj, shape.value(), dtype.value_or(af::dtype::f32));
         else if (detail::numpy_is_scalar(obj))
-            candidate = detail::numpy_scalar_to_array(obj, shape.value());
+            candidate = detail::numpy_scalar_to_array(obj, shape.value(), dtype.value_or(af::dtype::f32));
 
         if (!candidate)
             throw std::invalid_argument("Unable to process scalar value");
@@ -139,9 +141,9 @@ namespace pygauss::arraylike {
         else if (detail::numpy_is_array(obj))
             candidate = detail::numpy_array_to_array(obj);
         else if (detail::python_is_scalar(obj))
-            candidate = detail::python_scalar_to_array(obj, like.dims());
+            candidate = detail::python_scalar_to_array(obj, like.dims(), like.type());
         else if (detail::numpy_is_scalar(obj))
-            candidate = detail::numpy_scalar_to_array(obj, like.dims());
+            candidate = detail::numpy_scalar_to_array(obj, like.dims(), like.type());
 
         if (!candidate)
             throw std::invalid_argument("Unable to convert to array");
@@ -172,18 +174,18 @@ namespace pygauss::arraylike {
     /**
      * Builds an array from a scalar value to the dimensions specified in shape
      */
-    std::optional<af::array> scalar_as_array(const py::object& obj, const af::dim4& shape) {
+    std::optional<af::array> scalar_as_array(const py::object& obj, const af::dim4& shape, const af::dtype& ref_type) {
         if (detail::python_is_scalar(obj))
-            return detail::python_scalar_to_array(obj, shape);
+            return detail::python_scalar_to_array(obj, shape, ref_type);
 
         if (detail::numpy_is_scalar(obj))
-            return detail::numpy_scalar_to_array(obj, shape);
+            return detail::numpy_scalar_to_array(obj, shape, ref_type);
 
         return std::nullopt;
     }
 
-    af::array scalar_as_array_checked(const py::object& obj, const af::dim4& shape) {
-        auto conv = scalar_as_array(obj, shape);
+    af::array scalar_as_array_checked(const py::object& obj, const af::dim4& shape, const af::dtype& ref_type) {
+        auto conv = scalar_as_array(obj, shape, ref_type);
         if (!conv)
             throw std::invalid_argument("Unable to convert to array");
         return conv.value();
@@ -218,9 +220,9 @@ namespace pygauss::arraylike {
             return std::make_pair(x_as_array.value(), y_as_array.value());
 
         if (x_as_array)
-            y_as_array = scalar_as_array(y, x_as_array->dims());
+            y_as_array = scalar_as_array(y, x_as_array->dims(), x_as_array->type());
         else
-            x_as_array = scalar_as_array(x, y_as_array->dims());
+            x_as_array = scalar_as_array(x, y_as_array->dims(), y_as_array->type());
 
         // if either is not an array, fail with std::nullopt
         if (!x_as_array || !y_as_array)

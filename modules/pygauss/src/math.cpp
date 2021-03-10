@@ -218,11 +218,11 @@ void pygauss::bindings::math_operations(py::module_ &m) {
 
               if (!up.is_none() && !lo.is_none()) {
                   auto u = pygauss::arraylike::is_scalar(up) ?
-                           pygauss::arraylike::scalar_as_array_checked(up, a.dims()) :
+                           pygauss::arraylike::scalar_as_array_checked(up, a.dims(), a.type()) :
                            pygauss::arraylike::as_array_checked(up);
 
                   auto l = pygauss::arraylike::is_scalar(lo) ?
-                           pygauss::arraylike::scalar_as_array_checked(lo, a.dims()) :
+                           pygauss::arraylike::scalar_as_array_checked(lo, a.dims(), a.type()) :
                            pygauss::arraylike::as_array_checked(lo);
 
                   af_array out = nullptr;
@@ -232,7 +232,7 @@ void pygauss::bindings::math_operations(py::module_ &m) {
 
               if (!up.is_none()) {
                   auto u = pygauss::arraylike::is_scalar(up) ?
-                           pygauss::arraylike::scalar_as_array_checked(up, a.dims()) :
+                           pygauss::arraylike::scalar_as_array_checked(up, a.dims(), a.type()) :
                            pygauss::arraylike::as_array_checked(up);
 
                   af_array out = nullptr;
@@ -241,7 +241,7 @@ void pygauss::bindings::math_operations(py::module_ &m) {
               }
 
               auto l = pygauss::arraylike::is_scalar(lo) ?
-                       pygauss::arraylike::scalar_as_array_checked(lo, a.dims()) :
+                       pygauss::arraylike::scalar_as_array_checked(lo, a.dims(), a.type()) :
                        pygauss::arraylike::as_array_checked(lo);
 
               af_array out = nullptr;

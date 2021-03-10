@@ -291,7 +291,7 @@ namespace pygauss {
 
         std::optional<af::array> as_array(const py::object& obj);
 
-        af::array as_itself_or_promote(const py::object& obj, const af::dim4 &shape);
+        af::array as_itself_or_promote(const py::object& obj, const af::dim4 &shape, const af::dtype& ref_type);
 
         af::array as_array_like(const py::object& obj, const std::optional<af::dim4> &shape,
                                 const std::optional<af::dtype> &dtype);
@@ -300,8 +300,8 @@ namespace pygauss {
 
         af::array as_array_checked(const py::object& obj);
 
-        std::optional<af::array> scalar_as_array(const py::object& obj, const af::dim4& shape);
-        af::array scalar_as_array_checked(const py::object& obj, const af::dim4& shape);
+        std::optional<af::array> scalar_as_array(const py::object& obj, const af::dim4& shape, const af::dtype& ref_type);
+        af::array scalar_as_array_checked(const py::object& obj, const af::dim4& shape, const af::dtype& ref_type);
 
         std::optional<std::pair<af::array, af::array>> as_array(const py::object &x, const py::object &y);
 
@@ -310,11 +310,13 @@ namespace pygauss {
          */
         namespace detail {
 
+            af::dtype harmonize_types(const af::dtype scalar_type, const af::dtype array_type);
+
             bool numpy_is_scalar(const py::object& value);
-            af::array numpy_scalar_to_array(const py::object& value, const af::dim4 &shape);
+            af::array numpy_scalar_to_array(const py::object& value, const af::dim4 &shape, const af::dtype& ref_type);
 
             bool python_is_scalar(const py::object& value);
-            af::array python_scalar_to_array(const py::object& value, const af::dim4 &shape);
+            af::array python_scalar_to_array(const py::object& value, const af::dim4 &shape, const af::dtype& ref_type);
 
             bool numpy_is_array(const py::object& value);
             af::array numpy_array_to_array(const py::object &value);

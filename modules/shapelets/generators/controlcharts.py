@@ -340,10 +340,10 @@ if __name__ == '__main__':
         # [cc_upward(), cc_normal()],
         # [[cc_cyclic(), cc_normal()], [.9, .1]],
         # cc_decreasing()+cc_cyclic(),
-        # cc_downward(),
-        # cc_decreasing(),
-        cc_downward() + 0.5*white_noise(),
-        cc_upward() + 0.5*white_noise(),
+        cc_increasing(),
+        cc_decreasing(),
+        cc_downward() + 0.3*white_noise(),
+        cc_upward() + 0.3*white_noise(),
         
     ]
 
@@ -353,7 +353,13 @@ if __name__ == '__main__':
     # sh.random.permutation(arr, 1).display()
     # sh.random.permutation(10).display()
 
-    r = generate(program, 1000, start_level=100.0, repetitions=1)
-    plt.plot(r)
-    plt.show()
+    sh_rnd = sh.random.default_rng()
+    print(cc_increasing().generate_delta(10, sh_rnd).dtype)
+    print(cc_decreasing().generate_delta(10, sh_rnd).dtype)
+    # print((cc_downward() + 0.3*white_noise()).generate_delta(10, sh_rnd).dtype)
+    # print((cc_upward() + 0.3*white_noise()).generate_delta(10, sh_rnd).dtype)
+
+    # r = generate(program, 1000, start_level=100.0, repetitions=10)
+    # plt.plot(r)
+    # plt.show()
     

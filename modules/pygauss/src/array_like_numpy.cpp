@@ -137,7 +137,7 @@ namespace pygauss::arraylike {
             return af::isDoubleAvailable(af::getDevice()) ? _64 : _32;
         }
 
-        af::array numpy_scalar_to_array(const py::object &value, const af::dim4 &shape) {
+        af::array numpy_scalar_to_array(const py::object &value, const af::dim4 &shape, const af::dtype& ref_type) {
             auto arr = py::array::ensure(value);
             if (!arr) throw std::invalid_argument("Value not a valid numpy object");
 
@@ -147,6 +147,8 @@ namespace pygauss::arraylike {
             auto type = dtype_converter::load(arr.dtype().cast<py::handle>());
             if (!type.has_value()) throw std::invalid_argument("Unsupported value type.");
 
+            auto actual_type = harmonize_types(type.value(), ref_type);
+
             af_array handle = nullptr;
             af_err err;
             switch (type.value()) {
@@ -154,91 +156,86 @@ namespace pygauss::arraylike {
                     auto ptr = arr.unchecked<std::complex<float>>()(0);
                     auto real = static_cast<double>(ptr.real());
                     auto imag = static_cast<double>(ptr.imag());
-                    err = af_constant_complex(&handle, real, imag, shape.ndims(), shape.get(), af::dtype::c32);
+                    err = af_constant_complex(&handle, real, imag, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
                 case af::dtype::c64: {
                     auto ptr = arr.unchecked<std::complex<double>>()(0);
-                    err = af_constant_complex(&handle, ptr.real(), ptr.imag(), shape.ndims(), shape.get(),
-                                              choose_type(af::dtype::c64, af::dtype::c32));
+                    err = af_constant_complex(&handle, ptr.real(), ptr.imag(), shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::s16: {
                     auto data = arr.unchecked<int16_t>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::s16);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
                 case af::dtype::s32: {
                     auto data = arr.unchecked<int32_t>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::s32);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
                 case af::dtype::s64: {
                     auto data = arr.unchecked<int64_t>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(),
-                                      choose_type(af::dtype::s64, af::dtype::s32));
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::f16: {
                     auto data = arr.unchecked<half>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(),
-                                      af::isHalfAvailable(af::getDevice()) ? af::dtype::f16 : af::dtype::f32);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::f32: {
                     auto data = arr.unchecked<float>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::f32);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::f64: {
                     auto data = arr.unchecked<double>()(0);
-                    err = af_constant(&handle, data, shape.ndims(), shape.get(),
-                                      choose_type(af::dtype::f64, af::dtype::f32));
+                    err = af_constant(&handle, data, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::u8: {
                     auto data = arr.unchecked<uint8_t>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::u8);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::u16: {
                     auto data = arr.unchecked<uint16_t>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::u16);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::u32: {
                     auto data = arr.unchecked<uint32_t>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::u32);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
 
                 case af::dtype::u64: {
                     auto data = arr.unchecked<uint64_t>()(0);
                     auto casted = static_cast<double>(data);
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(),
-                                      choose_type(af::dtype::u64, af::dtype::u32));
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(),actual_type);
                     break;
                 }
 
                 case af::dtype::b8: {
                     auto data = arr.unchecked<uint8_t>()(0);
                     auto casted = data == 1 ? 1.0 : 0.0;
-                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), af::dtype::b8);
+                    err = af_constant(&handle, casted, shape.ndims(), shape.get(), actual_type);
                     break;
                 }
             }

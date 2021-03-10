@@ -12,27 +12,26 @@ bool python_is_scalar(const py::object& value) {
            || py::isinstance<std::complex<double>>(value);
 }
 
-af::array python_scalar_to_array(const py::object& value, const af::dim4 &shape) {
+af::array python_scalar_to_array(const py::object& value, const af::dim4 &shape, const af::dtype& ref_type) {
     af_array handle = nullptr;
-
-    auto _64BitsSupported = af::isDoubleAvailable(af::getDevice());
 
     auto err = AF_SUCCESS;
     if (py::isinstance<py::float_>(value)) {
-        auto actual_dtype = _64BitsSupported ? af::dtype::f64 : af::dtype::f32;
+        auto actual_dtype = harmonize_types(af::dtype::f64, ref_type);
         err = af_constant(&handle, py::cast<double>(value), shape.ndims(), shape.get(), actual_dtype);
 
     } else if (py::isinstance<py::bool_>(value)) {
+        auto actual_dtype = harmonize_types(af::dtype::b8, ref_type);
         auto v = py::cast<bool>(value) ? 1.0 : 0.0;
-        err = af_constant(&handle, v, shape.ndims(), shape.get(), af::dtype::b8);
+        err = af_constant(&handle, v, shape.ndims(), shape.get(), actual_dtype);
 
     } else if (py::isinstance<py::int_>(value)) {
-        auto actual_dtype =  _64BitsSupported ? af::dtype::f64 : af::dtype::f32;
+        auto actual_dtype = harmonize_types(af::dtype::s64, ref_type);
         err = af_constant(&handle, (double) py::cast<long>(value), shape.ndims(), shape.get(), actual_dtype);
 
     } else if (py::isinstance<std::complex<double>>(value)) {
         auto c = py::cast<std::complex<double>>(value);
-        auto actual_dtype =  _64BitsSupported ? af::dtype::c64 : af::dtype::c32;
+        auto actual_dtype = harmonize_types(af::dtype::c64, ref_type);
         err = af_constant_complex(&handle, c.real(), c.imag(), shape.ndims(), shape.get(), actual_dtype);
     } else {
         // Unsupported

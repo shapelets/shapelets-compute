@@ -11,7 +11,7 @@ typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs
 
 
 af::array binary_function(const af::array &self, const py::object &other, bool reverse, binaryFn fn) {
-    af::array rhs = pygauss::arraylike::as_itself_or_promote(other, self.dims());
+    af::array rhs = pygauss::arraylike::as_itself_or_promote(other, self.dims(), self.type());
 
     auto batch = pygauss::GForStatus::get();
     if (!batch) {
@@ -98,7 +98,7 @@ void pygauss::bindings::array_obj(py::module &m) {
            [](af::array &self, const py::object &selector, const py::object &value) {
                // Interpret the index expression...
                auto[res_dim, index_dim, index] = pygauss::arraylike::build_index(selector, self.dims());
-               af::array rhs = arraylike::as_itself_or_promote(value, index_dim);
+               af::array rhs = arraylike::as_itself_or_promote(value, index_dim, self.type());
                if (rhs.type() != self.type())
                    rhs = rhs.as(self.type());
 
@@ -287,7 +287,7 @@ void pygauss::bindings::array_obj(py::module &m) {
 
     ka.def("__neg__",
            [](const af::array &self) {
-               auto zero = py::float_(0.0);
+               auto zero = py::float_(0.0f);
                return binary_function(self, zero, true, af_sub);
            });
 

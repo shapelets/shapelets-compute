@@ -167,7 +167,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
           py::arg("lst").none(false),
           py::arg("dimension") = 0,
           R"_(
-    Joins up to 10 arrays along a particular dimension.
+    Joins any number of arrays along a particular dimension.
 
     In the case that not all objects in the lst are arrays, the parameters shape and dtype would guide
     the transformation; if those parameters are not set, the first array in the list will determine
