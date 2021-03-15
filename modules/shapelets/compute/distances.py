@@ -1,62 +1,66 @@
-from typing import Literal
+from .__basic_typing import ArrayLike
+from ._array_obj import ShapeletsArray
+
 from ._pygauss import (
-    euclidian as _euclidian, 
-    hamming as _hamming, 
-    manhattan as _manhattan, 
-    sbd as _sbd, 
-    dtw as _dtw
+    DistanceType,
+    pdist as _pdist,
+    cdist as _cdist
+    
 )   
 
-MetricType = Literal["euclidian", "hamming", "manhattan", "sbd", "dtw", "mpdist"]
-
-def pdist(tss, metric: MetricType): 
+def pdist(tss: ArrayLike, metric: DistanceType, **kwargs) -> ShapeletsArray: 
     """
     Pairwise distances between observations in n-dimensional space.
     """
-    pass
+    return _pdist(tss, metric, **kwargs)
 
-def cdist(xa, xb, metric: MetricType):
+def cdist(xa: ArrayLike, xb: ArrayLike, metric: DistanceType, **kwargs) -> ShapeletsArray: 
     """
     Compute distance between each pair of the two collections of inputs.
     """
-    pass 
+    return _cdist(xa, xb, metric, **kwargs)
 
-def euclidian(a, b):
+def euclidian(a: ArrayLike, b: ArrayLike) -> ShapeletsArray: 
     """
     Computes the Euclidean distance between two 1-D arrays.
     """
-    return cdist(a, b, "euclidian")
+    return cdist(a, b, DistanceType.Euclidian)
 
-def hamming(a, b):
+def hamming(a: ArrayLike, b: ArrayLike) -> ShapeletsArray: 
     """
     Computes the Hamming distance between two 1-D arrays.
     """
-    return cdist(a, b, "hamming")
+    return cdist(a, b, DistanceType.Hamming)
 
-def cityblock(a, b):
+def cityblock(a: ArrayLike, b: ArrayLike) -> ShapeletsArray: 
     """
     Computes the City Block (a.k.a. Manhantan) distance between two 1-D arrays.
     """
-    return cdist(a, b, "manhatan")
+    return cdist(a, b, DistanceType.Manhattan)
 
-def sbd(a, b):
+def sbd(a: ArrayLike, b: ArrayLike) -> ShapeletsArray: 
     """
     Computes the Shape-Based distance (SBD) between two 1-D arrays.
     
     It computes the normalized cross-correlation and it returns 1.0 minus the value 
     that maximizes the correlation value between each pair of time series.
     """
-    return cdist(a, b, "sbd")
+    return cdist(a, b, DistanceType.SBD)
 
-def dtw(a, b):
+def dtw(a: ArrayLike, b: ArrayLike) -> ShapeletsArray: 
     """
     Computes the Dynamic Time Warping Distance between two 1-D arrays.
     """
-    return cdist(a, b, "dtw")
+    return cdist(a, b, DistanceType.DTW)
 
-def mpdist(a, b):
+def mpdist(a: ArrayLike, b: ArrayLike) -> ShapeletsArray: 
     """
     Computes the Matrix Profile Distance between two 1-D arrays.
     """
-    return cdist(a, b, "mpdist")    
+    raise ValueError("Not implemented")
     
+def chebyshev(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
+    return cdist(a, b, DistanceType.Chebyshev)
+
+def minkowshi(a: ArrayLike, b: ArrayLike, p: float) -> ShapeletsArray:
+    return cdist(a, b, DistanceType.Minkowshi, p=p)

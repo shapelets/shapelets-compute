@@ -103,7 +103,9 @@
         "stop_token": "cpp",
         "filesystem": "cpp",
         "hash_map": "cpp",
-        "hash_set": "cpp"
+        "hash_set": "cpp",
+        "__functional_03": "cpp",
+        "__hash": "cpp"
     },
     "files.exclude": {
         "**/__pycache__": true,

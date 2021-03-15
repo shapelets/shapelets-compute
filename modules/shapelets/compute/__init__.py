@@ -1,8 +1,9 @@
 # keeping module
 from . import random
 from . import fft
+from . import distances 
 
-__all__ = ["random", "fft"]
+__all__ = ["random", "fft", "distances"]
 
 
 # direct imports
