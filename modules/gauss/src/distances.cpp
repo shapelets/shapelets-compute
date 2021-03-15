@@ -1,11 +1,36 @@
 #include <gauss/distances.h>
 #include <gauss/normalization.h>
+#include <gauss/matrix.h>
 
 #include <algorithm>
 #include <iostream>
 
 namespace gauss::distances {
 
+distance_algorithm_t mpdist(int32_t w, double threshold) {
+    return {
+        false,               // all same length
+        true,               // is symmetric
+        std::nullopt,       // results will be always integers.
+        [=](const af::array& src, const af::array& dst) {
+            auto dst_cols = dst.dims(1);
+            auto result = af::array(1, dst_cols, src.type());
+            af::array pab, pba, iab, iba;
+
+            for (auto ii = 0; ii < dst_cols; ii++) {
+                auto target = dst(af::span, ii);
+                gauss::matrix::matrixProfile(src, target, w, pab, iab);
+                gauss::matrix::matrixProfile(target, src, w, pba, iba);
+                auto abba = af::join(0, pab, pba);
+                auto sorted = af::sort(abba);
+                auto upper_idx = static_cast<dim_t>(std::ceil(threshold * (target.dims(0)+ src.dims(0)))) - 1;
+                auto checked_idx = std::min(sorted.dims(0)-1, upper_idx);
+                result(0, ii) = sorted(checked_idx);
+            }
+            return result;
+        }
+    };
+}
 
 
 distance_algorithm_t hamming() {

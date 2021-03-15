@@ -1,6 +1,7 @@
 import shapelets.compute as sc
 from shapelets.compute.distances import DistanceType
-
+import os
+import numpy as np
 
 def test_dist_euclidian():
     a = sc.array([[0, 0, 1],
@@ -179,7 +180,6 @@ def test_dist_sbd():
 
 
 def test_dist_dtw():
-    sc.set_backend(sc.Backend.OpenCL)
     a = sc.array([[0, 0, 1],
                   [0, 1, 0],
                   [1, 0, 0]], dtype="float32")
@@ -206,3 +206,19 @@ def test_dist_dtw():
         [2.0000, 3.0000, 1.0000, 2.0000, 0.0000, 1.0000, 0.0000, 1.0000],
         [3.0000, 2.0000, 2.0000, 1.0000, 2.0000, 1.0000, 1.0000, 0.0000]
     ])
+
+def test_dist_mpdist():
+    ts = sc.array([1., 2, 3, 1, 2, 3, 4, 5, 6, 0, 0, 1, 1, 2, 2, 4, 5, 1, 1, 9], dtype="float64")
+    query = sc.array([0.23595094, 0.9865171, 0.1934413, 0.60880883, 0.55174926, 0.77139988, 0.33529215, 0.63215848], dtype="float64")
+    s1 = sc.distances.mpdist(ts, query, 4)
+    s2 = sc.distances.mpdist(query,ts, 4)
+    assert s1.same_as(s2)
+    assert s1.same_as([0.4377])
+
+def test_dist_mpdist_against_data():
+    import pathlib
+    current_path = pathlib.Path(__file__).parent.absolute()
+    ts = np.loadtxt(os.path.join(current_path, 'sampledata.txt'))
+    tsb = ts[199:300]
+    w = 32
+    assert sc.distances.mpdist(ts, tsb, w).same_as([0.])

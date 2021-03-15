@@ -21,6 +21,7 @@ distance_algorithm_t chebyshev();
 distance_algorithm_t minkowshi(double p);
 distance_algorithm_t sbd();
 distance_algorithm_t dtw();
+distance_algorithm_t mpdist(int32_t w, double threshold = 0.05);
 
 af::array compute(const distance_algorithm_t& algo, const af::array& xa);
 af::array compute(const distance_algorithm_t& algo, const af::array& xa, const af::array &xb);

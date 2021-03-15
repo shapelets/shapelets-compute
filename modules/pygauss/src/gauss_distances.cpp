@@ -40,6 +40,17 @@ gauss::distances::distance_algorithm_t enumToAlgo(distance_types dst,py::kwargs 
       return gauss::distances::sbd();      
     case distance_types::DTW:
       return gauss::distances::dtw();
+    case distance_types::MPDIST: {
+        auto key = py::str("w");
+        if (!kwargs || !kwargs.contains(key)) throw std::invalid_argument("MPDist requires parameter w");
+        auto w = kwargs[key].cast<int32_t>();
+        auto thresKey = py::str("threshold");
+        auto threshold = 0.05;
+        if (kwargs.contains(thresKey)) {
+          threshold = kwargs[thresKey].cast<double>();
+        }
+        return gauss::distances::mpdist(w, threshold);
+      }
     default:
       throw std::runtime_error("TODO");
   }
@@ -74,8 +85,8 @@ void pygauss::bindings::gauss_distance_functions(py::module_ &m) {
         auto right = arraylike::as_array_checked(xb);
         return gauss::distances::compute(enumToAlgo(distType, kwargs), left, right);
     },
-    py::arg("xb").none(false),
     py::arg("xa").none(false),
+    py::arg("xb").none(false),
     py::arg("dst").none(false)
     );
 
