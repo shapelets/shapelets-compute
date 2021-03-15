@@ -3,6 +3,7 @@
 #include <gauss/dimensionality.h>
 #include <gauss/distances.h>
 #include <gauss/features.h>
+#include <gauss/fft.h>
 #include <gauss/filters.h>
 #include <gauss/linalg.h>
 #include <gauss/matrix.h>

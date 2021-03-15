@@ -149,6 +149,7 @@ namespace pybind11::detail {
                 case af::dtype::c32:
                     return pybind11::dtype::of<std::complex<float>>();
                 case af::dtype::c64:
+                default:
                     return pybind11::dtype::of<std::complex<double>>();
             }
         }

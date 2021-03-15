@@ -152,6 +152,7 @@ set(GAUSSLIB_SOURCES ${GAUSSLIB_SRC}/clustering.cpp
                      ${GAUSSLIB_SRC}/dimensionality.cpp
                      ${GAUSSLIB_SRC}/distances.cpp
                      ${GAUSSLIB_SRC}/features.cpp
+                     ${GAUSSLIB_SRC}/fft.cpp                     
                      ${GAUSSLIB_SRC}/filters.cpp
                      ${GAUSSLIB_SRC}/libraryInternal.cpp
                      ${GAUSSLIB_SRC}/linalg.cpp
@@ -171,6 +172,7 @@ set(GAUSSLIB_HEADERS ${GAUSSLIB_INC}/gauss/clustering.h
                      ${GAUSSLIB_INC}/gauss/dimensionality.h
                      ${GAUSSLIB_INC}/gauss/distances.h
                      ${GAUSSLIB_INC}/gauss/features.h
+                     ${GAUSSLIB_INC}/gauss/fft.h
                      ${GAUSSLIB_INC}/gauss/filters.h
                      ${GAUSSLIB_INC}/gauss/linalg.h
                      ${GAUSSLIB_INC}/gauss/matrix.h

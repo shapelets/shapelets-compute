@@ -49,7 +49,7 @@ namespace pygauss::arraylike {
 
         auto safe_conversion = af::isDoubleAvailable(af::getDevice()) ? af::dtype::f64 : af::dtype::f32;
         if (warn_if_conversion)
-            PyErr_WarnEx(PyExc_UserWarning, "Automatic conversion to floating array", 1);
+            PyErr_WarnEx(PyExc_UserWarning, "Automatic conversion to floating array", 2);
 
         src = src.as(safe_conversion);
     }

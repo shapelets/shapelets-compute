@@ -9,6 +9,7 @@ def test_slicing_invert():
 
 
 def test_slicing_ranges():
+
     a = sh.iota((4, 4), 1)
     # first two rows
     assert a[0:2, ::].same_as([[0, 4, 8, 12], [1, 5, 9, 13]])
@@ -47,12 +48,12 @@ def test_ellipsis_operator():
     assert a[...].same_as(a)
     ts = a[0, ..., 0]
     tn = n[0, ..., 0]
-    ts = sh.moddims(ts, (3, 1))
+    ts = sh.reshape(ts, (3, 1))
     assert ts.same_as(tn)
 
     ts = a[::, 1, ...]
     tn = n[::, 1, ...]
-    ts = sh.moddims(ts, (3, 3))
+    ts = sh.reshape(ts, (3, 3))
     assert ts.same_as(tn)
 
     assert a[..., 1, 1].same_as(n[..., 1, 1])
