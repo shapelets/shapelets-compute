@@ -2,9 +2,14 @@
 from . import random
 from . import fft
 from . import distances 
+<<<<<<< HEAD
 from . import matrixprofile
 
 __all__ = ["random", "fft", "distances", "matrixprofile"]
+=======
+
+__all__ = ["random", "fft", "distances"]
+>>>>>>> master
 
 
 # direct imports

@@ -117,5 +117,8 @@
     "python.pythonPath": "/Users/justo.ruiz/.pyenv/shims/python",
     "git.ignoreSubmodules": true,
     "jupyter.jupyterServerType": "local",
+<<<<<<< HEAD
     "jupyter.textOutputLimit": 0,
+=======
+>>>>>>> master
 }
