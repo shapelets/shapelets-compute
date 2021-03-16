@@ -655,6 +655,7 @@ std::vector<Point> gauss::dimensionality::visvalingam(const std::vector<Point> &
 
     return out_vector;
 }
+
 af::array gauss::dimensionality::visvalingam(const af::array &pointList, int numPoints) {
     if (pointList.dims(1) != 2) {
         throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");

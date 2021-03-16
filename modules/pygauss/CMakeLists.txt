@@ -12,7 +12,7 @@ find_package(spdlog REQUIRED)
 find_package(pybind11 REQUIRED)
 
 # Find arrow
-find_package(arrow CONFIG REQUIRED)
+find_package(Arrow CONFIG REQUIRED)
 
 set(PYGAUSS_BASE_DIR "${PROJECT_SOURCE_DIR}")
 set(PYGAUSS_SRC "${PYGAUSS_BASE_DIR}/src")

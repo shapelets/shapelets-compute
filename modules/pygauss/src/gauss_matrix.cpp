@@ -8,51 +8,71 @@
 namespace py = pybind11;
 namespace gmatrix = gauss::matrix;
 
-struct matrix_profile {
-    matrix_profile(af::array profile, af::array index) : profile(std::move(profile)), index(std::move(index)) {}
 
-    af::array profile;
-    af::array index;
-};
+void pygauss::bindings::matrix_profile_functions(py::module_ &m)
+{
 
-void pygauss::bindings::matrix_profile_functions(py::module_ &m) {
+    m.def(
+        "mass",
+        [](const py::object& queries, const py::object& series) {
+            auto qs = arraylike::as_array_checked(queries);
+            arraylike::ensure_floating(qs);
+            auto ts = arraylike::as_array_checked(series);
+            arraylike::ensure_floating(ts);
 
-    py::class_<matrix_profile>(m, "MatrixProfile")
-            .def(py::init<af::array, af::array>())
-            .def_readwrite("profile", &matrix_profile::profile)
-            .def_readwrite("index", &matrix_profile::index);
+            af::array distances;
+            gmatrix::mass(qs, ts, distances);
+            return distances;        
+        },
+        py::arg("queries").none(false),
+        py::arg("series").none(false),
+        "TODO"
+    );
 
-    m.def("matrixprofile",
-          [](const af::array &ta, const py::int_ &m, const std::optional<af::array> &tb) {
-              af::array profile;
-              af::array index;
-              if (tb.has_value())
-                  gmatrix::matrixProfile(ta, tb.value(), m, profile, index);
-              else
-                  gmatrix::matrixProfile(ta, m, profile, index);
-              return matrix_profile{profile, index};
-          },
-          py::arg("ta").none(false),
-          py::arg("m").none(false),
-          py::arg("tb") = py::none(),
-          "TODO");
+    m.def(
+        "matrixprofile",
+        [](const py::object &series_a, const int64_t m, const std::optional<py::object> &series_b) {
+            auto ta = arraylike::as_array_checked(series_a);
+            arraylike::ensure_floating(ta);
 
-    m.def("matrixprofileLR",
-          [](const af::array &ta, const py::int_ &m) {
-              af::array left_profile;
-              af::array left_index;
-              af::array right_profile;
-              af::array right_index;
+            af::array profile;
+            af::array index;
 
-              gmatrix::matrixProfileLR(ta, m, left_profile, left_index, right_profile, right_index);
+            if (series_b.has_value()) {
+                auto tb = arraylike::as_array_checked(series_b.value());
+                arraylike::ensure_floating(tb);
+                gmatrix::matrixProfile(ta, tb, m, profile, index);
+            }
+            else {
+                gmatrix::matrixProfile(ta, m, profile, index);
+            }
 
-              py::dict result;
-              result["left"] = matrix_profile{left_profile, left_index};
-              result["right"] = matrix_profile{right_profile, right_index};
+            return py::make_tuple(profile, index);
+        },
+        py::arg("series_a").none(false),
+        py::arg("m").none(false),
+        py::arg("series_b") = py::none(),
+        "TODO");
 
-              return result;
-          },
-          py::arg("ta").none(false),
-          py::arg("m").none(false),
-          "TODO");
+    m.def(
+        "matrixprofileLR",
+        [](const py::object &series_a, const int64_t m) {
+            auto ta = arraylike::as_array_checked(series_a);
+            arraylike::ensure_floating(ta);
+
+            af::array left_profile;
+            af::array left_index;
+            af::array right_profile;
+            af::array right_index;
+
+            gmatrix::matrixProfileLR(ta, m, left_profile, left_index, right_profile, right_index);
+
+            py::dict result;
+            result["left"] = py::make_tuple(left_profile, left_index);
+            result["right"] = py::make_tuple(right_profile, right_index);
+            return result;
+        },
+        py::arg("ta").none(false),
+        py::arg("m").none(false),
+        "TODO");
 }

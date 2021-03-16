@@ -1,4 +1,3 @@
-from . import controlcharts
+from .controlcharts import *
 
-__all__ = []
-__all__ += controlcharts.__all__
+

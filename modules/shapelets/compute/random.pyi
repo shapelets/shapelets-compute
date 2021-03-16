@@ -1,7 +1,9 @@
-from typing import Optional
-from . import ArrayLike, DataTypeLike, ShapeLike, ShapeletsArray, _pygauss;
+from typing import Optional, Protocol
+from . import _pygauss
+from .__basic_typing import ShapeLike, DataTypeLike, ArrayLike
+from ._array_obj import ShapeletsArray
 
-class RandomEngineType():
+class RandomEngineType:
     def __eq__(self, arg0: object) -> bool: ...
     def __getstate__(self) -> int: ...
     def __hash__(self) -> int: ...
@@ -18,7 +20,7 @@ class RandomEngineType():
     Threefry: _pygauss.RandomEngineType # value = <RandomEngineType.Threefry: 200>
     __members__: dict # value = {'Default': <RandomEngineType.Default: 100>, 'Mersenne': <RandomEngineType.Mersenne: 300>, 'Threefry': <RandomEngineType.Threefry: 200>, 'Philox': <RandomEngineType.Default: 100>}
 
-class ShapeletsRandomEngine():
+class ShapeletsRandomEngine:
     def beta(self, a: float, b: float, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray: ...
     def chisquare(self, df: float, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray: ...
     def exponential(self, scale: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray: ...

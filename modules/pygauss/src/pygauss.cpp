@@ -55,5 +55,6 @@ PYBIND11_MODULE(_pygauss, m) {
     signal_processing_functions(m);
     statistic_functions(m);
     matrix_profile_functions(m);
+    gauss_distance_functions(m);
     gauss_statistic_bindings(m);
 }

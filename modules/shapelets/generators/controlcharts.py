@@ -1,16 +1,16 @@
 
 from abc import ABCMeta, abstractmethod
-from typing import Callable, List, Optional, Sequence, Tuple, overload, Protocol, Union
-import shapelets.compute as sh
+from typing import Callable, List, Tuple, Union
+
+from .. import compute as sc
+
 import math
 import random
-
 
 class DeltaGenerator(metaclass=ABCMeta):
 
     @abstractmethod
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
-        ...
+    def generate_delta(self, n: int, rng) -> sc.ShapeletsArray: ...
 
     def __add__(self, other):
         if isinstance(other, DeltaGenerator):
@@ -59,10 +59,10 @@ class DeltaGenerator(metaclass=ABCMeta):
 
 
 class _Derived(DeltaGenerator):
-    def __init__(self, fn: Callable[[int, sh.random.ShapeletsRandomEngine], DeltaGenerator]) -> None:
+    def __init__(self, fn: Callable[[int, sc.random.ShapeletsRandomEngine], DeltaGenerator]) -> None:
         self.fn = fn
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
         return self.fn(n, rng)
 
 
@@ -71,12 +71,12 @@ class _Cyclic(DeltaGenerator):
         self.amp = amp
         self.freq = freq
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
-        a = sh.tile(rng.uniform(*self.amp, 1), n+1)
-        f = sh.tile(rng.uniform(*self.freq, 1), n+1)
-        t = sh.iota(n+1, dtype=f.dtype)
-        values = a*sh.sin((2.0 * math.pi * t) / f)
-        return sh.diff1(values, 0)
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
+        a = sc.tile(rng.uniform(*self.amp, 1), n+1)
+        f = sc.tile(rng.uniform(*self.freq, 1), n+1)
+        t = sc.iota(n+1, dtype=f.dtype)
+        values = a*sc.sin((2.0 * math.pi * t) / f)
+        return sc.diff1(values, 0)
 
 
 class _Normal(DeltaGenerator):
@@ -84,17 +84,16 @@ class _Normal(DeltaGenerator):
         """ does nothing """
         pass
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
-        return sh.zeros(n)
-
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
+        return sc.zeros(n)
 
 class _IncDec(DeltaGenerator):
     def __init__(self, increasing: bool, grad: Tuple[int, int]):
         self.grad = grad
         self.increasing = increasing
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
-        g = sh.tile(rng.uniform(*self.grad), n)
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
+        g = sc.tile(rng.uniform(*self.grad), n)
         if not self.increasing:
             return -g
         return g
@@ -105,25 +104,25 @@ class _UpDown(DeltaGenerator):
         self.bump = bump
         self.upwards = upwards
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
         x = rng.uniform(*self.bump)
         if not self.upwards:
             x = -x
 
         t3 = rng.uniform(int(n/3), int(2*n/3))
-        t = sh.iota(n+1)
-        values = sh.zeros(n+1)
-        values[t >= sh.tile(t3, n+1)] = x
-        return sh.diff1(values, 0)
+        t = sc.iota(n+1)
+        values = sc.zeros(n+1)
+        values[t >= sc.tile(t3, n+1)] = x
+        return sc.diff1(values, 0)
 
 
 class _WhiteNoise(DeltaGenerator):
     def __init__(self, b0: float, fs: float):
         self.adj = math.sqrt(b0*fs/2.0)
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
         values = self.adj * rng.standard_normal(n+1)
-        return sh.diff1(values, 0)
+        return sc.diff1(values, 0)
 
 
 class _BrownNoise(DeltaGenerator):
@@ -132,10 +131,10 @@ class _BrownNoise(DeltaGenerator):
         b0 = b_minus2*(4.0*math.pi*math.pi)
         self.adj = math.sqrt(b0*fs/2.0)
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
         values = self.adj * rng.standard_normal(n+1)
-        brown = self.scale * sh.cumsum(values)
-        return sh.diff1(brown, 0)
+        brown = self.scale * sc.cumsum(values)
+        return sc.diff1(brown, 0)
 
 
 class _VioletNoise(DeltaGenerator):
@@ -144,10 +143,10 @@ class _VioletNoise(DeltaGenerator):
         self.fs = fs
         self.adj = math.sqrt(b0*fs/2.0)
 
-    def generate_delta(self, n: int, rng: sh.random.ShapeletsRandomEngine) -> sh.ShapeletsArray:
+    def generate_delta(self, n: int, rng: sc.random.ShapeletsRandomEngine) -> sc.ShapeletsArray:
         white = self.adj*rng.standard_normal(n+2)
-        violet = self.fs * sh.diff1(white, 0)
-        return sh.diff1(violet, 0)
+        violet = self.fs * sc.diff1(white, 0)
+        return sc.diff1(violet, 0)
 
 
 def cc_downward(bump: Tuple[int, int] = (7.5, 20)) -> DeltaGenerator:
@@ -270,17 +269,17 @@ def violet_noise(b2: float = 1.0, fs: float = 1.0) -> DeltaGenerator:
 
 # missing pink
 
-def _run_choice(py_rnd: random.Random, sh_rnd: sh.random.ShapeletsRandomEngine, n: int, choices: List, prob: List) -> sh.ShapeletsArray:
+def _run_choice(py_rnd: random.Random, sh_rnd: sc.random.ShapeletsRandomEngine, n: int, choices: List, prob: List) -> sc.ShapeletsArray:
     gen = py_rnd.choices(choices, prob, k=1)[0]
     return gen.generate_delta(n, sh_rnd)
 
-def _run_single(sh_rnd: sh.random.ShapeletsRandomEngine, n: int, delta: DeltaGenerator) -> sh.ShapeletsArray:
+def _run_single(sh_rnd: sc.random.ShapeletsRandomEngine, n: int, delta: DeltaGenerator) -> sc.ShapeletsArray:
     return delta.generate_delta(n, sh_rnd)
 
-def _process_single_program_instruction(x: DeltaGenerator, n: int, py_rnd: random.Random, sh_rnd: sh.random.ShapeletsRandomEngine):
+def _process_single_program_instruction(x: DeltaGenerator, n: int, py_rnd: random.Random, sh_rnd: sc.random.ShapeletsRandomEngine):
     return (lambda z,e: lambda: _run_single(sh_rnd, z,e))(n, x)
 
-def _process_multiple_program_instruction(x: List, n: int, py_rnd: random.Random, sh_rnd: sh.random.ShapeletsRandomEngine):
+def _process_multiple_program_instruction(x: List, n: int, py_rnd: random.Random, sh_rnd: sc.random.ShapeletsRandomEngine):
     l = len(x)
     prob = [1.0/l]*l 
 
@@ -291,7 +290,7 @@ def _process_multiple_program_instruction(x: List, n: int, py_rnd: random.Random
     
     return (lambda z,c,p: lambda: _run_choice(py_rnd, sh_rnd, z,c,p))(n, x, prob)
 
-def _process_program_instruction(x: Union[List, DeltaGenerator], n: int, py_rnd: random.Random, sh_rnd: sh.random.ShapeletsRandomEngine):
+def _process_program_instruction(x: Union[List, DeltaGenerator], n: int, py_rnd: random.Random, sh_rnd: sc.random.ShapeletsRandomEngine):
     if isinstance(x, List) and len(x) > 0:
         return _process_multiple_program_instruction(x, n, py_rnd, sh_rnd)     
     elif isinstance(x, DeltaGenerator):
@@ -299,18 +298,20 @@ def _process_program_instruction(x: Union[List, DeltaGenerator], n: int, py_rnd:
     
     raise ValueError("Unknown element in list " + str(x)) 
 
-def generate(program: List = [], lengths: Union[int, List[int]] = 10, start_level: float = 0.0, repetitions: int = 1, seed: int = random.randint(0, 1000000)): 
+def generate(program: List = [], lengths: Union[int, List[int]] = 10, start_level: float = 0.0, repetitions: int = 1): 
     if len(program) == 0 or (isinstance(lengths, List) and len(lengths) != len(program)):
         raise ValueError("No valid configuration provided")
 
-    sh_rnd = sh.random.default_rng(seed = seed)
+    seed=random.randint(0, 1000000)
+    sh_rnd = sc.random.default_rng(seed = seed)
     py_rnd = random.Random(seed)
+
     if isinstance(lengths, int):
         lengths = [lengths] * len(program)
 
     instructions = [_process_program_instruction(x, n, py_rnd, sh_rnd) for (x,n) in zip(program, lengths)]
     data =[i() for _ in range(repetitions) for i in instructions ]
-    return sh.cumsum(sh.join(data, 0)) + start_level;
+    return sc.cumsum(sc.join(data, 0)) + start_level;
 
 
 __all__ = [
@@ -332,6 +333,8 @@ if __name__ == '__main__':
 
     import matplotlib.pyplot as plt 
 
+    x = sc.random.default_rng()
+
     program = [
         # white_noise(),
         # brown_noise(),
@@ -347,13 +350,13 @@ if __name__ == '__main__':
         
     ]
 
-    # arr = sh.iota((5,3))
+    # arr = sc.iota((5,3))
     # arr.display()
-    # sh.random.permutation(arr, 0).display()
-    # sh.random.permutation(arr, 1).display()
-    # sh.random.permutation(10).display()
+    # sc.random.permutation(arr, 0).display()
+    # sc.random.permutation(arr, 1).display()
+    # sc.random.permutation(10).display()
 
-    sh_rnd = sh.random.default_rng()
+    sh_rnd = sc.random.default_rng()
     print(cc_increasing().generate_delta(10, sh_rnd).dtype)
     print(cc_decreasing().generate_delta(10, sh_rnd).dtype)
     # print((cc_downward() + 0.3*white_noise()).generate_delta(10, sh_rnd).dtype)

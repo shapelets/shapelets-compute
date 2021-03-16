@@ -10,7 +10,7 @@ namespace spd = spdlog;
 typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs, const bool batch);
 
 
-af::array binary_function(const af::array &self, const py::object &other, bool reverse, binaryFn fn) {
+af::array binary_function(af::array &self, const py::object &other, bool reverse, binaryFn fn) {
     af::array rhs = pygauss::arraylike::as_itself_or_promote(other, self.dims(), self.type());
 
     auto batch = pygauss::GForStatus::get();
@@ -31,7 +31,7 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
 
 #define BINARY_OP(OP, PYTHON_FN)                                                                        \
     ka.def(#PYTHON_FN,                                                                                  \
-                   [](const af::array &self, const py::object &other){                                  \
+                   [](af::array &self, const py::object &other){                                        \
                        spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, false, OP);                                  \
                    },                                                                                   \
@@ -40,7 +40,7 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
 
 #define BINARY_OPR(OP, PYTHON_FN)                                                                        \
     ka.def(#PYTHON_FN,                                                                                   \
-                   [](const af::array &self, const py::object &other){                                  \
+                   [](af::array &self, const py::object &other){                                        \
                        spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, true, OP);                                   \
                    },                                                                                   \
@@ -52,6 +52,7 @@ af::array binary_function(const af::array &self, const py::object &other, bool r
                    [](af::array &self, const py::object &other){                                        \
                        spd::debug("Binary inplace operation {}", #OP);                                  \
                        spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
+                       binary_function(self, other, false, OP);                                         \
                        return self;                                                                     \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
@@ -123,6 +124,12 @@ void pygauss::bindings::array_obj(py::module &m) {
                return self.copy();
            }, py::arg("memo"), "Deep copy");
 
+    ka.def("__len__",
+           [](const af::array &self) {
+               auto dims = self.dims();
+               return dims[0];
+           });       
+
     ka.def_property_readonly("backend",
                              [](const af::array &self) {
                                  af_backend result;
@@ -186,7 +193,21 @@ void pygauss::bindings::array_obj(py::module &m) {
                                  return self.H();
                              }, "Get the conjugate-transpose of the current array");
 
+    ka.def_property_readonly("real",
+                             [](const af::array &self) {
+                                return af::real(self);
+                             }, "Returns the real part of this tensor");
 
+    ka.def_property_readonly("imag",
+                             [](const af::array &self) {
+                                 return af::imag(self);
+                             }, "Returns the imaginary part of this tensor");
+
+    ka.def("eval",
+           [](const af::array &self){
+               self.eval();
+           });
+    
     ka.def("astype",
            [](const af::array &self, const af::dtype &type) {
                return self.as(type);
@@ -199,7 +220,7 @@ void pygauss::bindings::array_obj(py::module &m) {
            [](const af::array &self) {
                self.eval();
                char *out = nullptr;
-               af_array_to_string(&out, "", self.get(), 4, !self.isvector());
+               af_array_to_string(&out, "", self.get(), 4, true);
                return std::string(out);
            });
 
@@ -207,7 +228,7 @@ void pygauss::bindings::array_obj(py::module &m) {
            [](const af::array &self, int precision) {
                self.eval();
                char *out = nullptr;
-               af_array_to_string(&out, "", self.get(), precision, !self.isvector());
+               af_array_to_string(&out, "", self.get(), precision, true);
                py::print(py::str(out));
            },
            py::arg("precision") = 4);
@@ -286,7 +307,7 @@ void pygauss::bindings::array_obj(py::module &m) {
     BINARY_IOP(af_bitshiftr, __irshift__)
 
     ka.def("__neg__",
-           [](const af::array &self) {
+           [](af::array &self) {
                auto zero = py::float_(0.0f);
                return binary_function(self, zero, true, af_sub);
            });

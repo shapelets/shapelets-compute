@@ -1,15 +1,13 @@
-
 from ._pygauss import (
-    RandomEngineType, ShapeletsRandomEngine,
-    default_rng, randint, randn, random, permutation
+    default_rng, randint, randn, random, permutation, ShapeletsRandomEngine,RandomEngineType
 )
 
 __all__ = [
-    "RandomEngineType",
-    "ShapeletsRandomEngine",
     "default_rng",
     "randint", 
     "randn", 
     "random",
-    "permutation"
+    "permutation",
+    "ShapeletsRandomEngine",
+    "RandomEngineType"
 ]

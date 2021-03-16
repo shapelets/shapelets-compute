@@ -238,50 +238,6 @@ namespace pygauss {
          */
         bool is_scalar(const py::object &value);
 
-//        /**
-//         * Returns true if the object can be interpreted as an array by
-//         * checking internal representations
-//         */
-//        bool is_array(const py::object &value);
-//
-//        /**
-//         * Returns an af::array instance based on the python object received.
-//         *
-//         * This implementation tests first if the actual object itself represents
-//         * an af::array or a ParallelFor before testing other possible conversions.
-//         *
-//         * `shape` and `dtype` parameters are only used if `array_like` represents
-//         * a constant value.  If you wish to ensure the shape / type of the cast,
-//         * use `cast_and_adjust`.
-//         *
-//         * @return   An empty optional container if the conversion cannot be executed; otherwise,
-//         * a valid arrayfire instance.
-//         */
-//        std::optional<af::array> try_cast(const py::object &value,
-//                                          const std::optional<af::dim4> &shape = std::nullopt,
-//                                          const std::optional<af::dtype> &dtype = std::nullopt);
-//
-//        /**
-//         * Same version as try_cast, but with no optionality.  `shape` and `dtype` parameters
-//         * are only used if `array_like` represents a constant value.
-//         *
-//         * @return   Throws an exception if the conversion cannot be performed; otherwise, it
-//         * returns a valid arrayfire instance.
-//         */
-//        af::array cast(const py::object &array_like,
-//                       bool floating = false,
-//                       const std::optional<af::dim4> &shape = std::nullopt,
-//                       const std::optional<af::dtype> &dtype = std::nullopt);
-//
-//        /**
-//         * This method is useful when interfacing with Python as it parses the object using
-//         * `try_cast` method, but it will later on try to adjust the shape and type as given.
-//         */
-//        af::array cast_and_adjust(const py::object &array_like,
-//                                  const std::optional<af::dim4> &shape,
-//                                  const std::optional<af::dtype> &dtype);
-
-
         /**
          * Checks if src is of type floating (that is any floating or complex type).  If
          * it is not, it converts src to a new array whose type is either f32 or f64 as a function
@@ -354,6 +310,8 @@ namespace pygauss {
         void statistic_functions(py::module &m);
 
         void matrix_profile_functions(py::module &m);
+
+        void gauss_distance_functions(py::module &m);
 
         void gauss_statistic_bindings(py::module &m);
     }

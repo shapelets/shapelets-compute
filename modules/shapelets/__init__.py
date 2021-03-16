@@ -17,4 +17,6 @@ else:
     from . import compute
     from . import generators
 
+    __all__ = ["compute", "generators"]
+
 del stderr
