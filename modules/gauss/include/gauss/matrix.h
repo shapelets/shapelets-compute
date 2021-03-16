@@ -6,6 +6,7 @@
 
 #include <utility>
 #include <vector>
+#include <optional>
 
 namespace gauss::matrix {
 
@@ -191,6 +192,23 @@ GAUSSAPI void matrixProfileLR(const af::array &tss, long m, af::array &profileLe
  *  that 0 is an invalid chain index.
  */
 GAUSSAPI void getChains(const af::array &tss, long m, af::array &chains);
+
+
+GAUSSAPI af::array mpdist_vector(const af::array &tss, const af::array &ts_b, long w, double threshold = 0.05);
+
+typedef struct {
+    uint32_t index;
+    uint32_t size;
+    uint32_t window;
+    double pct;
+    af::array distances; 
+    af::array indices;
+} snippet_t;
+
+GAUSSAPI std::vector<snippet_t> snippets(const af::array& tss, 
+                                         const uint32_t snippet_size, 
+                                         const uint32_t num_snippets, 
+                                         const std::optional<uint32_t>& window_size = std::nullopt); 
 
 }  // namespace gauss
 

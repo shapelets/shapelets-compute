@@ -2,8 +2,9 @@
 from . import random
 from . import fft
 from . import distances 
+from . import matrixprofile
 
-__all__ = ["random", "fft", "distances"]
+__all__ = ["random", "fft", "distances", "matrixprofile"]
 
 
 # direct imports

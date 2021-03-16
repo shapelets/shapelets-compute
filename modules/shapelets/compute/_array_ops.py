@@ -21,6 +21,9 @@ from ._pygauss import (
     signbit, sin, sinh, sort, sort_keys, sqrt, square, stdev, substract, sum, svd, 
     tan, tanh, tgamma, tile, topk_max, topk_min, transpose, true_divide, trunc, union, 
     unique, upper, var_p, var_s, where, zeros,
+
+    unwrap, wrap,
+    
     ScopedBatch,ConvMode,ConvDomain,MatrixProperties,NormType,ScanOp,BorderType
 )
 
@@ -47,5 +50,7 @@ __all__ = [
     "tan", "tanh", "tgamma", "tile", "topk_max", "topk_min", "transpose", "true_divide", "trunc", "union", 
     "unique", "upper", "var_p", "var_s", "where", "zeros", 
     
+    "unwrap", "wrap",
+
     "ScopedBatch","ConvMode","ConvDomain","MatrixProperties","NormType","ScanOp","BorderType"
 ]

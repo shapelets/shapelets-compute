@@ -61,7 +61,7 @@ def dtw(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return cdist(a, b, DistanceType.DTW)
 
-def mpdist(a: ArrayLike, b: ArrayLike, w: int, threshold: float =0.05) -> ShapeletsArray: 
+def mpdist(a: ArrayLike, b: ArrayLike, w: int, threshold: float = 0.05) -> ShapeletsArray: 
     """
     Computes the Matrix Profile Distance between two 1-D arrays.
     """

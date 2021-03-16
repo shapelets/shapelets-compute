@@ -2,6 +2,9 @@
 #include <pybind11/stl.h>
 
 #include <pygauss.h>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 
 #include <utility>
 
@@ -11,6 +14,50 @@ namespace gmatrix = gauss::matrix;
 
 void pygauss::bindings::matrix_profile_functions(py::module_ &m)
 {
+    py::class_<gmatrix::snippet_t>(m, "Snippet")
+    .def_property_readonly("indices", [](const gmatrix::snippet_t& self) { return self.indices; })
+    .def_property_readonly("index", [](const gmatrix::snippet_t& self) { return self.index; })
+    .def_property_readonly("distances", [](const gmatrix::snippet_t& self) { return self.distances; })
+    .def_property_readonly("pct", [](const gmatrix::snippet_t& self) { return self.pct; })
+    .def_property_readonly("window", [](const gmatrix::snippet_t& self) { return self.window; })
+    .def_property_readonly("size", [](const gmatrix::snippet_t& self) { return self.size; })
+    .def("__repr__",
+        [](const gmatrix::snippet_t& self) {
+            std::stringstream result;
+            auto start_pos = self.index * self.size;
+            auto end_pos = start_pos + self.size - 1;
+            result << "Snippet [" << start_pos << "," << end_pos << "] (" << std::setprecision(3) << self.pct * 100 << " %)";
+            return result.str();
+        });
+
+
+    m.def("snippets",
+         [](const py::object& tsa, const uint32_t snippet_size, const uint32_t num_snippets, std::optional<uint32_t> window_size) {
+            auto a = arraylike::as_array_checked(tsa);
+            return gmatrix::snippets(a, snippet_size, num_snippets, window_size);
+         },
+         py::arg("tsa").none(false),
+         py::arg("snippet_size").none(false),
+         py::arg("num_snippets").none(false),
+         py::arg("window_size") = py::none()
+         );
+
+    m.def("mpdist_vect", 
+        [](const py::object& tsa, const py::object& tsb, long w, std::optional<double> threshold) {
+            auto a = arraylike::as_array_checked(tsa);
+            auto b = arraylike::as_array_checked(tsb);
+            
+            if (threshold.has_value()) {
+                return gmatrix::mpdist_vector(a, b, w, threshold.value());
+            }
+
+            return gmatrix::mpdist_vector(a, b, w);
+        },
+        py::arg("tsa").none(false),
+        py::arg("tsb").none(false),
+        py::arg("w").none(false),
+        py::arg("threshold") = 0.05
+        );
 
     m.def(
         "mass",
