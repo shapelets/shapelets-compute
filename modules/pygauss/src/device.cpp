@@ -93,9 +93,9 @@ void pygauss::bindings::device_operations(py::module &m) {
                 result << dev.name << " (";
                 result << dev.platform << " - ";
                 result << dev.compute << " - ";
-                result << dev.toolkit << ")";
-                result << " F64: " << (dev.isDoubleAvailable ? "✓" : "✘") << " - F16: "
-                       << (dev.isHalfAvailable ? "✓" : "✘");
+                result << dev.toolkit << ") ";
+                result << "F64: " << (dev.isDoubleAvailable ? "✓" : "✘") << " - "
+                       << "F16: " << (dev.isHalfAvailable ? "✓" : "✘");
                 return result.str();
             });
 
@@ -131,9 +131,9 @@ void pygauss::bindings::device_operations(py::module &m) {
                   af::setDevice(i);
                   af::deviceInfo(b_name, b_platform, b_toolkit, b_compute);
                   result.push_back({
-                                           i, std::string(b_name), std::string(b_platform),
-                                           std::string(b_toolkit), std::string(b_compute),
-                                           af::isHalfAvailable(i), af::isDoubleAvailable(i)
+                                        i, std::string(b_name), std::string(b_platform),
+                                        std::string(b_toolkit), std::string(b_compute),
+                                        af::isHalfAvailable(i), af::isDoubleAvailable(i)
                                    });
               }
               af::setDevice(current);

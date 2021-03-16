@@ -12,3 +12,6 @@
 /.mypy_cache
 __pycache__
 /out
+cmake/opt
+.DS_Store
+cmake/_linux_af.sh

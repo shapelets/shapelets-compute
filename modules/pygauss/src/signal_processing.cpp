@@ -4,110 +4,142 @@
 
 namespace py = pybind11;
 
-void pygauss::bindings::signal_processing_functions(py::module &m) {
+void pygauss::bindings::signal_processing_functions(py::module &m)
+{
 
-    m.def("convolve",
-          [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
-              af::array s = arraylike::as_array_checked(signal);
-              af::array f = arraylike::as_array_checked(filter);
+    m.def(
+        "convolve",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
 
-              arraylike::ensure_floating(s);
-              arraylike::ensure_floating(f);
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
 
-              return af::convolve(s, f, mode, domain);
-          },
-          py::arg("signal").none(false),
-          py::arg("filter").none(false),
-          py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
-          py::arg("domain") = af::convDomain::AF_CONV_AUTO,
-          "TODO");
+            return af::convolve(s, f, mode, domain);
+        },
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
 
-    m.def("convolve1",
-          [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
-              af::array s = arraylike::as_array_checked(signal);
-              af::array f = arraylike::as_array_checked(filter);
-              arraylike::ensure_floating(s);
-              arraylike::ensure_floating(f);
-              return af::convolve1(s, f, mode, domain);
-          },
-          py::arg("signal").none(false),
-          py::arg("filter").none(false),
-          py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
-          py::arg("domain") = af::convDomain::AF_CONV_AUTO,
-          "TODO");
+    m.def(
+        "convolve1",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
+            return af::convolve1(s, f, mode, domain);
+        },
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
 
-    m.def("convolve2",
-          [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
-              af::array s = arraylike::as_array_checked(signal);
-              af::array f = arraylike::as_array_checked(filter);
-              arraylike::ensure_floating(s);
-              arraylike::ensure_floating(f);
-              return af::convolve2(s, f, mode, domain);
-          },
-          py::arg("signal").none(false),
-          py::arg("filter").none(false),
-          py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
-          py::arg("domain") = af::convDomain::AF_CONV_AUTO,
-          "TODO");
+    m.def(
+        "convolve2",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
+            return af::convolve2(s, f, mode, domain);
+        },
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
 
-    m.def("convolve3",
-          [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
-              af::array s = arraylike::as_array_checked(signal);
-              af::array f = arraylike::as_array_checked(filter);
-              arraylike::ensure_floating(s);
-              arraylike::ensure_floating(f);
+    m.def(
+        "convolve3",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
 
-              return af::convolve3(s, f, mode, domain);
-          },
-          py::arg("signal").none(false),
-          py::arg("filter").none(false),
-          py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
-          py::arg("domain") = af::convDomain::AF_CONV_AUTO,
-          "TODO");
+            return af::convolve3(s, f, mode, domain);
+        },
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
 
-    m.def("fft",
-          [](const py::object &signal, const std::optional<py::int_> &odim, const std::optional<py::float_> &norm) {
-              af::array s = arraylike::as_array_checked(signal);
-              arraylike::ensure_floating(s);
+    py::enum_<gauss::fft::Norm>(m, "fftNorm", "Gauss FFT Normalisation")
+            .value("Backward", gauss::fft::Norm::Backward, "signal -> freq: 1.0, freq -> signal: 1.0/n")
+            .value("Ortho", gauss::fft::Norm::Orthonormal, "signal -> freq: 1.0/sqrt(n), freq -> signal: 1.0/sqrt(n)")
+            .value("Forward", gauss::fft::Norm::Forward, "signal -> freq: 1.0/n, freq -> signal: 1.0")
+            .export_values();
 
-              if (norm.has_value())
-                  return af::fftNorm(s, norm.value(), odim.value_or(0));
+    m.def(
+        "_fft",
+        [](const py::object &signal, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+            af::array s = arraylike::as_array_checked(signal);
+            arraylike::ensure_floating(s);
 
-              return af::fft(s, odim.value_or(0));
-          },
-          py::arg("signal").none(false),
-          py::arg("odim") = 0,
-          py::arg("norm") = py::none(),
-          R"__(Fast fourier transform on one dimensional signals.
-            Parameters
-            ----------
-                signal: One dimensional array.  Required
-                odim  : Integer, Defaults to zero.
-                        The length of the output signal, in order to truncate or pad the input signal
-                norm  : Float, Defaults to none.
-                        The scaling factor; if not provided, it is computed internally.
-          )__");
+            return gauss::fft::fft(s, norm, shape);
+        },
+        py::arg("signal").none(false),
+        py::arg("norm").none(false),
+        py::arg("shape").none(false),
+        "TODO");
 
-    m.def("ifft",
-          [](const py::object &coeff, const std::optional<py::int_> &odim, const std::optional<py::float_> &norm) {
-              af::array c = arraylike::as_array_checked(coeff);
-              arraylike::ensure_floating(c);
+    m.def(
+        "_ifft",
+        [](const py::object &coef, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+            af::array c = arraylike::as_array_checked(coef);
+            arraylike::ensure_floating(c);
+            return gauss::fft::ifft(c, norm, shape);
+        },
+        py::arg("coef").none(false),
+        py::arg("norm").none(false),
+        py::arg("shape").none(false),
+        "TODO");
 
-              if (norm.has_value())
-                  return af::ifftNorm(c, norm.value(), odim.value_or(0));
+    m.def(
+        "_rfft",
+        [](const py::object &signal, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+            af::array s = arraylike::as_array_checked(signal);
+            arraylike::ensure_floating(s);
+            return gauss::fft::rfft(s, norm, shape);
+        },
+        py::arg("signal").none(false),
+        py::arg("norm").none(false),
+        py::arg("shape").none(false),
+        "TODO");
 
-              return af::ifft(c, odim.value_or(0));
-          },
-          py::arg("coeff").none(false),
-          py::arg("odim") = 0,
-          py::arg("norm") = py::none(),
-          R"__(Fast fourier transform on one dimensional signals.
-            Parameters
-            ----------
-                coeff : FFT coefficients.
-                odim  : Integer, Defaults to zero.
-                        The length of the output signal, in order to truncate or pad the input signal
-                norm  : Float, Defaults to none.
-                        The scaling factor; if not provided, it is computed internally.
-          )__");
+    m.def(
+        "_irfft",
+        [](const py::object &coef, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+            af::array c = arraylike::as_array_checked(coef);
+            arraylike::ensure_floating(c);
+            return gauss::fft::irfft(c, norm, shape);
+        },
+        py::arg("coef").none(false),
+        py::arg("norm").none(false),
+        py::arg("shape").none(false),
+        "TODO");
+
+    m.def(
+        "rfftfreq",
+        [](const int n, const double d) {
+            return gauss::fft::rfftfreq(n, d);
+        },
+        py::arg("n").none(false),
+        py::arg("d") = 1.0,
+        "");
+
+    m.def("fftfreq",         
+        [](const int n, const double d) {
+            return gauss::fft::fftfreq(n, d);
+        },
+        py::arg("n").none(false),
+        py::arg("d") = 1.0,
+        "");
 }
+

@@ -9,7 +9,7 @@ function (download_af)
         execute_process(
             COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/macos_arrayfire.sh ${CMAKE_SOURCE_DIR}/external/arrayfire
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-            COMMAND_ECHO STDERR
+            # COMMAND_ECHO STDERR
             RESULT_VARIABLE AF_DOWNLOADED
         )
 
@@ -20,7 +20,7 @@ function (download_af)
         execute_process(
             COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/cmake/linux_arrayfire.sh ${CMAKE_SOURCE_DIR}/external/arrayfire
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-            COMMAND_ECHO STDERR
+            # COMMAND_ECHO STDERR
             RESULT_VARIABLE AF_DOWNLOADED
         )
 

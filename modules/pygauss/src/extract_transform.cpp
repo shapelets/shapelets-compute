@@ -46,7 +46,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
           "Create a upper triangular matrix from input array\n"
           "The parameter unit_diag forces the diagonal elements to be one.");
 
-    m.def("moddims",
+    m.def("reshape",
           [](const py::object& array_like, const af::dim4 &shape) {
               auto a = arraylike::as_array_checked(array_like);
               return af::moddims(a, shape);

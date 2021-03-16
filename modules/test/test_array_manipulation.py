@@ -164,17 +164,17 @@ def test_moddims():
     # start with a single column, 12 rows
     a = sh.iota(12, 1)
     # in order, organise it as 2 rows, 6 columns
-    b = sh.moddims(a, (2, 6))
+    b = sh.reshape(a, (2, 6))
     assert b.same_as([[0, 2, 4, 6, 8, 10], [1, 3, 5, 7, 9, 11]])
     # now 3 rows, 4 columns
-    c = sh.moddims(a, (3, 4))
+    c = sh.reshape(a, (3, 4))
     assert c.same_as([[0, 3, 6, 9], [1, 4, 7, 10], [2, 5, 8, 11]])
     # etc...
-    d = sh.moddims(a, (4, 3))
+    d = sh.reshape(a, (4, 3))
     assert d.same_as([[0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]])
-    e = sh.moddims(a, (6, 2))
+    e = sh.reshape(a, (6, 2))
     assert e.same_as([[0, 6], [1, 7], [2, 8], [3, 9], [4, 10], [5, 11]])
-    f = sh.moddims(a, (1, 12))
+    f = sh.reshape(a, (1, 12))
     assert f.same_as(a.T)
 
 
