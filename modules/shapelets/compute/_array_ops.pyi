@@ -473,10 +473,7 @@ def where(condition: ArrayLike, x: ArrayLike = None, y: ArrayLike = None) -> Sha
 
 def zeros(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray: ...
 
-<<<<<<< HEAD
 ##
 
 def unwrap(a: ArrayLike, wx: int, wy: int, sx: int, sy:int, px: int =0, py: int = 0, is_column: bool = True): ...
 def wrap(a: ArrayLike, ox: int, oy: int, wx: int, wy: int, sx: int, sy: int, px: int =0, py: int = 0, is_column: bool = True): ...
-=======
->>>>>>> master

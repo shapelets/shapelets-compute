@@ -14,7 +14,6 @@ namespace gmatrix = gauss::matrix;
 
 void pygauss::bindings::matrix_profile_functions(py::module_ &m)
 {
-<<<<<<< HEAD
     py::class_<gmatrix::snippet_t>(m, "Snippet")
     .def_property_readonly("indices", [](const gmatrix::snippet_t& self) { return self.indices; })
     .def_property_readonly("index", [](const gmatrix::snippet_t& self) { return self.index; })
@@ -59,8 +58,6 @@ void pygauss::bindings::matrix_profile_functions(py::module_ &m)
         py::arg("w").none(false),
         py::arg("threshold") = 0.05
         );
-=======
->>>>>>> master
 
     m.def(
         "mass",
