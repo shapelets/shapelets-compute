@@ -3,7 +3,7 @@ from shapelets.compute.distances import DistanceType
 import os
 import numpy as np
 
-def test_dist_euclidian():
+def test_dist_euclidean():
     a = sc.array([[0, 0, 1],
                   [0, 1, 0],
                   [1, 0, 0]], dtype="float32")
@@ -14,13 +14,13 @@ def test_dist_euclidian():
         [0, 1, 0, 1, 0, 1, 0, 1]
     ], dtype="float32")
 
-    assert sc.distances.euclidian(a, b).same_as([
+    assert sc.distances.euclidean(a, b).same_as([
         [1.0000, 0.0000, 1.4142, 1.0000, 1.4142, 1.0000,  1.7321,  1.4142],
         [1.0000, 1.4142, 0.0000, 1.0000, 1.4142, 1.7321,  1.0000,  1.4142],
         [1.0000, 1.4142, 1.4142, 1.7321, 0.0000, 1.0000,  1.0000,  1.4142]
     ])
 
-    assert sc.distances.pdist(b, DistanceType.Euclidian).same_as([
+    assert sc.distances.pdist(b, DistanceType.Euclidean).same_as([
         [0.0000, 1.0000, 1.0000, 1.4142, 1.0000, 1.4142, 1.4142, 1.7321],
         [1.0000, 0.0000, 1.4142, 1.0000, 1.4142, 1.0000, 1.7321, 1.4142],
         [1.0000, 1.4142, 0.0000, 1.0000, 1.4142, 1.7321, 1.0000, 1.4142],
@@ -32,7 +32,7 @@ def test_dist_euclidian():
     ])
 
 
-def test_dist_cityblock():
+def test_dist_manhattan():
     a = sc.array([[0, 0, 1],
                   [0, 1, 0],
                   [1, 0, 0]], dtype="float32")
@@ -43,7 +43,7 @@ def test_dist_cityblock():
         [0, 1, 0.0, 1, 0, 1, 0, 1]
     ], dtype="float32")
 
-    assert sc.distances.cityblock(a, b).same_as([
+    assert sc.distances.manhattan(a, b).same_as([
         [1.0000, 0.0000, 2.3000, 1.0000, 2.0000, 1.0000, 3.0000, 2.0000],
         [1.0000, 2.0000, 0.3000, 1.0000, 2.0000, 3.0000, 1.0000, 2.0000],
         [1.0000, 2.0000, 2.3000, 3.0000, 0.0000, 1.0000, 1.0000, 2.0000],
@@ -101,9 +101,9 @@ def test_dist_minkowshi():
     ], dtype="float32")
 
     assert sc.distances.minkowshi(a, b, 2.0).same_as(
-        sc.distances.euclidian(a, b))
+        sc.distances.euclidean(a, b))
     assert sc.distances.minkowshi(a, b, 1.0).same_as(
-        sc.distances.cityblock(a, b))
+        sc.distances.manhattan(a, b))
     assert sc.distances.minkowshi(a, b, 0.5).same_as([
         [1.0000, 0.0000, 4.0000, 1.0000, 4.0000, 1.0000, 9.0000, 4.0000],
         [1.0000, 4.0000, 0.0000, 1.0000, 4.0000, 9.0000, 1.0000, 4.0000],
