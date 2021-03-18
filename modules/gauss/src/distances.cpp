@@ -7,6 +7,310 @@
 
 namespace gauss::distances {
 
+#define LOCK_STEP_DST_ALGORITHM(ALGO, SYMM) \
+    distance_algorithm_t ALGO() {   \
+        return {    \
+            true,   \
+            SYMM,   \
+            std::nullopt,   \
+            [](const af::array& src, const af::array& dst) {    \
+                auto dst_cols = dst.dims(1);    \
+                auto result = af::array(1, dst_cols, src.type());   \
+                gfor(auto ii, dst_cols) {   \
+                    result(0, ii) = builtin::ALGO(src, dst(af::span, ii));  \
+                }   \
+                return result;  \
+            }   \
+        };  \
+    }                                                                          
+
+
+namespace builtin {
+
+// The L1 Family
+inline af::array gower(const af::array &p, const af::array::array_proxy &q) {
+    return (1.0/p.dims(0)) * af::sum(af::abs(p - q));
+}
+inline af::array soergel(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::abs(p - q)) / af::sum(af::max(p, q));
+}
+inline af::array kulczynski(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::abs(p-q) / af::sum(af::min(p,q)));
+}
+inline af::array sorensen(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::abs(p - q)) / af::sum(p + q);
+}
+inline af::array lorentzian(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::log1p(af::abs(p - q)));
+}
+inline af::array canberra(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::abs(p - q) / (p + q));
+}
+
+// The Intersection family
+inline af::array intersection(const af::array &p, const af::array::array_proxy &q) {
+    return 0.5 * af::sum(af::abs(p - q));
+}
+inline af::array wavehedges(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(1.0 - af::min(p, q) / af::max(p, q));
+}
+inline af::array czekanowski(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::abs(p - q)) / af::sum(p + q);
+}
+// missing tanimoto, ruzicka, kulczynski? and motyka
+
+// The Squared L2 family
+inline af::array squared_euclidean(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::pow(p - q, 2.0));
+}
+inline af::array pearson(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::pow(p - q, 2.0) / q);
+}
+inline af::array neyman(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::pow(p - q, 2.0) / p);
+}
+inline af::array squared_chi(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::pow(p - q, 2.0) / (p + q));
+}
+inline af::array prob_symmetric_chi(const af::array &p, const af::array::array_proxy &q) {
+    return 2.0 * af::sum(af::pow(p - q, 2.0) / (p + q));
+}
+inline af::array divergence(const af::array &p, const af::array::array_proxy &q) {
+    return 2.0 * af::sum(af::pow(p - q, 2.0) / af::pow(p + q, 2.0));
+}
+inline af::array clark(const af::array &p, const af::array::array_proxy &q) {
+    return af::sqrt(af::sum(af::pow(af::abs(p - q), 2.0) / (p + q)));
+}
+inline af::array additive_symm_chi(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::pow(p - q, 2.0) * (p + q) / (p * q));
+}
+
+// The Inner Product family
+inline af::array innerproduct(const af::array &p, const af::array::array_proxy &q) {
+    return 1.0 - af::sum(p*q);
+}
+inline af::array harmonic_mean(const af::array &p, const af::array::array_proxy &q) {
+    return 1.0 - 2.0 * af::sum(p*q/(p+q));
+}
+inline af::array cosine(const af::array &p, const af::array::array_proxy &q) {
+    auto pt = af::sqrt(af::sum(af::pow(p, 2.0)));
+    auto qt = af::sqrt(af::sum(af::pow(q, 2.0)));
+    return 1.0 - af::sum(p*q)/(pt*qt);
+}
+inline af::array kumarhassebrook(const af::array &p, const af::array::array_proxy &q) {
+    return 1.0 - (af::sum(p*q)/(af::sum(af::pow(p, 2.0))+af::sum(af::pow(q, 2.0))-af::sum(p*q)));
+}
+inline af::array jaccard(const af::array &p, const af::array::array_proxy &q) {
+    return 1.0 - (af::sum(af::pow(p - q, 2.0)) / af::sum(af::pow(p, 2.0) + af::pow(q, 2.0) - p*q));
+}
+inline af::array dice(const af::array &p, const af::array::array_proxy &q) {
+    return 1.0 - (af::sum(af::pow(p - q, 2.0)) / af::sum(af::pow(p, 2.0) + af::pow(q, 2.0)));
+}
+
+// The Fidelity family
+inline af::array fidelity(const af::array &p, const af::array::array_proxy &q) {
+    return 1.0 - af::sum(af::sqrt(p * q));
+}
+inline af::array bhattacharyya(const af::array &p, const af::array::array_proxy &q) {
+    return -af::log(af::sum(af::sqrt(p * q)));
+}
+inline af::array hellinger(const af::array &p, const af::array::array_proxy &q) {
+    return 2.0 * af::sqrt(1.0 - (af::sum(af::sqrt(p * q))));
+}
+inline af::array matusita(const af::array &p, const af::array::array_proxy &q) {
+    return af::sqrt(2.0 - (2.0 * af::sum(af::sqrt(p * q))));
+}
+inline af::array square_chord(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::pow(af::sqrt(p) - af::sqrt(q), 2.0));
+}
+
+//The Shannon’s Entropy family
+inline af::array kullback(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(p * af::log(p/q));
+}
+inline af::array jeffrey(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum((p-q) * af::log(p/q));
+}
+inline af::array topsoe(const af::array &p, const af::array::array_proxy &q) {
+    auto logpq = af::log(p + q);
+    return af::sum(p * (af::log(2.0*p) - logpq) + q * (af::log(2.0 * q) - logpq));
+}
+inline af::array jensen_shannon(const af::array &p, const af::array::array_proxy &q) {
+    auto logpq = af::log(p+q);
+    return 0.5 * af::sum(p * (af::log(2.0*p) - logpq) + q * (af::log(2.0*q) - logpq));
+}
+inline af::array jensen_difference(const af::array &p, const af::array::array_proxy &q) {
+    auto pqh = (p+q) / 2.0;
+    return af::sum(((p * af::log(p) + q * log(q)) / 2.0 )-(pqh * log(pqh)));
+}
+inline af::array k_divergence(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(p * af::log((2.0*p) / (p+q)));
+}
+
+
+// The Combinations family
+inline af::array taneja(const af::array &p, const af::array::array_proxy &q) {
+    auto pqh = (p + q) / 2.0;
+    return af::sum(pqh * (af::log(pqh) - af::log(af::sqrt(p * q))));
+}
+
+inline af::array kumar_johnson(const af::array &p, const af::array::array_proxy &q) {
+    auto diffsq = af::pow(af::pow(p, 2.0) - af::pow(q, 2.0), 2.0);
+    auto threetwo = 2.0 * af::pow(p*q, 3.0/2.0);
+    return af::sum(diffsq / threetwo);
+}
+inline af::array avg_l1_linf(const af::array &p, const af::array::array_proxy &q) {
+    auto abs_diff = af::abs(p - q);
+    return (af::sum(abs_diff) +  af::max(abs_diff)) / 2.0;
+}
+
+// The Vicissitude family
+inline af::array vicis_wave_hedges(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::abs(p - q) / af::min(p, q));
+}
+inline af::array min_symmetric_chi(const af::array &p, const af::array::array_proxy &q) {
+    auto pqds = af::pow(p - q, 2.0);
+    return af::min(af::sum(pqds / p), af::sum(pqds / q));
+}
+inline af::array max_symmetric_chi(const af::array &p, const af::array::array_proxy &q) {
+    auto pqds = af::pow(p - q, 2.0);
+    return af::max(af::sum(pqds / p), af::sum(pqds / q));
+}
+
+// The Minkowski family
+inline af::array euclidean(const af::array &p, const af::array::array_proxy &q) {
+    return af::sqrt(af::sum(af::pow(p - q, 2.0)));
+}
+inline af::array manhattan(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::abs(p - q));
+}
+inline af::array chebyshev(const af::array &p, const af::array::array_proxy &q) {
+    return af::max(af::abs(p - q));
+}
+inline af::array abs_euclidean(const af::array &p, const af::array::array_proxy &q) {
+    return af::sqrt(af::sum(af::pow(af::abs(p - q), 2.0)));
+}
+}
+
+// The L1 Family
+//      gower
+//      sorensen
+//      soergel
+//      kulczynski
+//      lorentzian
+//      canberra
+LOCK_STEP_DST_ALGORITHM(gower, true)
+LOCK_STEP_DST_ALGORITHM(sorensen, true)
+LOCK_STEP_DST_ALGORITHM(soergel, true)
+LOCK_STEP_DST_ALGORITHM(kulczynski, true)
+LOCK_STEP_DST_ALGORITHM(lorentzian, true)
+LOCK_STEP_DST_ALGORITHM(canberra, true)
+
+
+
+// The Intersection family
+//      intersection
+//      wavehedges
+//      czekanowski
+LOCK_STEP_DST_ALGORITHM(intersection, true)
+LOCK_STEP_DST_ALGORITHM(wavehedges, true)
+LOCK_STEP_DST_ALGORITHM(czekanowski, true)
+
+
+// The Squared L2 family
+//      squared_euclidean
+//      pearson
+//      neyman
+//      squared_chi
+//      prob_symmetric_chi
+//      divergence
+//      clark
+//      additive_symm_chi
+LOCK_STEP_DST_ALGORITHM(squared_euclidean, true)
+LOCK_STEP_DST_ALGORITHM(pearson, true)
+LOCK_STEP_DST_ALGORITHM(additive_symm_chi, true)
+LOCK_STEP_DST_ALGORITHM(squared_chi, true)
+LOCK_STEP_DST_ALGORITHM(prob_symmetric_chi, true)
+LOCK_STEP_DST_ALGORITHM(divergence, true)
+LOCK_STEP_DST_ALGORITHM(clark, true)
+LOCK_STEP_DST_ALGORITHM(neyman, true)
+
+// The Inner Product family
+//      innerproduct
+//      harmonic_mean
+//      cosine
+//      kumarhassebrook
+//      jaccard
+//      dice
+LOCK_STEP_DST_ALGORITHM(harmonic_mean, true)
+LOCK_STEP_DST_ALGORITHM(innerproduct, true)
+LOCK_STEP_DST_ALGORITHM(kumarhassebrook, true)
+LOCK_STEP_DST_ALGORITHM(cosine, true)
+LOCK_STEP_DST_ALGORITHM(dice, true)
+LOCK_STEP_DST_ALGORITHM(jaccard, true)
+
+
+// The Fidelity family
+//      fidelity
+//      bhattacharyya
+//      hellinger
+//      matusita
+//      square_chord
+LOCK_STEP_DST_ALGORITHM(fidelity, true)
+LOCK_STEP_DST_ALGORITHM(bhattacharyya, true)
+LOCK_STEP_DST_ALGORITHM(matusita, true)
+LOCK_STEP_DST_ALGORITHM(hellinger, true)
+LOCK_STEP_DST_ALGORITHM(square_chord, true)
+
+
+//The Shannon’s Entropy family
+//      kullback
+//      jeffrey
+//      topsoe
+//      jensen_shannon
+//      jensen_difference
+//      k_divergence
+LOCK_STEP_DST_ALGORITHM(kullback, false)
+LOCK_STEP_DST_ALGORITHM(jeffrey, false)
+LOCK_STEP_DST_ALGORITHM(topsoe, true)
+LOCK_STEP_DST_ALGORITHM(k_divergence, false)
+LOCK_STEP_DST_ALGORITHM(jensen_difference, true)
+LOCK_STEP_DST_ALGORITHM(jensen_shannon, true)
+
+
+// The Combinations family
+//      taneja
+//      kumar_johnson
+//      avg_l1_linf
+LOCK_STEP_DST_ALGORITHM(taneja, true)
+LOCK_STEP_DST_ALGORITHM(kumar_johnson, true)
+LOCK_STEP_DST_ALGORITHM(avg_l1_linf, true)
+
+
+// The Vicissitude family
+//      vicis_wave_hedges
+//      min_symmetric_chi
+//      max_symmetric_chi
+LOCK_STEP_DST_ALGORITHM(vicis_wave_hedges, true)
+LOCK_STEP_DST_ALGORITHM(min_symmetric_chi, true)
+LOCK_STEP_DST_ALGORITHM(max_symmetric_chi, true)
+
+// The Minkowski family
+//      euclidean
+//      manhattan
+//      chebyshev
+//      abs_euclidean
+LOCK_STEP_DST_ALGORITHM(manhattan, true)
+LOCK_STEP_DST_ALGORITHM(chebyshev, true)
+LOCK_STEP_DST_ALGORITHM(abs_euclidean, true)
+LOCK_STEP_DST_ALGORITHM(euclidean, true)
+
+
+
+
+
+
+
 distance_algorithm_t mpdist(int32_t w, double threshold) {
     return {
         false,               // all same length
@@ -32,7 +336,6 @@ distance_algorithm_t mpdist(int32_t w, double threshold) {
     };
 }
 
-
 distance_algorithm_t hamming() {
     return { 
         true,               // all same length
@@ -45,38 +348,6 @@ distance_algorithm_t hamming() {
                 result(0, ii) = af::sum(src != dst(af::span, ii));
             }
             return result.as(af::dtype::s32);
-        }
-    };
-}
-
-distance_algorithm_t manhattan() {
-    return { 
-        true,               // all same length
-        true,               // is symmetric
-        std::nullopt,       // no preference on the result type
-        [](const af::array& src, const af::array& dst) {
-            auto dst_cols = dst.dims(1);
-            auto result = af::array(1, dst_cols, src.type());
-            gfor(auto ii, dst_cols) {
-                result(0, ii) = af::sum(af::abs(src - dst(af::span, ii)));
-            }
-            return result;
-        }
-    };
-}
-
-distance_algorithm_t chebyshev() {
-    return { 
-        true,               // all same length
-        true,               // is symmetric
-        std::nullopt,       // no preference on the result type
-        [](const af::array& src, const af::array& dst) {
-            auto dst_cols = dst.dims(1);
-            auto result = af::array(1, dst_cols, src.type());
-            gfor(auto ii, dst_cols) {
-                result(0, ii) = af::max(af::abs(src - dst(af::span, ii)), 0);
-            }
-            return result;
         }
     };
 }
@@ -156,21 +427,6 @@ af::array dtwInternal(const af::array &a, const af::array &bss) {
     return af::reorder(cost(m - 1, n - 1, af::span), 0, 2, 1, 3);
 }
 
-distance_algorithm_t euclidian() {
-    return { 
-        true,               // all same length
-        true,               // is symmetric
-        std::nullopt,       // no preference on the result type
-        [](const af::array& src, const af::array& dst) {
-            auto dst_cols = dst.dims(1);
-            auto result = af::array(1, dst_cols, src.type());
-            gfor(auto ii, dst_cols) {
-                result(0, ii) = af::sqrt(af::sum(af::pow(src - dst(af::span, ii), 2)));
-            }
-            return result;
-        }
-    };
-}
 
 distance_algorithm_t dtw() {
     return { 

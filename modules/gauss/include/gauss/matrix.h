@@ -210,6 +210,9 @@ GAUSSAPI std::vector<snippet_t> snippets(const af::array& tss,
                                          const uint32_t num_snippets, 
                                          const std::optional<uint32_t>& window_size = std::nullopt); 
 
+
+GAUSSAPI af::array cac(const af::array& profile, const af::array& index, const long w);
+
 }  // namespace gauss
 
 #endif

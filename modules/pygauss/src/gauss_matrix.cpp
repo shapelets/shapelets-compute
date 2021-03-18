@@ -30,6 +30,15 @@ void pygauss::bindings::matrix_profile_functions(py::module_ &m)
             return result.str();
         });
 
+    m.def("cac",
+        [](const py::object& profile, const py::object& index, const uint32_t window_size) {
+            auto p = arraylike::as_array_checked(profile);
+            auto i = arraylike::as_array_checked(index);
+            return gmatrix::cac(p, i, window_size);
+        },
+        py::arg("profile").none(false),
+        py::arg("index").none(false),
+        py::arg("window_size").none(false));
 
     m.def("snippets",
          [](const py::object& tsa, const uint32_t snippet_size, const uint32_t num_snippets, std::optional<uint32_t> window_size) {

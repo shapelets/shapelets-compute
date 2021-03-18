@@ -1,5 +1,4 @@
 from typing import Optional, Sequence, Union
-from .__basic_typing import Backend
 from . import _pygauss
 
 class Backend:
@@ -18,7 +17,6 @@ class Backend:
     Default: _pygauss.Backend # value = <Backend.Default: 0>
     OpenCL: _pygauss.Backend # value = <Backend.OpenCL: 4>
     __members__: dict # value = {'Default': <Backend.Default: 0>, 'CPU': <Backend.CPU: 1>, 'CUDA': <Backend.CUDA: 2>, 'OpenCL': <Backend.OpenCL: 4>}
-
 
 
 class DeviceInfo:

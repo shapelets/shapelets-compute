@@ -18,11 +18,14 @@ from ._pygauss import (
     ones, pad, parallel_range, pinverse, positive, power, product, qr, rad2deg, radians, 
     range, rank, real, reciprocal, rem, reorder, right_shift, 
     rint, root, round, rsqrt, scan, shift, sigmoid, sign, 
-    signbit, sin, sinh, sort, sort_keys, sqrt, square, stdev, substract, sum, svd, 
+    signbit, sin, sinh, sort, sort_index, sort_by_key, sqrt, square, stdev, substract, sum, svd, 
     tan, tanh, tgamma, tile, topk_max, topk_min, transpose, true_divide, trunc, union, 
     unique, upper, var_p, var_s, where, zeros,
 
     unwrap, wrap,
+
+    any_by_key, all_by_key, count_by_key, max_by_key, min_by_key, product_by_key, nanproduct_by_key,
+    sum_by_key, nansum_by_key, scan_by_key,
     
     ScopedBatch,ConvMode,ConvDomain,MatrixProperties,NormType,ScanOp,BorderType
 )
@@ -46,11 +49,14 @@ __all__ = [
     "ones", "pad", "parallel_range", "pinverse", "positive", "power", "product", "qr", "rad2deg", "radians", 
     "range", "rank", "real", "reciprocal", "rem", "reorder", "right_shift", 
     "rint", "root", "round", "rsqrt", "scan", "shift", "sigmoid", "sign", 
-    "signbit", "sin", "sinh", "sort", "sort_keys", "sqrt", "square", "stdev", "substract", "sum", "svd", 
+    "signbit", "sin", "sinh", "sort", "sort_index", "sort_by_key", "sqrt", "square", "stdev", "substract", "sum", "svd", 
     "tan", "tanh", "tgamma", "tile", "topk_max", "topk_min", "transpose", "true_divide", "trunc", "union", 
     "unique", "upper", "var_p", "var_s", "where", "zeros", 
     
     "unwrap", "wrap",
+
+    "any_by_key", "all_by_key", "count_by_key", "max_by_key", "min_by_key", "product_by_key", 
+    "nanproduct_by_key", "sum_by_key", "nansum_by_key", "scan_by_key",
 
     "ScopedBatch","ConvMode","ConvDomain","MatrixProperties","NormType","ScanOp","BorderType"
 ]
