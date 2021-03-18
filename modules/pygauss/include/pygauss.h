@@ -301,7 +301,7 @@ namespace pygauss {
 
         void logic_operations(py::module &m);
 
-        void math_operations(py::module_ &m);
+        void math_operations(py::module &m);
 
         void random_numbers(py::module &m);
 
@@ -314,6 +314,8 @@ namespace pygauss {
         void gauss_distance_functions(py::module &m);
 
         void gauss_statistic_bindings(py::module &m);
+
+        void gauss_normalization_functions(py::module &m);
     }
 
 

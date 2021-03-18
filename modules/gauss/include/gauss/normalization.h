@@ -108,6 +108,12 @@ GAUSSAPI af::array znorm(const af::array &tss, double epsilon = 0.00000001);
  */
 GAUSSAPI void znormInPlace(af::array &tss, double epsilon = 0.00000001);
 
+
+GAUSSAPI af::array unitLengthNorm(const af::array &tss);
+GAUSSAPI af::array medianNorm(const af::array &tss);
+GAUSSAPI af::array sigmoidNorm(const af::array &tss);
+GAUSSAPI af::array tanhNorm(const af::array &tss);
+
 }  // namespace gauss
 
 #endif

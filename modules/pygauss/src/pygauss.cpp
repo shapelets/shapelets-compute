@@ -57,4 +57,5 @@ PYBIND11_MODULE(_pygauss, m) {
     matrix_profile_functions(m);
     gauss_distance_functions(m);
     gauss_statistic_bindings(m);
+    gauss_normalization_functions(m);
 }
