@@ -123,11 +123,6 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
           "Check if all the elements along a specified dimension are true.");
 
 
-    // TODO: missing by key* algos
-
-    // todo: missing imax and imin
-
-
     m.def("nan_to_num",
           [](const py::object &array_like, double nan, double inf) {
               auto a = pygauss::arraylike::as_array_checked(array_like);
@@ -540,22 +535,29 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
           "Find the second order differences along specified dimensions");
 
     m.def("sort",
-          [](const py::object &array_like, int dim, const bool &asc) -> std::tuple<af::array, af::array> {
+          [](const py::object &array_like, int dim, const bool asc) -> af::array {
               auto a = pygauss::arraylike::as_array_checked(array_like);
-              af::array indices, data;
-              af::sort(data, indices, a, dim, asc);
-
-              return {data, indices};
+              return af::sort(a, dim, asc);
           },
           py::arg("array_like").none(false),
           py::arg("dim") = 0,
-          py::arg("asc") = py::bool_(true),
-          "Sort the array along a specified dimension.  This method returns a tuple with the data and the "
-          "indices that would have sort the array (sort and argsort)");
+          py::arg("asc") = true,
+          "Sort the array along a specified dimension");
 
-    m.def("sort_keys",
-          [](const py::object &data, const py::object &keys, int dim,
-             const bool asc) -> std::tuple<af::array, af::array> {
+    m.def("sort_index",
+          [](const py::object &data, int dim, const bool asc) -> std::tuple<af::array, af::array> {
+              auto a = pygauss::arraylike::as_array_checked(data);
+              af::array sorted_keys, sorted_data;
+              af::sort(sorted_keys, sorted_data, a, dim, asc);
+
+              return { sorted_data, sorted_keys };
+          },
+          py::arg("data").none(false),
+          py::arg("dim") = 0,
+          py::arg("asc") = true);               
+
+    m.def("sort_by_key",
+          [](const py::object &keys, const py::object &data, int dim, const bool asc) -> std::tuple<af::array, af::array> {
               auto a = pygauss::arraylike::as_array_checked(data);
               auto k = pygauss::arraylike::as_array_checked(keys);
 
@@ -564,12 +566,10 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
               return {sorted_data, sorted_keys};
           },
-          py::arg("data").none(false),
           py::arg("keys").none(false),
+          py::arg("data").none(false),
           py::arg("dim") = 0,
-          py::arg("asc") = true,
-          "Sort the array along a specified dimension using an auxiliary array containing the indexing keys.  "
-          "This method returns a tuple with the data and the keys sorted");
+          py::arg("asc") = true);
 
     m.def("flatnonzero",
           [](const py::object &array_like) -> af::array {
@@ -610,4 +610,131 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
           py::arg("x2").none(false),
           py::arg("is_unique") = py::bool_(false),
           "Find the union of two arrays.");
+
+
+    m.def("any_by_key",
+        [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::anyTrueByKey(out_keys, out_vals, k, v, dim.value_or(-1));
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("dim") = py::none());
+
+    m.def("all_by_key",
+        [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::allTrueByKey(out_keys, out_vals, k, v, dim.value_or(-1));
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("dim") = py::none());
+
+    m.def("count_by_key",
+        [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::countByKey(out_keys, out_vals, k, v, dim.value_or(-1));
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("dim") = py::none());          
+
+    m.def("max_by_key",
+        [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::maxByKey(out_keys, out_vals, k, v, dim.value_or(-1));
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("dim") = py::none());  
+
+    m.def("min_by_key",
+        [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::minByKey(out_keys, out_vals, k, v, dim.value_or(-1));
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("dim") = py::none());  
+
+    m.def("product_by_key",
+        [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::productByKey(out_keys, out_vals, k, v, dim.value_or(-1));
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("dim") = py::none()); 
+        
+    m.def("nanproduct_by_key",
+        [](const py::object &keys, const py::object &vals, const double nan_value, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::productByKey(out_keys, out_vals, k, v, dim.value_or(-1), nan_value);
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("nan_value") = 1.0,
+        py::arg("dim") = py::none());           
+
+    m.def("sum_by_key",
+        [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::sumByKey(out_keys, out_vals, k, v, dim.value_or(-1));
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("dim") = py::none()); 
+
+
+    m.def("nansum_by_key",
+        [](const py::object &keys, const py::object &vals, const double nan_value, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
+            auto k = pygauss::arraylike::as_array_checked(keys);
+            auto v = pygauss::arraylike::as_array_checked(vals);
+            af::array out_keys, out_vals;
+            af::sumByKey(out_keys, out_vals, k, v, dim.value_or(-1), nan_value);
+            return {out_keys, out_vals};   
+        },
+        py::arg("keys").none(false),
+        py::arg("vals").none(true),
+        py::arg("nan_value") = 0.0,
+        py::arg("dim") = py::none()); 
+
+    m.def("scan_by_key",
+          [](const py::object &keys, const py::object &vals, int dim, const af::binaryOp &op, const bool &inclusive_scan) {
+              auto k = pygauss::arraylike::as_array_checked(keys);
+              auto v = pygauss::arraylike::as_array_checked(vals);
+              return af::scanByKey(k, v, dim, op, inclusive_scan);
+          },
+          py::arg("keys").none(false),
+          py::arg("vals").none(false),
+          py::arg("dim") = 0,
+          py::arg("op") = af::binaryOp::AF_BINARY_ADD,
+          py::arg("inclusive_scan") = true);
+
+
+
 }

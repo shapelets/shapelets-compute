@@ -329,4 +329,13 @@ void pygauss::bindings::array_obj(py::module &m) {
               }
           },
           "Forces the evaluation of all the arrays");
+
+    ka.def(
+        "assign",
+        [](af::array &self, const af::array &indices, const af::array &rhs){
+            self(indices)=rhs;
+            return self;
+        },
+        py::arg("indices").none(false),
+        py::arg("rhs").none(false));
 }

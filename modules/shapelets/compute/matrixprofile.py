@@ -7,7 +7,7 @@ from ._pygauss import (
     mass as _mass, 
     matrixprofileLR as _matrixprofileLR,
     mpdist_vect as _mpdist_vect,
-    snippets, Snippet
+    snippets, Snippet, cac
     )
 
 ## Matrix Profile

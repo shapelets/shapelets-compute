@@ -149,6 +149,35 @@ af::array mpdist_vector(const af::array &tss, const af::array &ts_b, long w, dou
     return sorted(dist_loc, af::span).T();
 }
 
+af::array cac(const af::array& profile, const af::array& index, const long w) {
+
+    auto pos = af::iota(index.dims(), af::dim4(1,1,1,1), index.type());
+    auto small = af::sort(af::min(pos, index));
+    auto large = af::sort(af::max(pos, index));
+    af::array si, sv;
+    af::sumByKey(si, sv, small, af::constant(1, small.dims(), index.type()));
+
+    af::array li, lv;
+    af::sumByKey(li, lv, large, af::constant(1, large.dims(), index.type()));
+
+    auto mark = af::constant(0, index.dims(), index.type());
+    mark(si) += sv;
+    mark(li) -= lv;
+
+    auto cross_count = af::accum(mark);
+
+    auto i = af::iota(cross_count.dims());
+    auto l = cross_count.dims(0);
+    auto adj = 2.0 * i * (l - i) / l;
+
+    auto normalized_cross_count = af::min(cross_count / adj, 1.0);
+
+    normalized_cross_count(af::seq(0, (w*5-1))) = 1.0;
+    normalized_cross_count(af::seq(l-(w*5), l-1)) = 1.0;
+    
+    return normalized_cross_count;
+}
+
 // snippet_size, num_snippets=2, window_size = None
 std::vector<snippet_t> snippets(const af::array& tss, const uint32_t snippet_size, const uint32_t num_snippets, const std::optional<uint32_t>& window_size) {
 
