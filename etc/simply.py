@@ -18,16 +18,16 @@ e = time.perf_counter() - s
 print("Loading data took: " + str(e) )
 
 # %%
-import matrixprofile as morg 
-xx = np.array(ts)
-s = morg.discover.snippets(xx, 400, 2)
-for i in range(len(s)):
-    print('** Snippet-' + str(i+1) + ' **')
-    print('Index:', s[i]['index'])
-    print('Fraction:', s[i]['fraction'])
-    print()
+# import matrixprofile as morg 
+# xx = np.array(ts)
+# s = morg.discover.snippets(xx, 400, 2)
+# for i in range(len(s)):
+#     print('** Snippet-' + str(i+1) + ' **')
+#     print('Index:', s[i]['index'])
+#     print('Fraction:', s[i]['fraction'])
+#     print()
 
-cProfile.run('morg.discover.snippets(xx, 400, 2)')
+# cProfile.run('morg.discover.snippets(xx, 400, 2)')
 
 # %%
 

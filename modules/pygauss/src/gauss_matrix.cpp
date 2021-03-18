@@ -12,7 +12,7 @@ namespace py = pybind11;
 namespace gmatrix = gauss::matrix;
 
 
-void pygauss::bindings::matrix_profile_functions(py::module_ &m)
+void pygauss::bindings::matrix_profile_functions(py::module &m)
 {
     py::class_<gmatrix::snippet_t>(m, "Snippet")
     .def_property_readonly("indices", [](const gmatrix::snippet_t& self) { return self.indices; })

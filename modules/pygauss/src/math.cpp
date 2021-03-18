@@ -47,7 +47,7 @@ af::array floor_divide(const af::array &left, const af::array &right, bool broad
 }
 
 
-void pygauss::bindings::math_operations(py::module_ &m) {
+void pygauss::bindings::math_operations(py::module &m) {
 
 //
 // Trigonometric Functions

@@ -181,7 +181,7 @@ gauss::distances::distance_algorithm_t enumToAlgo(distance_types dst,py::kwargs 
   }
 }
 
-void pygauss::bindings::gauss_distance_functions(py::module_ &m) {
+void pygauss::bindings::gauss_distance_functions(py::module &m) {
 
   py::enum_<distance_types>(m, "DistanceType", "Distance Type")
         .value("Abs_Euclidean", distance_types::Abs_Euclidean, "")

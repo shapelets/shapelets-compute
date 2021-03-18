@@ -1,6 +1,8 @@
 #include <gauss/internal/libraryInternal.h>
 #include <gauss/internal/matrixInternal.h>
+#include <gauss/normalization.h>
 #include <gauss/matrix.h>
+#include <tbb/tick_count.h>
 
 #include <stdexcept>
 #include <iostream>
@@ -15,14 +17,7 @@ constexpr long BATCH_SIZE_A = 8192;
 namespace gauss {
 namespace matrix {
 
-void mass(const af::array &q, const af::array &t, af::array &distances) {
-    af::array aux, mean, stdev;
-    auto qReordered = af::reorder(q, 0, 3, 2, 1);
-    auto m = qReordered.dims(0);
-    internal::meanStdev(t, aux, m, mean, stdev);
-    internal::mass(qReordered, t, aux, mean, stdev, distances);
-    distances = af::reorder(distances, 2, 0, 1, 3);
-}
+
 
 void findBestNOccurrences(const af::array &q, const af::array &t, long n, af::array &distances, af::array &indexes) {
     if (n > t.dims(0) - q.dims(0) + 1) {
@@ -107,22 +102,74 @@ void matrixProfileLR(const af::array &tss, long m, af::array &profileLeft, af::a
     internal::scampLR(tss, m, profileLeft, indexLeft, profileRight, indexRight);
 }
 
-af::array mpdist_vector(const af::array &tss, const af::array &ts_b, long w, double threshold) {
-    auto subseq_count = ts_b.dims(0) - w + 1;
 
-    // Batch all the querys and run in a single operation
-    // all the computations
-    auto queries = af::unwrap(ts_b, w, 1, 1, 1);
 
-    // matrix is going to be a len(tss) - w + 1 rows by len(ts_b) - w + 1 columns
-    // each row represents a position of ts and on each column we have the 
-    // distance to each subquery.
-    af::array mass;
-    gauss::matrix::mass(queries, tss, mass);
+typedef struct {
+    af::array aux; 
+    af::array mean;
+    af::array stdev;
+    af::array t;
+    af::array fft;
+    int32_t w;
+} mass_t;
 
-    // by computing the min of each row (this is a column vector)
-    // we have the matrix profile distances of ts to ts_b    
-    af::array ts_mins = af::min(mass, 1);
+
+mass_t mass_prepare(const af::array &t, const int32_t w) {
+    af::array aux, mean, stdev; 
+    internal::meanStdev(t, aux, w, mean, stdev);
+    
+    auto fft = af::fft(t, 0);
+
+    std::cout << t.dims() << std::endl;
+    std::cout << fft.dims() << std::endl;
+    std::cout << std::endl;
+
+    return {aux, mean, stdev, t, fft, w};
+}
+
+af::array mass_fft(const mass_t& state, const af::array &q) {
+    // af::array slidingDotProduct(const af::array &q, const af::array &t) {
+    auto n = state.t.dims(0);
+    auto m = q.dims(0);
+
+    // Flipping all the query sequences contained in q
+    auto qr = af::flip(q, 0);
+    auto qr_fft = af::fft(qr, n);
+    auto Z = af::tile(state.fft, 1, 1, 1, qr.dims(3)) * af::conjg(qr_fft);
+    auto z = af::real(af::ifft(Z));
+
+    // Calculating the convolve of all the query sequences contained in qr
+    // against all the time series contained in t
+    // af::array qt = af::real(af::convolve(t, qr, AF_CONV_EXPAND, AF_CONV_FREQ));
+    return z(af::seq(m - 1, n - 1), af::span, af::span, af::span);
+}
+
+// }
+
+af::array mass_compute(const mass_t& state, const af::array &queries, bool normalize) {
+    auto qReordered = af::reorder(queries, 0, 3, 2, 1);
+    auto checked_q = (normalize) ? gauss::normalization::znorm(qReordered, 1e-8) : qReordered;
+
+    af::array qt = mass_fft(state, checked_q);
+    af::array sum_q = af::sum(checked_q, 0);
+    af::array sum_q2 = af::sum(af::pow(checked_q, 2), 0);
+
+    // Calculate the distance and index profiles for all the combinations of query sequences and reference time series
+    af::array distances;
+    internal::calculateDistances(qt, state.aux, sum_q, sum_q2, state.mean, state.stdev, distances);
+    return af::reorder(distances, 2, 0, 1, 3);
+}
+
+void mass(const af::array &q, const af::array &t, af::array &distances) {
+    af::array aux, mean, stdev;
+    auto qReordered = af::reorder(q, 0, 3, 2, 1);
+    auto m = qReordered.dims(0);
+    internal::meanStdev(t, aux, m, mean, stdev);
+    internal::mass(qReordered, t, aux, mean, stdev, distances);
+    distances = af::reorder(distances, 2, 0, 1, 3);
+}
+
+af::array mass_to_mpdist_vector(const af::array& mass, long w, double threshold) {
     
     // we are going to compute the column min on a sliding window of wize
     // w for each row on mass, which is going to represent the matrix profile
@@ -134,48 +181,42 @@ af::array mpdist_vector(const af::array &tss, const af::array &ts_b, long w, dou
     auto uw = af::unwrap(mass, w, 1, 1, 1);
     // all in parallel...
     auto uw_mins = af::min(uw, 0);
+
     // go back to the previous arragement...
     auto mins = af::wrap(uw_mins, mass.dims(0)-w+1, mass.dims(1), 1, 1, 1, 1).T();
-    // compute windows of ts_mins
 
+    // compute windows of ts_mins
+    // by computing the min of each row (this is a column vector)
+    // we have the matrix profile distances of ts to ts_b    
+    af::array ts_mins = af::min(mass, 1);
     auto unw_ts_mins = af::unwrap(ts_mins, w, 1, 1, 1);
+    
     // join
     auto data = af::join(0, mins, unw_ts_mins);
+
     // sort
-    auto sorted = af::sort(data, 0);
+    auto sorted = sort(data, 0);
+    // auto sorted = data;
+
     // choose
     auto dist_loc = static_cast<dim_t>(std::ceil(threshold * data.dims(0)));
+
     // return
     return sorted(dist_loc, af::span).T();
 }
 
-af::array cac(const af::array& profile, const af::array& index, const long w) {
+af::array mpdist_vector(const af::array &tss, const af::array &ts_b, long w, double threshold) {
+    // Batch all the querys and run in a single operation
+    // all the computations
+    auto queries = af::unwrap(ts_b, w, 1, 1, 1);
 
-    auto pos = af::iota(index.dims(), af::dim4(1,1,1,1), index.type());
-    auto small = af::sort(af::min(pos, index));
-    auto large = af::sort(af::max(pos, index));
-    af::array si, sv;
-    af::sumByKey(si, sv, small, af::constant(1, small.dims(), index.type()));
+    // matrix is going to be a len(tss) - w + 1 rows by len(ts_b) - w + 1 columns
+    // each row represents a position of ts and on each column we have the 
+    // distance to each subquery.
+    af::array mass;
+    gauss::matrix::mass(queries, tss, mass);
 
-    af::array li, lv;
-    af::sumByKey(li, lv, large, af::constant(1, large.dims(), index.type()));
-
-    auto mark = af::constant(0, index.dims(), index.type());
-    mark(si) += sv;
-    mark(li) -= lv;
-
-    auto cross_count = af::accum(mark);
-
-    auto i = af::iota(cross_count.dims());
-    auto l = cross_count.dims(0);
-    auto adj = 2.0 * i * (l - i) / l;
-
-    auto normalized_cross_count = af::min(cross_count / adj, 1.0);
-
-    normalized_cross_count(af::seq(0, (w*5-1))) = 1.0;
-    normalized_cross_count(af::seq(l-(w*5), l-1)) = 1.0;
-    
-    return normalized_cross_count;
+    return mass_to_mpdist_vector(mass, w, threshold);
 }
 
 // snippet_size, num_snippets=2, window_size = None
@@ -202,15 +243,28 @@ std::vector<snippet_t> snippets(const af::array& tss, const uint32_t snippet_siz
     auto groups = tss_padded.dims(0) / snippet_size;
     n = tss_padded.dims(0);
     
+    auto mass_state = mass_prepare(tss_padded, w);
+
     std::vector<af::array> distances;
     for(auto i=0; i<n; i+= snippet_size) {
-        auto dist_vector = mpdist_vector(tss_padded, tss_padded(af::seq(i, i+snippet_size-1)), w);
+        
+        auto ts_b = tss_padded(af::seq(i, i+snippet_size-1));
+
+        // Batch all the querys and run in a single operation
+        // all the computations
+        auto queries = af::unwrap(ts_b, w, 1, 1, 1);
+        auto mass = mass_compute(mass_state, queries, true);
+        auto dist_vector = mass_to_mpdist_vector(mass, w, 0.05);
+        // auto dist_vector = mpdist_vector(tss_padded, tss_padded(af::seq(i, i+snippet_size-1)), w);
         distances.push_back(dist_vector);
     }
 
     // Do a first pass so all variables and first snippet are initialised 
     // with ease
     std::vector<snippet_t> results;
+
+    for(auto it = distances.begin(); it != distances.end(); it++)
+        af::eval(*it);
 
     auto minims = std::numeric_limits<double>::infinity();
     uint32_t index = 0;
@@ -252,7 +306,57 @@ std::vector<snippet_t> snippets(const af::array& tss, const uint32_t snippet_siz
     return results;
 }
 
+
+af::array cac(const af::array& profile, const af::array& index, const long w) {
+
+    auto pos = af::iota(index.dims(), af::dim4(1,1,1,1), index.type());
+    auto small = af::sort(af::min(pos, index));
+    auto large = af::sort(af::max(pos, index));
+    af::array si, sv;
+    af::sumByKey(si, sv, small, af::constant(1, small.dims(), index.type()));
+
+    af::array li, lv;
+    af::sumByKey(li, lv, large, af::constant(1, large.dims(), index.type()));
+
+    auto mark = af::constant(0, index.dims(), index.type());
+    mark(si) += sv;
+    mark(li) -= lv;
+
+    auto cross_count = af::accum(mark);
+
+    auto i = af::iota(cross_count.dims());
+    auto l = cross_count.dims(0);
+    auto adj = 2.0 * i * (l - i) / l;
+
+    auto normalized_cross_count = af::min(cross_count / adj, 1.0);
+
+    normalized_cross_count(af::seq(0, (w*5-1))) = 1.0;
+    normalized_cross_count(af::seq(l-(w*5), l-1)) = 1.0;
+    
+    return normalized_cross_count;
+}
+
 void getChains(const af::array &tss, long m, af::array &chains) { internal::getChains(tss, m, chains); }
+
+
+
+
+/**
+ * Computes rolling mean and standard deviation
+ */ 
+void compute_mean_std(af::array& means, af::array& stds, const af::array &t, const int32_t m) {
+    auto windows = af::unwrap(t, m, 1, 1, 1);
+    means = af::mean(windows, 0);
+    stds = af::stdev(windows, 0);
+}
+
+
+
+
+
+
+
+
 
 }  // namespace matrix
 }  // namespace gauss
