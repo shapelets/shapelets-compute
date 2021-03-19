@@ -1,6 +1,5 @@
 #%%
 import os
-import scipy.io
 import numpy as np
 import pathlib
 import matplotlib.pyplot as plt 
@@ -10,6 +9,7 @@ import cProfile
 current_path = pathlib.Path(__file__).parent.absolute()
 file = os.path.join(current_path, "regime.txt")
 data = np.loadtxt(file)
+
 # plt.plot(data)
 # plt.show()
 

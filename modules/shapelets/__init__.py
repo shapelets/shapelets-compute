@@ -16,7 +16,7 @@ else:
     # Normal initialization here
     from . import compute
     from . import generators
-
-    __all__ = ["compute", "generators"]
+    from . import data
+    __all__ = ["compute", "generators", "data"]
 
 del stderr

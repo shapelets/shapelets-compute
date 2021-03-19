@@ -196,7 +196,7 @@ af::array mass_to_mpdist_vector(const af::array& mass, long w, double threshold)
 
     // sort
     auto sorted = sort(data, 0);
-    // auto sorted = data;
+    //auto sorted = data;
 
     // choose
     auto dist_loc = static_cast<dim_t>(std::ceil(threshold * data.dims(0)));

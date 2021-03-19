@@ -36,10 +36,13 @@ cProfile.run('sc.matrixprofile.snippets(ts, 400, 2)')
 # %%
 
 fig, ax = plt.subplots(figsize=(18, 8))
+margin= (sc.amin(ts) * .9).real
 
 ax.plot(ts)
 for idx, sn in enumerate(snippets):
-    ax.plot(sn.indices, (-2 * np.ones_like(sn.indices)) + idx/15., 'o', label=repr(sn), markersize=4, alpha=.5)
+    ax.plot(sn.indices, (margin * np.ones_like(sn.indices)) + idx/15., 'o', label=repr(sn), markersize=20, alpha=.1)
 
 ax.legend()
 plt.show()
+
+# %%

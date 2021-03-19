@@ -98,9 +98,10 @@ class CMakeBuild(cmdclass["build_ext"]):
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
             '-DPYTHON_EXECUTABLE=' + sys.executable
         ]
-
+        
         cfg = 'Debug' if self.debug else 'Release'
-        build_args = ['--config', 'Debug']  # cfg]
+        print(cfg)
+        build_args = ['--config', cfg]  # cfg]
 
         if platform.system() == "Windows":
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
