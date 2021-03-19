@@ -84,7 +84,7 @@ plt.show()
 sc.distances.mpdist(queries[:, 0], queries[:, 1], w=20)
 
 # %%
-labels=["Ts1", "Ts2", "Ts3", "Ts4", "Ts5"]
+l=["Ts1", "Ts2", "Ts3", "Ts4", "Ts5"]
 dst = sc.distances.pdist(queries, DistanceType.MPDist, w=25)
 # %%
 
@@ -92,14 +92,14 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 dists = squareform(dst)
 linkage_matrix = linkage(dists, "single")
-dendrogram(linkage_matrix, labels)
+dendrogram(linkage_matrix, labels=l)
 plt.show()
 # %%
 
 # With SBD Distance
 dists = squareform(sc.distances.pdist(queries, DistanceType.SBD))
 linkage_matrix = linkage(dists, "single")
-dendrogram(linkage_matrix, labels)
+dendrogram(linkage_matrix, labels=l)
 plt.show()
 
 # %%
@@ -107,7 +107,7 @@ plt.show()
 # With Euclidian Distance
 dists = squareform(sc.distances.pdist(queries, DistanceType.Euclidean))
 linkage_matrix = linkage(dists, "single")
-dendrogram(linkage_matrix, labels)
+dendrogram(linkage_matrix, labels=l)
 plt.show()
 
 # %%
