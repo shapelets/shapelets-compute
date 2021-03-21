@@ -64,7 +64,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
           "It flattens an array to one dimension");
 
     m.def("flip",
-          [](const py::object& array_like, const uint dimension) {
+          [](const py::object& array_like, const uint32_t dimension) {
               auto a = arraylike::as_array_checked(array_like);
               return af::flip(a, dimension);
           },
@@ -73,7 +73,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
           "Flips an array along a dimension");
 
     m.def("reorder",
-          [](const py::object& array_like, const uint x, const uint y, const uint z, const uint w) {
+          [](const py::object& array_like, const uint32_t x, const uint32_t y, const uint32_t z, const uint32_t w) {
               auto a = arraylike::as_array_checked(array_like);
               return af::reorder(a, x, y, z);
           },
@@ -98,7 +98,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
           "Shifts data in a circular buffer fashion along a chosen dimension");
 
     m.def("tile",
-          [](const py::object& array_like, const uint x, const uint y, const uint z, const uint w) {
+          [](const py::object& array_like, const uint32_t x, const uint32_t y, const uint32_t z, const uint32_t w) {
               auto a = arraylike::as_array_checked(array_like);
               return af::tile(a, x, y, z, w);
           },

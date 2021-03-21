@@ -2,7 +2,7 @@
 #include <gauss/internal/matrixInternal.h>
 #include <gauss/normalization.h>
 #include <gauss/matrix.h>
-#include <tbb/tick_count.h>
+// #include <tbb/tick_count.h>
 
 #include <stdexcept>
 #include <iostream>
@@ -279,7 +279,7 @@ std::vector<snippet_t> snippets(const af::array& tss, const uint32_t snippet_siz
     results.push_back({index, snippet_size, w});
 
     auto minis = distances[index];
-    for (auto sn=1; sn<num_snippets; sn++) {
+    for (auto sn=1; sn < num_snippets; sn++) {
         auto minims = std::numeric_limits<double>::infinity();
         index = 0;
         j = 0;
@@ -310,10 +310,10 @@ std::vector<snippet_t> snippets(const af::array& tss, const uint32_t snippet_siz
 af::array cac(const af::array& profile, const af::array& index, const long w) {
 
     auto pos = af::iota(index.dims(), af::dim4(1,1,1,1), index.type());
-    auto small = af::sort(af::min(pos, index));
+    auto smll = af::sort(af::min(pos, index));
     auto large = af::sort(af::max(pos, index));
     af::array si, sv;
-    af::sumByKey(si, sv, small, af::constant(1, small.dims(), index.type()));
+    af::sumByKey(si, sv, smll, af::constant(1, smll.dims(), index.type()));
 
     af::array li, lv;
     af::sumByKey(li, lv, large, af::constant(1, large.dims(), index.type()));

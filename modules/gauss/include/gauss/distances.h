@@ -4,6 +4,7 @@
 #include <arrayfire.h>
 #include <gauss/defines.h>
 #include <optional>
+#include <functional>
 
 namespace gauss::distances {
 

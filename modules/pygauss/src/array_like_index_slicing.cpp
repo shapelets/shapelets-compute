@@ -142,8 +142,8 @@ namespace pygauss {
                 throw_on_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, false));
                 auto v1 = start < 0 ? arr_dim[i] + start : start;
                 auto v2 = stop < 0 ? arr_dim[i] + stop : stop;
-                auto span = (long) abs(v1 - v2) + 1;
-                auto int_div = div(span, abs(step));
+                auto span = (long long) abs(v1 - v2) + 1;
+                auto int_div = std::div(span, std::abs(step));
                 auto len = int_div.quot + (int_div.rem != 0 ? 1 : 0);
                 result_dim[i] = (dim_t) len;
                 spd::trace("Preprocessed selector: resulting dimension at pos {} is {} (Original was {})", i,
@@ -161,7 +161,7 @@ namespace pygauss {
                 throw_on_error(af_set_seq_param_indexer(afIndex, start, stop, step, i, true));
                 auto v1 = start < 0 ? arr_dim[i] + start : start;
                 auto v2 = stop < 0 ? arr_dim[i] + stop : stop;
-                auto span = (long) abs(v1 - v2) + 1;
+                auto span = (long long) abs(v1 - v2) + 1;
                 auto int_div = div(span, abs(step));
                 auto len = int_div.quot + (int_div.rem != 0 ? 1 : 0);
                 result_dim[i] = (dim_t) len;

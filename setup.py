@@ -105,8 +105,7 @@ class CMakeBuild(cmdclass["build_ext"]):
 
         if platform.system() == "Windows":
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
-            if sys.maxsize > 2 ** 32:
-                cmake_args += ['-A', 'x64']
+            cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
@@ -125,11 +124,9 @@ class CMakeBuild(cmdclass["build_ext"]):
         if ext.target:
             if isinstance(ext.target, list):
                 for target in ext.target:
-                    subprocess.check_call(['cmake', '--build', '.', '--target', target] + build_args,
-                                          cwd=self.build_temp)
+                    subprocess.check_call(['cmake', '--build', '.', '--target', target] + build_args, cwd=self.build_temp)
             else:
-                subprocess.check_call(['cmake', '--build', '.', '--target', ext.target] + build_args,
-                                      cwd=self.build_temp)
+                subprocess.check_call(['cmake', '--build', '.', '--target', ext.target] + build_args, cwd=self.build_temp)
         else:
             subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 

@@ -87,7 +87,7 @@ void pygauss::bindings::matrix_profile_functions(py::module &m)
 
     m.def(
         "matrixprofile",
-        [](const py::object &series_a, const int64_t m, const std::optional<py::object> &series_b) {
+        [](const py::object &series_a, const int32_t m, const std::optional<py::object> &series_b) {
             auto ta = arraylike::as_array_checked(series_a);
             arraylike::ensure_floating(ta);
 
@@ -112,7 +112,7 @@ void pygauss::bindings::matrix_profile_functions(py::module &m)
 
     m.def(
         "matrixprofileLR",
-        [](const py::object &series_a, const int64_t m) {
+        [](const py::object &series_a, const int32_t m) {
             auto ta = arraylike::as_array_checked(series_a);
             arraylike::ensure_floating(ta);
 
