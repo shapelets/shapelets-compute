@@ -234,7 +234,7 @@ void pygauss::bindings::linear_algebra_operations(py::module &m) {
               auto is32BitsOp = A.type() == af::dtype::f32 || A.type() == af::dtype::c32;
 
               // Ensure B matches the type of A
-              auto B = arraylike::as_array_checked(a);
+              auto B = arraylike::as_array_checked(b);
               if (B.type() != A.type())
                   B = B.as(A.type());
 
