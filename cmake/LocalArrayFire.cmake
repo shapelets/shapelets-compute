@@ -5,7 +5,7 @@ function (download_af)
     
     execute_process(
         COMMAND python setup_af.py
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/cmake"
         RESULT_VARIABLE AF_DOWNLOADED
     )
 
@@ -36,7 +36,13 @@ if (ArrayFire_Local OR NOT EXISTS ${ArrayFire_DIR} OR NOT ArrayFire_FOUND)
     endif()
 
     # ensure ArrayFire_DIR is set
-    set(ArrayFire_DIR "${CMAKE_SOURCE_DIR}/external/arrayfire/share/ArrayFire/cmake")
+    
+    if (WIN32)
+        set(ArrayFire_DIR "${CMAKE_SOURCE_DIR}/external/arrayfire/cmake")
+    else()
+        set(ArrayFire_DIR "${CMAKE_SOURCE_DIR}/external/arrayfire/share/ArrayFire/cmake")
+    endif()    
+    
     # add directory to list of cmake modules
     list(APPEND CMAKE_MODULE_PATH ${ArrayFire_DIR})
 endif()
