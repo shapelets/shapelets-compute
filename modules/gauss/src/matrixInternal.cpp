@@ -133,7 +133,8 @@ void runScamp(SCAMP::SCAMPArgs &args) {
     // When using GPUs do not use CPU workers as they are much slower currently
     // and can cause unnecessary latency
     int numWorkersCPU = 0;
-    if (algos::library::getBackend() == algos::library::Backend::KHIVA_BACKEND_CPU) {
+    if (af::getActiveBackend() == af::Backend::AF_BACKEND_CPU) {
+    // if (algos::library::getBackend() == algos::library::Backend::KHIVA_BACKEND_CPU) {
         devices.clear();
         numWorkersCPU = std::thread::hardware_concurrency();
     }
