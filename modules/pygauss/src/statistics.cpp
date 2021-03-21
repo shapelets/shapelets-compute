@@ -47,7 +47,7 @@ void pygauss::bindings::statistic_functions(py::module &m) {
           [](const af::array &a, const int k) {
               af::array values;
               af::array indices;
-              af::topk(values, indices, k, 0, af_topk_function::AF_TOPK_MAX);
+              af::topk(values, indices, a, k, 0, af_topk_function::AF_TOPK_MAX);
               py::tuple result(2);
               result[0] = values;
               result[1] = indices;
@@ -62,7 +62,7 @@ void pygauss::bindings::statistic_functions(py::module &m) {
           [](const af::array &a, const int k) {
               af::array values;
               af::array indices;
-              af::topk(values, indices, k, 0, af_topk_function::AF_TOPK_MIN);
+              af::topk(values, indices, a, k, 0, af_topk_function::AF_TOPK_MIN);
 
               py::tuple result(2);
               result[0] = values;
