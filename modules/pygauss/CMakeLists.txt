@@ -6,10 +6,12 @@ project(PyGauss)
 find_package(ArrayFire CONFIG REQUIRED)
 
 # Logging support
-find_package(spdlog REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 # Find the pybind11 package
-find_package(pybind11 REQUIRED)
+find_package(Python COMPONENTS Interpreter Development)
+find_package(pybind11 CONFIG)
+# find_package(pybind11 REQUIRED)
 
 # Find arrow
 find_package(Arrow CONFIG REQUIRED)
@@ -46,6 +48,8 @@ target_link_libraries(PyGauss
         PRIVATE
         ArrayFire::af
         gauss
+        $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cufft>
+        $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cudart>
         spdlog::spdlog
         ${CMAKE_DL_LIBS})
 
