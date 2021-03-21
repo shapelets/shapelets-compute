@@ -14,7 +14,11 @@ include(LocalArrayFire)
 
 # VCPKG to install dependencies
 include(AutoVcpkg)
-vcpkg_install(pybind11 gtest eigen3 benchmark boost spdlog arrow)
+if(WIN32)
+    vcpkg_install(pybind11:x64-windows-static gtest:x64-windows-static eigen3:x64-windows-static benchmark:x64-windows-static boost:x64-windows-static spdlog:x64-windows-static arrow:x64-windows-static)
+else()
+    vcpkg_install(pybind11 gtest eigen3 benchmark boost spdlog arrow)
+endif()
 
 ####
 # END: Pre-Project Setup
@@ -27,31 +31,30 @@ project(ShapeletsSolo)
 option(SOLO_ENABLE_COVERAGE "This flag anables Code Coverage of the code" OFF)
 
 # Using C++ 11
-SET(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_CXX_STANDARD_REQUIRED ON) # Required
-SET(CMAKE_CXX_EXTENSIONS ON) # with compiler extensions like gnu++11
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON) # Required
+set(CMAKE_CXX_EXTENSIONS ON) # with compiler extensions like gnu++11
 
 # Set the build type
-IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE "Release" 
-      CACHE STRING "Build configuration 'Release' or 'Debug'." FORCE)
-ENDIF()
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build configuration 'Release' or 'Debug'." FORCE)
+endif()
 
 # In debug mode, avoid any optimisations
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    SET(CMAKE_CXX_FLAGS "-g -O0")
-ENDIF()
+if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+    set(CMAKE_CXX_FLAGS "-g -O0")
+endif()
 
 # Avoid conflicts with min and max functions
-IF(WIN32)
-    ADD_DEFINITIONS(-DNOMINMAX)
-ENDIF()
+if(WIN32)
+    add_definitions(-DNOMINMAX)
+endif()
 
 #global settings
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # Turn compiler warnings up to 11
     string(REGEX REPLACE "[-/]W[1-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -pedantic -Wno-gnu-zero-variadic-macro-arguments -Wint-conversion -Wshorten-64-to-32")
