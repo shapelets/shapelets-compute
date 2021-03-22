@@ -2,7 +2,8 @@
 #define __FORMATTERS_H__
 
 #include <arrayfire.h>
-#include <fmt/format.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
 
 /**
  * Formatter to log af::dim4 instances

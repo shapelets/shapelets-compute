@@ -95,7 +95,8 @@ def setup_arrayfire(base_folder, download_folder, cfg):
 
 if __name__ == '__main__':
     current_path = pathlib.Path(__file__).parent.absolute()
-    with open('setup_af.json', 'r') as json_file:
+    cfg_file = os.path.join(current_path, "setup_af.json")
+    with open(cfg_file, 'r') as json_file:
         cfg = json.load(json_file)
 
     download_folder = os.path.join(current_path, cfg["downloads"])

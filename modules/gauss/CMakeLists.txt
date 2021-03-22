@@ -56,7 +56,7 @@ endif()
 ###
 
 if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-  set(CMAKE_CUDA_ARCHITECTURES 75 72 70 61 60 50 37 35 30)
+  set(CMAKE_CUDA_ARCHITECTURES 75 72 70 61 60) # 50 37 35)
 endif()
 
 add_library(gauss_scamp_common external/scamp/src/common.cpp)

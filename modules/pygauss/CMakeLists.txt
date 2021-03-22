@@ -6,19 +6,20 @@ project(PyGauss)
 find_package(ArrayFire CONFIG REQUIRED)
 
 # Logging support
-find_package(spdlog CONFIG REQUIRED)
+# find_package(spdlog CONFIG REQUIRED)
 
 # Find the pybind11 package
-find_package(Python COMPONENTS Interpreter Development)
-find_package(pybind11 CONFIG)
+# find_package(Python COMPONENTS Interpreter Development)
+# find_package(pybind11 CONFIG)
 # find_package(pybind11 REQUIRED)
 
 # Find arrow
-find_package(Arrow CONFIG REQUIRED)
+# find_package(Arrow CONFIG REQUIRED)
 
 set(PYGAUSS_BASE_DIR "${PROJECT_SOURCE_DIR}")
 set(PYGAUSS_SRC "${PYGAUSS_BASE_DIR}/src")
 set(PYGAUSS_INC "${PYGAUSS_BASE_DIR}/include")
+set(PYGAUSS_LOG_INC "${PYGAUSS_BASE_DIR}/../../external/spdlog/include")
 
 # Files to add to compilation
 file(GLOB_RECURSE PYGAUSS_CODE
@@ -39,6 +40,7 @@ set_target_properties(PyGauss
 ## Declare include directories
 target_include_directories(PyGauss
         PRIVATE
+        ${PYGAUSS_LOG_INC}
         ${PYGAUSS_INC})
 
 # Add compile definitions
@@ -50,7 +52,7 @@ target_link_libraries(PyGauss
         gauss
         $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cufft>
         $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cudart>
-        spdlog::spdlog
+       # spdlog::spdlog_header_only
         ${CMAKE_DL_LIBS})
 
 

@@ -5,7 +5,6 @@
 #include <arrayfire.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
 #include "formatters.h"
