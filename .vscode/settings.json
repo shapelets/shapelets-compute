@@ -114,8 +114,12 @@
         "**/.mypy_cache": true,
         "**/.pytest_cache": true,
     },
-    "python.pythonPath": "/Users/justo.ruiz/.pyenv/shims/python",
+    "python.pythonPath": "v3.8\\Scripts\\python.exe",
     "git.ignoreSubmodules": true,
     "jupyter.jupyterServerType": "local",
     "jupyter.textOutputLimit": 0,
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "C:\\Shapelets\\dev\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+    },
+    "cmake.configureOnOpen": false
 }

@@ -96,7 +96,9 @@ class CMakeBuild(cmdclass["build_ext"]):
         extdir = os.path.join(extdir, ext.output_dir)
         cmake_args = [
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-            '-DPYTHON_EXECUTABLE=' + sys.executable
+#            '-DPYTHON_EXECUTABLE=' + sys.executable,
+            '-DCMAKE_TOOLCHAIN_FILE=C:\\Shapelets\\dev\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake'
+#             '-DPython_ROOT_DIR=C:\\Users\\JustoRuizFerrer\\.pyenv\\pyenv-win\\versions\\3.8.2'
         ]
         
         cfg = 'Debug' if self.debug else 'Release'
@@ -119,6 +121,10 @@ class CMakeBuild(cmdclass["build_ext"]):
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+
+        print(repr(['cmake', ext.sourcedir] + cmake_args))
+        print(repr(self.build_temp))
+        print(repr(env))
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         if ext.target:

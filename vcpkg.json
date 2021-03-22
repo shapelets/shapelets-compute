@@ -1,0 +1,13 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+    "name": "shapelets-solo",
+    "version": "0.15.2",
+    "builtin-baseline": "9986c28da97f316fe3c79be0538af8f46a200796",
+    "dependencies": [
+        "eigen3",
+        "boost-math"
+    ],
+    "overrides": [
+       
+    ]    
+}

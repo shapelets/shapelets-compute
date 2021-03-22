@@ -41,3 +41,14 @@ git submodule update --init --recursive.
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
 pybind11-stubgen shapelets.compute --ignore-invalid all  -o ./out 
+
+
+
+# PYBind11
+Why is it external? Because vcpkg automatically gets the latest pyton environment.  This should be a headers only library whose 
+rt dependencies should be determined through virtual envs.
+
+#Spdlog
+vcpkg does a very odd thing here: it forces the compilation with the external fmt library, rather than using the header only 
+version that ships with spdlog.  there is no way of fixing this since it "compiles" at instalation fixing the external nature 
+of fmt (which then becomes dynamically linked regardless of preferences in windows.)
