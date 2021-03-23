@@ -105,7 +105,8 @@
         "hash_map": "cpp",
         "hash_set": "cpp",
         "__functional_03": "cpp",
-        "__hash": "cpp"
+        "__hash": "cpp",
+        "core": "cpp"
     },
     "files.exclude": {
         "**/__pycache__": true,

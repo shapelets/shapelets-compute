@@ -5,6 +5,8 @@ import os
 # os.environ["AF_SHOW_LOAD_PATH"]="1"
 # os.environ["AF_PRINT_ERRORS"]="1"
 
+
+# Pro
 library_dir = None 
 
 # current location
@@ -17,8 +19,11 @@ else:
     library_dir = os.path.join(compute_dir, '..', '.libs')
 
 # In development, fall back to external / arrayfire / lib folder
-if not os.path.exists(library_dir):    
-    library_dir = os.path.join(compute_dir, '..', '..', '..', 'external', 'arrayfire', 'lib')
+if not os.path.exists(library_dir):
+    if os.name == "posix":
+        library_dir = os.path.join(compute_dir, '..', '..', '..', 'external', 'arrayfire', 'lib64')
+    else:
+        library_dir = os.path.join(compute_dir, '..', '..', '..', 'external', 'arrayfire', 'lib')
 
 if not os.path.exists(library_dir):
     raise RuntimeError("No valid location can be stablished for native libraries.")

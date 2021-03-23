@@ -22,6 +22,8 @@ find_package(ArrayFire QUIET)
 
 if (ArrayFire_FOUND)
     message(STATUS "ArrayFire: System Installation at ${ArrayFire_DIR}")
+else()
+    message(STATUS "ArrayFire: No system-wide installation found")
 endif()
 
 # if a local copy is preferred or there is no installation of 
