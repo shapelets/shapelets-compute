@@ -16,7 +16,6 @@ cmdclass = versioneer.get_cmdclass()
 # Technique from numpy
 builtins.__SHAPELETS_SETUP__ = True
 
-
 def process_version_information(full_version):
     """ Builds a textual version string out of the information provided by versioneer"""
     is_dev = 'dev' not in full_version
@@ -144,8 +143,7 @@ def create_metadata(full_version, doc_url):
         ext_modules=[CMakeExtension("pygauss",
                                     debug=True,
                                     output_dir='shapelets/compute',
-                                    target=["PyGauss"])],
-                                    # target=["PyGauss", "stubcpu", "stubcuda", "stubcl"])],
+                                    target=["PyGauss"])]
         python_requires='>=3.7',
         package_data={
             'shapelets': ['*.pyi', 'py.typed'],
