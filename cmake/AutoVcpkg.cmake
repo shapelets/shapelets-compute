@@ -42,7 +42,6 @@ function (vcpkg_download)
 
     file(WRITE "${DOWNLOADS_DIRECTORY}/vcpkg-download/CMakeLists.txt" "${vcpkg_download_contents}")
 
-
     execute_process(COMMAND "${CMAKE_COMMAND}"
         "-H${DOWNLOADS_DIRECTORY}/vcpkg-download"
         "-B${DOWNLOADS_DIRECTORY}/vcpkg-download")
@@ -66,16 +65,6 @@ endfunction ()
 
 
 function (vcpkg_install)
-    # Variables:
-    #   ENV{VCPKG_ROOT}         Points to an existing installation of VCPKG through environment variables.
-    #   AUTO_VCPKG_ROOT         Points to an existing installation of VCPKG through command line settings in cmake
-    #   AUTO_VCPKG_EXECUTABLE   Flag that indicates if vcpkg executable has been found
-    #
-    # We want to leave this script with 
-    #   CMAKE_TOOLCHAIN_FILE    Pointing to vcpkg.cmake file for auto configuration
-
-    # The variable controlling the process is AUTO_VCPKG_ROOT, which should be bootstrapped from the environment 
-    # to find existing installations or it will be set by this process.
 
     # if it is not set and there is an enviornment variable point to it
     if(NOT DEFINED AUTO_VCPKG_ROOT)
@@ -93,31 +82,14 @@ function (vcpkg_install)
     if (NOT AUTO_VCPKG_EXECUTABLE)
         message(STATUS "Couldn't find vcpkg in ${AUTO_VCPKG_ROOT}; downloading and building...")
         vcpkg_download()
+        find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT})
+        if (NOT AUTO_VCPKG_EXECUTABLE)
+            message(FATAL_ERROR "Cannot find vcpkg executable")
+        endif ()
     endif()
-
-    message(STATUS "Checking for vcpkg in ${AUTO_VCPKG_ROOT}")
-    find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT})
-    if (NOT AUTO_VCPKG_EXECUTABLE)
-        message(FATAL_ERROR "Cannot find vcpkg executable")
-    endif ()
 
     mark_as_advanced(AUTO_VCPKG_EXECUTABLE)
     set(CMAKE_TOOLCHAIN_FILE "${AUTO_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 
-    cmake_parse_arguments(_vcpkg_install "" "TRIPLET" "" ${ARGN})
-    if (NOT ARGN)
-        message(STATUS "vcpkg_install() called with no packages to install")
-        return()
-    endif ()
-
-    if (NOT _vcpkg_install_TRIPLET)
-        set(packages ${ARGN})
-    else ()
-        string(APPEND ":${_vcpkg_install_TRIPLET}" packages ${ARGN})
-    endif ()
-    
-    string(JOIN ", " join ${packages})
-    message(STATUS "vcpkg_install() called to install: ${join}")
-
-    execute_process (COMMAND "${AUTO_VCPKG_EXECUTABLE}" "install" ${packages})
+    execute_process (COMMAND "${AUTO_VCPKG_EXECUTABLE} install --feature-flags:versions,manifest")
 endfunction ()

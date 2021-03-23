@@ -95,11 +95,7 @@ class CMakeBuild(cmdclass["build_ext"]):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         extdir = os.path.join(extdir, ext.output_dir)
         cmake_args = [
-            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-#            '-DPYTHON_EXECUTABLE=' + sys.executable,
-#            '-DCMAKE_TOOLCHAIN_FILE=C:\\Shapelets\\dev\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake'
-            "-DCMAKE_TOOLCHAIN_FILE=/home/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"
-#             '-DPython_ROOT_DIR=C:\\Users\\JustoRuizFerrer\\.pyenv\\pyenv-win\\versions\\3.8.2'
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir
         ]
         
         cfg = 'Debug' if self.debug else 'Release'

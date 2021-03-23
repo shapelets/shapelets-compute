@@ -122,5 +122,18 @@
     "cmake.configureSettings": {
         "CMAKE_TOOLCHAIN_FILE": "C:\\Shapelets\\dev\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
     },
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "cSpell.language": "en-GB",
+    "cSpell.words": [
+        "arrayfire",
+        "cmake",
+        "ostr",
+        "pybind",
+        "pyenv",
+        "pygauss",
+        "shapelets",
+        "spdlog",
+        "vcpkg",
+        "virtualenv"
+    ]
 }
