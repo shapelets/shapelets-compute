@@ -94,7 +94,8 @@ class CMakeBuild(cmdclass["build_ext"]):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         extdir = os.path.join(extdir, ext.output_dir)
         cmake_args = [
-            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+            '-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE'
         ]
         
         cfg = 'Debug' if self.debug else 'Release'
@@ -127,9 +128,6 @@ class CMakeBuild(cmdclass["build_ext"]):
         else:
             subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-        print()
-
-
 def create_metadata(full_version, doc_url):
     return dict(
         project_urls={
@@ -143,7 +141,7 @@ def create_metadata(full_version, doc_url):
         ext_modules=[CMakeExtension("pygauss",
                                     debug=True,
                                     output_dir='shapelets/compute',
-                                    target=["PyGauss"])]
+                                    target=["PyGauss"])],
         python_requires='>=3.7',
         package_data={
             'shapelets': ['*.pyi', 'py.typed'],
