@@ -41,7 +41,8 @@ namespace pygauss::arraylike {
         for (size_t i = 1; i < dimCount; ++i)
             strides[i] = strides[i - 1] * shape[i - 1];
 
-        auto isDirect = af::getActiveBackend() != af::Backend::AF_BACKEND_OPENCL;
+        auto isDirect = af::getActiveBackend() == af::Backend::AF_BACKEND_CPU;
+
         void *data = nullptr;
 
         switch (self.type()) {
