@@ -4,73 +4,76 @@ import numpy as np
 import pathlib
 import matplotlib.pyplot as plt 
 import shapelets.compute as sc 
+from shapelets.data import load_dataset
 import cProfile
 
 current_path = pathlib.Path(__file__).parent.absolute()
-file = os.path.join(current_path, "regime.txt")
-data = np.loadtxt(file)
+file = os.path.join(current_path, "vanilla_ice.csv")
 
-# plt.plot(data)
-# plt.show()
+data = np.loadtxt('C:\Shapelets\dev\python-client\modules\shapelets\data\Patient1.Mix 02.amc.txt')
+
+#data = load_dataset("robot_dog.txt")
+print(data.shape)
+data = data[:, 1] # 1
+plt.plot(data)
+plt.show()
+
+w = 150
 
 # %%
-profile, index = sc.matrixprofile.matrix_profile(data, 100)
+profile, index = sc.matrixprofile.matrix_profile(data, w)
 # plt.plot(profile)
 # plt.show()
 
 # %%
-cac = sc.matrixprofile.cac(profile, index, 100)
-# print(sc.argmin(cac))
-# plt.plot(cac)
+cac, argmin = sc.matrixprofile.cac(profile, index, w)
+print(argmin)
+# plt.plot(cac[5*w:-5*w])
 # plt.show()
-
-cProfile.run('sc.matrixprofile.matrix_profile(data, 100)')
-cProfile.run('sc.matrixprofile.cac(profile, index, 100)')
-
-
-
-
 
 
 # %%
 
-# pos = sc.range(len(index), dtype=index.dtype)
-# small = sc.minimum(pos, index)
-# small_mark = sc.zeros(len(index), dtype=index.dtype)
-# large = sc.maximum(pos, index)
-# large_mark = sc.zeros(len(index), dtype=index.dtype)
+pos = sc.iota(index.shape, dtype = index.dtype)
 
-# # %%
-# xx = sc.sort(small)
-# si, sv = sc.sum_by_key(xx, sc.ones(xx.shape, dtype=index.dtype))
-# small_mark.assign(si, sv)
-# print(small_mark.shape[0] == index.shape[0])
+smll = sc.minimum(pos, index)
+large = sc.maximum(pos, index)
 
-# xx = sc.sort(large)
-# li, lv = sc.sum_by_key(xx, sc.ones(xx.shape, dtype=index.dtype))
-# large_mark.assign(li, lv)
-# print(large_mark.shape[0] == index.shape[0])
-# mark = small_mark - large_mark
+# sc.join([smll[1050:1150], pos[1050:1150], index[1050:1150]], 1)
+
+smll = sc.sort(smll)
+large = sc.sort(large)
+
+si, sv = sc.sum_by_key(smll, sc.full(smll.shape, 1.0))
+li, lv = sc.sum_by_key(large, sc.full(large.shape, -1.0))
+
+mark1 = sc.zeros(index.shape)
+mark1.assign(si, sv)
+mark2 = sc.zeros(index.shape)
+mark2.assign(li, lv)
+
+mark = mark1 + mark2
+
+cross_count = sc.cumsum(mark)
 
 
-# # %%
-# crosscount = sc.cumsum(mark)
+i = sc.iota(cross_count.shape)
+l = cross_count.shape[0]
+adj = 2.0 * i * (l-i) / l 
+plt.plot(cross_count)
+plt.plot(adj)
+#plt.plot(adj / cross_count)
+plt.show()
 
-# # %%
-# plt.plot(crosscount)
-# plt.show()
-# # %%
-# l = crosscount.shape[0]
-# i = sc.iota(l)
-# adj = 2*i*(l-i)/l
 
-# # %%
-# plt.plot(adj)
-# plt.show()
-# # %%
-# normalized_crosscount = sc.minimum(crosscount / adj, 1)
+cross_count =cross_count /adj
 
-# # %%
-# plt.plot(normalized_crosscount)
-# plt.show()
-# # %%
+cross_count = sc.minimum(cross_count, 1.)
+fig, ax1 = plt.subplots() 
+ax1.plot(data[5*w:-5*w], color="tab:green")
+ax2=ax1.twinx()
+ax2.plot(cross_count[5*w:-5*w], color="tab:red")
+plt.show()
+
+# %%
+x = cross_count[5*w:-5*w]
