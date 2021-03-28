@@ -3,8 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${vcpkgRoot}/x64-osx/include"
+                "${workspaceFolder}/**"
             ],
             "defines": [],
             "macFrameworkPath": [],
@@ -13,7 +12,7 @@
             "cppStandard": "gnu++14",
             "intelliSenseMode": "macos-gcc-x64",
             "configurationProvider": "ms-vscode.cmake-tools",
-            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/temp.macosx-10.14-x86_64-3.8/compile_commands.json"
         },
         {
             "name": "Windows",

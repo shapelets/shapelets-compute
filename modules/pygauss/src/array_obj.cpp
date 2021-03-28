@@ -157,6 +157,31 @@ void pygauss::bindings::array_obj(py::module &m) {
                                  return self.issingle();
                              });
 
+    ka.def_property_readonly("is_integer",
+                             [](const af::array &self) {
+                                 return self.isinteger();
+                             });
+
+    ka.def_property_readonly("is_complex",
+                             [](const af::array &self) {
+                                 return self.iscomplex();
+                             });
+
+    ka.def_property_readonly("is_bool",
+                             [](const af::array &self) {
+                                 return self.isbool();
+                             });
+
+    ka.def_property_readonly("is_floating",
+                             [](const af::array &self) {
+                                 return self.isfloating();
+                             });
+
+    ka.def_property_readonly("is_half",
+                             [](const af::array &self) {
+                                 return self.ishalf();
+                             });
+
     ka.def_property_readonly("shape",
                              [](const af::array &self) {
                                  return self.dims();
@@ -215,6 +240,210 @@ void pygauss::bindings::array_obj(py::module &m) {
            py::arg("type").none(false),
            "converts the array into a new array with the specified type");
 
+    ka.def("__int__", 
+        [](const af::array &self){
+            
+            if (self.elements() != 1)
+                throw std::runtime_error("Only arrays of one element can be converted to Python scalars");
+            switch (self.type())
+            {
+            case af::dtype::b8: {
+                auto d = self.scalar<char>();
+                return py::int_(d);
+            }
+            case af::dtype::c32: {
+                auto d = self.scalar<af::af_cfloat>();
+                return py::int_(static_cast<long long>(d.real));
+            }
+            case af::dtype::c64: {
+                auto d = self.scalar<af::af_cdouble>();
+                return py::int_(static_cast<long long>(d.real));
+            }
+            case af::dtype::s16: {
+                auto d = self.scalar<short>();
+                return py::int_(d);
+            }
+            case af::dtype::s32: {
+                auto d = self.scalar<int>();
+                return py::int_(d);
+            }
+            case af::dtype::s64: {
+                auto d = self.scalar<long long>();
+                return py::int_(d);
+            }
+            case af::dtype::f16: {
+                auto d = self.scalar<af::half>();
+                auto f = static_cast<float>(half::from_bits(d.data_));
+                return py::int_(static_cast<int>(f));
+            }
+            case af::dtype::f32: {
+                auto d = self.scalar<float>();
+                return py::int_(static_cast<long long>(d));
+            }
+            case af::dtype::f64: {
+                auto d = self.scalar<double>();
+                return py::int_(static_cast<long long>(d));
+            }
+            case af::dtype::u16: {
+                auto d = self.scalar<unsigned short>();
+                return py::int_(d);
+            }
+            case af::dtype::u32: {
+                auto d = self.scalar<unsigned int>();
+                return py::int_(d);
+            }
+            case af::dtype::u64: {
+                auto d = self.scalar<unsigned long long>();
+                return py::int_(d);
+            }
+            case af::dtype::u8: {
+                auto d = self.scalar<unsigned char>();
+                return py::int_(d);
+            }
+            default:
+                throw std::runtime_error("Unexpected type");
+                break;
+            }                  
+        });
+
+    ka.def("__float__", 
+        [](const af::array &self){
+            if (self.elements() != 1)
+                throw std::runtime_error("Only arrays of one element can be converted to Python scalars");
+
+            switch (self.type())
+            {
+            case af::dtype::b8: {
+                auto d = self.scalar<char>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::c32: {
+                auto d = self.scalar<af::af_cfloat>();
+                return py::float_(d.real);
+            }
+            case af::dtype::c64: {
+                auto d = self.scalar<af::af_cdouble>();
+                return py::float_(d.real);
+            }
+            case af::dtype::s16: {
+                auto d = self.scalar<short>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::s32: {
+                auto d = self.scalar<int>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::s64: {
+                auto d = self.scalar<long long>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::f16: {
+                auto d = self.scalar<af::half>();
+                auto f = static_cast<float>(half::from_bits(d.data_));
+                return py::float_(f);
+            }
+            case af::dtype::f32: {
+                auto d = self.scalar<float>();
+                return py::float_(d);
+            }
+            case af::dtype::f64: {
+                auto d = self.scalar<double>();
+                return py::float_(d);
+            }
+            case af::dtype::u16: {
+                auto d = self.scalar<unsigned short>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::u32: {
+                auto d = self.scalar<unsigned int>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::u64: {
+                auto d = self.scalar<unsigned long long>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::u8: {
+                auto d = self.scalar<unsigned char>();
+                return py::float_(static_cast<double>(d));
+            }
+            default:
+                throw std::runtime_error("Unexpected type");
+                break;
+            }                
+        });
+
+    ka.def("__complex__", 
+        [](const af::array &self){
+            if (self.elements() != 1)
+                throw std::runtime_error("Only arrays of one element can be converted to Python scalars");
+
+            switch (self.type())
+            {
+            case af::dtype::b8: {
+                auto d = self.scalar<char>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::c32: {
+                auto d = self.scalar<af::af_cfloat>();
+                return std::complex<double>(static_cast<double>(d.real), static_cast<double>(d.imag));
+            }
+            case af::dtype::c64: {
+                auto d = self.scalar<af::af_cdouble>();
+                return std::complex<double>(d.real, d.imag);
+            }
+            case af::dtype::s16: {
+                auto d = self.scalar<short>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::s32: {
+                auto d = self.scalar<int>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::s64: {
+                auto d = self.scalar<long long>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::f16: {
+                auto d = self.scalar<af::half>();
+                auto f = static_cast<float>(half::from_bits(d.data_));
+                return std::complex<double>(static_cast<double>(f), 0.0);
+            }
+            case af::dtype::f32: {
+                auto d = self.scalar<float>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::f64: {
+                auto d = self.scalar<double>();
+                return std::complex<double>(d, 0.0);
+            }
+            case af::dtype::u16: {
+                auto d = self.scalar<unsigned short>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::u32: {
+                auto d = self.scalar<unsigned int>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::u64: {
+                auto d = self.scalar<unsigned long long>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::u8: {
+                auto d = self.scalar<unsigned char>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            default:
+                throw std::runtime_error("Unexpected type");
+                break;
+            }
+        });
+
+    // ka.def("__iter__",
+    //     [](const af::array &self){
+    //         // Need to do this method for full compat with ndarray
+    //         // and pandas.
+    //         throw std::runtime_error("TODO");
+    //     });
 
     ka.def("__repr__",
            [](const af::array &self) {

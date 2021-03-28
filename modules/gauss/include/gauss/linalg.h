@@ -20,6 +20,9 @@ namespace gauss::linalg {
  */
 GAUSSAPI af::array lls(const af::array &A, const af::array &b);
 
+
+GAUSSAPI af::array levinsonDurbin(af::array acv, int order);
+
 }  // namespace gauss
 
 #endif

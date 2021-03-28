@@ -5,6 +5,7 @@
 #include <gauss/defines.h>
 
 namespace gauss::statistics {
+
 /**
  * @brief Returns the covariance matrix of the time series contained in tss.
  *
@@ -17,6 +18,17 @@ namespace gauss::statistics {
 GAUSSAPI af::array covariance(const af::array &tss, bool unbiased = true);
 
 /**
+ * @brief Returns the kth moment of the given time series.
+ *
+ * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param k The specific moment to be calculated.
+ *
+ * @return af::array The kth moment of the given time series.
+ */
+GAUSSAPI af::array moment(const af::array &tss, unsigned int k);
+
+/**
  * @brief Returns the kurtosis of tss (calculated with the adjusted Fisher-Pearson standardized moment coefficient G2).
  *
  * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
@@ -27,15 +39,166 @@ GAUSSAPI af::array covariance(const af::array &tss, bool unbiased = true);
 GAUSSAPI af::array kurtosis(const af::array &tss);
 
 /**
- * @brief Returns the kth moment of the given time series.
+ * @brief Calculates the sample skewness of tss (calculated with the adjusted Fisher-Pearson standardized moment
+ * coefficient G1).
  *
  * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
  * one indicates the number of time series.
- * @param k The specific moment to be calculated.
  *
- * @return af::array The kth moment of the given time series.
+ * @return af::array Array containing the skewness of each time series in tss.
  */
-GAUSSAPI af::array moment(const af::array &tss, int k);
+GAUSSAPI af::array skewness(const af::array &tss);
+
+
+
+using AggregationFuncDimT = af::array (*)(const af::array &, const dim_t);
+using AggregationFuncBoolDimT = af::array (*)(const af::array &, bool, const dim_t);
+using AggregationFuncInt = af::array (*)(const af::array &, const int);
+
+/**
+ * @brief Calculates the value of an aggregation function f_agg (e.g. var or mean) of the autocorrelation
+ * (Compare to http://en.wikipedia.org/wiki/Autocorrelation#Estimation), taken over different all possible
+ * lags (1 to length of x).
+ * \f[
+ * \frac{1}{n-1} \sum_{l=1,\ldots, n} \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
+ * \f]
+ *  where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean.
+ *
+ * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
+ * dimension one indicates the number of time series.
+ * @param aggregationFunction The function to summarise all autocorrelation with different lags.
+ *
+ * @return af::array An array with the same dimensions as tss, whose values (time series in dimension 0)
+ * contains the aggregated correlation for each time series.
+ */
+GAUSSAPI af::array aggregatedAutocorrelation(const af::array &tss, AggregationFuncBoolDimT aggregationFunction);
+
+/**
+ * @brief Calculates the value of an aggregation function f_agg (e.g. var or mean) of the autocorrelation
+ * (Compare to http://en.wikipedia.org/wiki/Autocorrelation#Estimation), taken over different all possible
+ * lags (1 to length of x).
+ * \f[
+ * \frac{1}{n-1} \sum_{l=1,\ldots, n} \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
+ * \f]
+ *  where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean.
+ *
+ * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
+ * dimension one indicates the number of time series.
+ * @param aggregationFunction The function to summarise all autocorrelation with different lags.
+ *
+ * @return af::array An array with the same dimensions as tss, whose values (time series in dimension 0)
+ * contains the aggregated correlation for each time series.
+ */
+GAUSSAPI af::array aggregatedAutocorrelation(const af::array &tss, AggregationFuncDimT aggregationFunction);
+
+/**
+ * @brief Calculates the value of an aggregation function f_agg (e.g. var or mean) of the autocorrelation
+ * (Compare to http://en.wikipedia.org/wiki/Autocorrelation#Estimation), taken over different all possible
+ * lags (1 to length of x).
+ * \f[
+ * \frac{1}{n-1} \sum_{l=1,\ldots, n} \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
+ * \f]
+ *  where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean.
+ *
+ * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
+ * dimension one indicates the number of time series.
+ * @param aggregationFunction The function to summarise all autocorrelation with different lags.
+ *
+ * @return af::array An array with the same dimensions as tss, whose values (time series in dimension 0)
+ * contains the aggregated correlation for each time series.
+ */
+GAUSSAPI af::array aggregatedAutocorrelation(const af::array &tss, AggregationFuncInt aggregationFunction);
+
+/**
+ * @brief Calculates the value of the partial autocorrelation function at the given lag. The lag \f$k\f$ partial
+ * autocorrelation of a time series \f$\lbrace x_t, t = 1 \ldots T \rbrace\f$ equals the partial correlation of
+ * \f$x_t\f$ and \f$x_{t-k}\f$, adjusted for the intermediate variables \f$\lbrace x_{t-1}, \ldots, x_{t-k+1}
+ * \rbrace\f$ ([1]). Following [2], it can be defined as:
+ * \f[
+ *      \alpha_k = \frac{ Cov(x_t, x_{t-k} | x_{t-1}, \ldots, x_{t-k+1})}
+ *      {\sqrt{ Var(x_t | x_{t-1}, \ldots, x_{t-k+1}) Var(x_{t-k} | x_{t-1}, \ldots, x_{t-k+1} )}}
+ * \f]
+ * with (a) \f$x_t = f(x_{t-1}, \ldots, x_{t-k+1})\f$ and (b) \f$ x_{t-k} = f(x_{t-1}, \ldots, x_{t-k+1})\f$
+ * being AR(k-1) models that can be fitted by OLS. Be aware that in (a), the regression is done on past values to
+ * predict \f$ x_t \f$ whereas in (b), future values are used to calculate the past value \f$x_{t-k}\f$.
+ * It is said in [1] that, for an AR(p), the partial autocorrelations \f$ \alpha_k \f$ will be nonzero for
+ * \f$ k<=p \f$ and zero for \f$ k>p \f$. With this property, it is used to determine the lag of an AR-Process.
+ *
+ * [1] Box, G. E., Jenkins, G. M., Reinsel, G. C., & Ljung, G. M. (2015). Time series analysis: forecasting and control.
+ * John Wiley & Sons.
+ *
+ * [2] https://onlinecourses.science.psu.edu/stat510/node/62
+ *
+ * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param lags Indicates the lags to be calculated.
+ *
+ * @return af::array The partial autocorrelation for each time series for the given lag.
+ */
+GAUSSAPI af::array partialAutocorrelation(const af::array &tss, const af::array &lags);
+
+/**
+ * @brief Calculates the autocorrelation of the specified lag for the given time series, according to the formula [1].
+ * \f[
+ * \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
+ * \f]
+ * where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean, \f$l\f$
+ * denotes the lag.
+ *
+ * [1] https://en.wikipedia.org/wiki/Autocorrelation#Estimation
+ *
+ * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param maxLag The maximum lag to compute.
+ * @param unbiased Determines whether it divides by (n - lag) (if true), or n (if false).
+ *
+ * @return af::array The autocorrelation value for the given time series.
+ */
+GAUSSAPI af::array autoCorrelation(const af::array &tss, unsigned int maxLag, bool unbiased = false);
+
+/**
+ * @brief Calculates the cross-correlation of the given time series.
+ *
+ * @param xss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param yss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param unbiased Determines whether it divides by n - lag (if true) or n (if false).
+ *
+ * @return af::array The cross-correlation value for the given time series.
+ */
+GAUSSAPI af::array crossCorrelation(const af::array &xss, const af::array &yss, bool unbiased = false);
+
+/**
+ * @brief Calculates the auto-covariance the given time series.
+ *
+ * @param xss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param unbiased Determines whether it divides by n - lag (if true) or n (if false).
+ *
+ * @return af::array The auto-covariance value for the given time series.
+ */
+GAUSSAPI af::array autoCovariance(const af::array &xss, bool unbiased = false);
+
+
+/**
+ * @brief Calculates the cross-covariance of the given time series.
+ *
+ * @param xss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param yss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
+ * one indicates the number of time series.
+ * @param unbiased Determines whether it divides by n - lag (if true) or n (if false).
+ *
+ * @return af::array The cross-covariance value for the given time series.
+ */
+GAUSSAPI af::array crossCovariance(const af::array &xss, const af::array &yss, bool unbiased = false);
+
+
+/**
+ * @brief Computes the correlation coeficients of all the column vectors in tss
+ */ 
+GAUSSAPI af::array correlation(const af::array &tss, bool unbiased = false);
 
 /**
  * @brief The Ljung–Box test checks that data within the time series are independently distributed (i.e. the
@@ -69,7 +232,7 @@ GAUSSAPI af::array moment(const af::array &tss, int k);
  *
  * @return af::array Ljung-Box statistic test.
  */
-GAUSSAPI af::array ljungBox(const af::array &tss, long lags);
+GAUSSAPI af::array ljungBox(const af::array &tss, unsigned int lags);
 
 /**
  * @brief Returns values at the given quantile.
@@ -95,27 +258,6 @@ GAUSSAPI af::array quantile(const af::array &tss, const af::array &q, float prec
  * the end in the second category.
  */
 GAUSSAPI af::array quantilesCut(const af::array &tss, float quantiles, float precision = 0.00000001);
-
-/**
- * @brief Estimates standard deviation based on a sample. The standard deviation is calculated using the "n-1" method.
- *
- * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- *
- * @return af::array The sample standard deviation.
- */
-GAUSSAPI af::array sampleStdev(const af::array &tss);
-
-/**
- * @brief Calculates the sample skewness of tss (calculated with the adjusted Fisher-Pearson standardized moment
- * coefficient G1).
- *
- * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- *
- * @return af::array Array containing the skewness of each time series in tss.
- */
-GAUSSAPI af::array skewness(const af::array &tss);
 
 }  // namespace gauss
 

@@ -1,7 +1,12 @@
 from typing import Optional, Sequence, Union
+
 from . import _pygauss
 
+
 class Backend:
+    """
+    Represents the different types of backends
+    """
     def __eq__(self, arg0: object) -> bool: ...
     def __getstate__(self) -> int: ...
     def __hash__(self) -> int: ...
@@ -12,11 +17,11 @@ class Backend:
     def __setstate__(self, arg0: int) -> None: ...
     @property
     def name(self) -> str: ...
-    CPU: _pygauss.Backend # value = <Backend.CPU: 1>
-    CUDA: _pygauss.Backend # value = <Backend.CUDA: 2>
-    Default: _pygauss.Backend # value = <Backend.Default: 0>
-    OpenCL: _pygauss.Backend # value = <Backend.OpenCL: 4>
-    __members__: dict # value = {'Default': <Backend.Default: 0>, 'CPU': <Backend.CPU: 1>, 'CUDA': <Backend.CUDA: 2>, 'OpenCL': <Backend.OpenCL: 4>}
+    CPU: _pygauss.Backend  
+    CUDA: _pygauss.Backend  
+    Default: _pygauss.Backend 
+    OpenCL: _pygauss.Backend  
+    __members__: dict
 
 
 class DeviceInfo:
@@ -34,6 +39,7 @@ class DeviceInfo:
     @property
     def platform(self) -> str: ...
 
+
 class DeviceMemory:
     def __repr__(self) -> str: ...
     @property
@@ -45,10 +51,14 @@ class DeviceMemory:
     @property
     def locked_bytes(self) -> int: ...
 
+
 def device_gc() -> None: ...
 def get_available_backends() -> Sequence[Backend]: ...
 def get_backend() -> Backend: ...
-def get_device_memory(dev: Optional[Union[int, DeviceInfo]] = None) -> DeviceMemory: ...
+def get_device_memory(
+    dev: Optional[Union[int, DeviceInfo]] = None) -> DeviceMemory: ...
+
+
 def get_device() -> DeviceInfo: ...
 def get_devices() -> Sequence[DeviceInfo]: ...
 def has_backend(test_backend: Backend) -> int: ...

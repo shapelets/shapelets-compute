@@ -284,6 +284,7 @@ namespace pygauss {
     }
 
     namespace bindings {
+        
         void device_operations(py::module &m);
 
         void shared_enum_types(py::module &m);
@@ -314,9 +315,9 @@ namespace pygauss {
 
         void gauss_distance_functions(py::module &m);
 
-        void gauss_statistic_bindings(py::module &m);
-
         void gauss_normalization_functions(py::module &m);
+
+        void gauss_dimensionality_functions(py::module &m);
     }
 
 

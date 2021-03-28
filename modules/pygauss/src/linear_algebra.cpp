@@ -8,44 +8,70 @@ namespace py = pybind11;
 
 void pygauss::bindings::linear_algebra_operations(py::module &m) {
 
-    m.def("unwrap",
-        [](const py::object &array_like, 
-           const int wx, const int wy,
-           const int sx, const int sy, 
-           const int px, const int py,
-           const bool is_column) {
 
-            auto a = arraylike::as_array_checked(array_like);
-            return af::unwrap(a,wx, wy, sx, sy, px, py, is_column);
-        },
-        py::arg("array_like").none(false),
-        py::arg("wx").none(false),
-        py::arg("wy").none(false),
-        py::arg("sx").none(false),
-        py::arg("sy").none(false),
-        py::arg("px") = 0,
-        py::arg("py") = 0,
-        py::arg("is_column") = true
-        );
 
-    m.def("wrap",
-        [](const py::object &array_like,
-           const int ox, const int oy, const int wx, const int wy, const int sx, const int sy,
-           const int px, const int py, const bool is_column) {
-            auto a = arraylike::as_array_checked(array_like);
-            return af::wrap(a, ox, oy, wx, wy, sx, sy, px, py, is_column);
+    m.def(
+        "convolve",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
+
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
+
+            return af::convolve(s, f, mode, domain);
         },
-        py::arg("array_like").none(false),
-        py::arg("ox").none(false),
-        py::arg("oy").none(false),
-        py::arg("wx").none(false),
-        py::arg("wy").none(false),
-        py::arg("sx").none(false),
-        py::arg("sy").none(false),
-        py::arg("px") = 0,
-        py::arg("py") = 0,
-        py::arg("is_column") = true
-        );
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
+
+    m.def(
+        "convolve1",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
+            return af::convolve1(s, f, mode, domain);
+        },
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
+
+    m.def(
+        "convolve2",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
+            return af::convolve2(s, f, mode, domain);
+        },
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
+
+    m.def(
+        "convolve3",
+        [](const py::object &signal, const py::object &filter, const af::convMode mode, const af::convDomain domain) {
+            af::array s = arraylike::as_array_checked(signal);
+            af::array f = arraylike::as_array_checked(filter);
+            arraylike::ensure_floating(s);
+            arraylike::ensure_floating(f);
+
+            return af::convolve3(s, f, mode, domain);
+        },
+        py::arg("signal").none(false),
+        py::arg("filter").none(false),
+        py::arg("mode") = af::convMode::AF_CONV_DEFAULT,
+        py::arg("domain") = af::convDomain::AF_CONV_AUTO,
+        "TODO");
 
     m.def("det",
           [](const py::object &array_like) {

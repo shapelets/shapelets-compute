@@ -106,7 +106,8 @@
         "hash_set": "cpp",
         "__functional_03": "cpp",
         "__hash": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "rope": "cpp"
     },
     "files.exclude": {
         "**/__pycache__": true,
@@ -136,5 +137,9 @@
         "!c",
         "!cpp",
         "!python"
-    ]
+    ],
+    "python.pythonPath": "venv/bin/python",
+    "C_Cpp.errorSquiggles": "Disabled",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": false
 }

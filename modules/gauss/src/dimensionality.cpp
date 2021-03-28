@@ -603,8 +603,7 @@ af::array gauss::dimensionality::SAX(const af::array &a, int alphabet_size) {
     return result;
 }
 
-std::vector<Point> gauss::dimensionality::visvalingam(const std::vector<Point> &pointList, int64_t numPoints,
-                                                      int64_t scale) {
+std::vector<Point> gauss::dimensionality::visvalingam(const std::vector<Point> &pointList, int64_t numPoints, int64_t scale) {
     std::map<int64_t, VisvalingamSummaryPoint> points;
     std::set<std::pair<int64_t, int64_t>, mapComparator> point_indexer;
     int64_t counter = 0;
@@ -658,8 +657,9 @@ std::vector<Point> gauss::dimensionality::visvalingam(const std::vector<Point> &
 
 af::array gauss::dimensionality::visvalingam(const af::array &pointList, int numPoints) {
     if (pointList.dims(1) != 2) {
-        throw std::invalid_argument("Invalid dims. Khiva array with two columns expected (x axis and y axis).");
+        throw std::invalid_argument("Invalid dims. Array with two columns expected (x axis and y axis).");
     }
+
     std::vector<Point> points;
     points.reserve(pointList.dims(0));
     auto x = gauss::utils::makeScopedHostPtr(pointList.col(0).host<float>());

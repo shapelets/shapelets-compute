@@ -97,33 +97,33 @@ af::array entropy(af::array tss, int m, float r) {
     return sum;
 }
 
-af::array aggregatingOnChunks(const af::array &input, long chunkSize, AggregationFuncInt aggregationFunction) {
-    // Calculating the chunk size to split the input data into. The rest of dividing the input data
-    // length by the chunk size should be zero. In other words, input data length should be multiple
-    // of the chunk size
-    auto size = (input.dims(0) % chunkSize == 0) ? 0 : chunkSize - input.dims(0) % chunkSize;
-    // If it is not multiple, then pad with zeros at the end
-    af::array inputChunks = af::join(0, input, af::constant(0, size, input.dims(1), input.type()));
-    // Modify the array dimensions to split it by the chunk size
-    inputChunks = af::moddims(inputChunks, chunkSize, inputChunks.dims(0) / chunkSize, inputChunks.dims(1));
-    // Aggregate the data using the aggregation function specified as parameter, and then reorder
-    // the resulting array to have the number of chunks in the 2nd dimension
-    return af::reorder(af::transpose(aggregationFunction(inputChunks, 0)), 0, 2, 1, 3);
-}
+// af::array aggregatingOnChunks(const af::array &input, long chunkSize, AggregationFuncInt aggregationFunction) {
+//     // Calculating the chunk size to split the input data into. The rest of dividing the input data
+//     // length by the chunk size should be zero. In other words, input data length should be multiple
+//     // of the chunk size
+//     auto size = (input.dims(0) % chunkSize == 0) ? 0 : chunkSize - input.dims(0) % chunkSize;
+//     // If it is not multiple, then pad with zeros at the end
+//     af::array inputChunks = af::join(0, input, af::constant(0, size, input.dims(1), input.type()));
+//     // Modify the array dimensions to split it by the chunk size
+//     inputChunks = af::moddims(inputChunks, chunkSize, inputChunks.dims(0) / chunkSize, inputChunks.dims(1));
+//     // Aggregate the data using the aggregation function specified as parameter, and then reorder
+//     // the resulting array to have the number of chunks in the 2nd dimension
+//     return af::reorder(af::transpose(aggregationFunction(inputChunks, 0)), 0, 2, 1, 3);
+// }
 
-af::array aggregatingOnChunks(const af::array &input, long chunkSize, AggregationFuncDimT aggregationFunction) {
-    // Calculating the chunk size to split the input data into. The rest of dividing the input data
-    // length by the chunk size should be zero. In other words, input data length should be multiple
-    // of the chunk size
-    auto size = (input.dims(0) % chunkSize == 0) ? 0 : chunkSize - input.dims(0) % chunkSize;
-    // If it is not multiple, then pad with zeros at the end
-    af::array inputChunks = af::join(0, input, af::constant(0, size, input.dims(1), input.type()));
-    // Modify the array dimensions to split it by the chunk size
-    inputChunks = af::moddims(inputChunks, chunkSize, inputChunks.dims(0) / chunkSize, inputChunks.dims(1));
-    // Aggregate the data using the aggregation function specified as parameter, and then reorder
-    // the resulting array to have the number of chunks in the 2nd dimension
-    return af::reorder(af::transpose(aggregationFunction(inputChunks, 0)), 0, 2, 1, 3);
-}
+// af::array aggregatingOnChunks(const af::array &input, long chunkSize, AggregationFuncDimT aggregationFunction) {
+//     // Calculating the chunk size to split the input data into. The rest of dividing the input data
+//     // length by the chunk size should be zero. In other words, input data length should be multiple
+//     // of the chunk size
+//     auto size = (input.dims(0) % chunkSize == 0) ? 0 : chunkSize - input.dims(0) % chunkSize;
+//     // If it is not multiple, then pad with zeros at the end
+//     af::array inputChunks = af::join(0, input, af::constant(0, size, input.dims(1), input.type()));
+//     // Modify the array dimensions to split it by the chunk size
+//     inputChunks = af::moddims(inputChunks, chunkSize, inputChunks.dims(0) / chunkSize, inputChunks.dims(1));
+//     // Aggregate the data using the aggregation function specified as parameter, and then reorder
+//     // the resulting array to have the number of chunks in the 2nd dimension
+//     return af::reorder(af::transpose(aggregationFunction(inputChunks, 0)), 0, 2, 1, 3);
+// }
 
 af::array ricker(int points, int a) {
     double pi = 3.14159265358979323846264338327950288;
@@ -436,45 +436,6 @@ af::array cidCeInternal(const af::array &tss) {
     return af::sqrt(af::sum(diff * diff));
 }
 
-af::array levinsonDurbin(af::array acv, int maxlag, bool) {
-    int order = maxlag;
-    af::array result = af::constant(0, order + 1, acv.dims(1), acv.type());
-
-    for (int i = 0; i < acv.dims(1); i++) {
-        af::array phi = af::constant(0, order + 1, order + 1, acv.type());
-        af::array sig = af::constant(0, order + 1, acv.type());
-
-        phi(1, 1) = acv(1, i) / acv(0, i);
-        sig(1) = acv(0, i) - (phi(1, 1) * acv(1, i));
-
-        // First iteration, to avoid problems with negative sequences with 1 element
-        int k = 2;
-        if (k < (order + 1)) {
-            phi(k, k) = (acv(k, i) - af::dot(phi(af::seq(1, k - 1), k - 1), acv(af::seq(1, k - 1), i))) / sig(k - 1);
-            for (int j = 1; j < k; j++) {
-                phi(j, k) = phi(j, k - 1) - (phi(k, k) * phi(k - j, k - 1));
-            }
-            sig(k) = sig(k - 1) * (1.0 - phi(k, k) * phi(k, k));
-        }
-
-        // Second and subsequent iterations
-        for (int l = 3; l < (order + 1); l++) {
-            af::array aux = acv(af::seq(1, l - 1), i);
-            phi(l, l) = (acv(l, i) - af::dot(phi(af::seq(1, l - 1), l - 1),
-                                             aux(af::seq(static_cast<double>(aux.dims(0)) - 1, 0, -1)))) /
-                        sig(l - 1);
-            for (int j = 1; j < l; j++) {
-                phi(j, l) = phi(j, l - 1) - (phi(l, l) * phi(l - j, l - 1));
-            }
-            sig(l) = sig(l - 1) * (1.0 - phi(l, l) * phi(l, l));
-        }
-
-        af::array pac = af::diag(phi);
-        pac(0) = 1.0;
-        result(af::span, i) = pac;
-    }
-    return result;
-}
 
 /**
  *  @brief Return a Hann window.
@@ -561,48 +522,31 @@ af::array gauss::features::absoluteSumOfChanges(const af::array &tss) {
     return af::sum(af::abs(minus), 0);
 }
 
-af::array gauss::features::aggregatedAutocorrelation(const af::array &tss,
-                                                     AggregationFuncBoolDimT aggregationFunction) {
-    auto n = tss.dims(0);
-    af::array autocorrelations = gauss::features::autoCorrelation(tss, n, true)(af::seq(1, n - 1), af::span);
-    return aggregationFunction(autocorrelations, true, 0);
-}
 
-af::array gauss::features::aggregatedAutocorrelation(const af::array &tss, AggregationFuncDimT aggregationFunction) {
-    auto n = tss.dims(0);
-    af::array autocorrelations = gauss::features::autoCorrelation(tss, n, true)(af::seq(1, n - 1), af::span);
-    return aggregationFunction(autocorrelations, 0);
-}
 
-af::array gauss::features::aggregatedAutocorrelation(const af::array &tss, AggregationFuncInt aggregationFunction) {
-    auto n = tss.dims(0);
-    af::array autocorrelations = gauss::features::autoCorrelation(tss, n, true)(af::seq(1, n - 1), af::span);
-    return aggregationFunction(autocorrelations, 0);
-}
+// void gauss::features::aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncDimT aggregationFunction,
+//                                             af::array &slope, af::array &intercept, af::array &rvalue,
+//                                             af::array &pvalue, af::array &stderrest) {
+//     // Aggregating the data using the specified chunk size and aggregation function
+//     af::array aggregateResult = aggregatingOnChunks(t, chunkSize, aggregationFunction);
+//     // Preparing the x vector for the linear regression. Tiling it to the number of time series
+//     // contained in t
+//     af::array x = af::tile(af::range(aggregateResult.dims(0)).as(t.type()), 1, static_cast<unsigned int>(t.dims(1)));
+//     // Calculating the linear regression and storing the results in the parameters passed as reference
+//     gauss::regression::linear(x, aggregateResult, slope, intercept, rvalue, pvalue, stderrest);
+// }
 
-void gauss::features::aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncDimT aggregationFunction,
-                                            af::array &slope, af::array &intercept, af::array &rvalue,
-                                            af::array &pvalue, af::array &stderrest) {
-    // Aggregating the data using the specified chunk size and aggregation function
-    af::array aggregateResult = aggregatingOnChunks(t, chunkSize, aggregationFunction);
-    // Preparing the x vector for the linear regression. Tiling it to the number of time series
-    // contained in t
-    af::array x = af::tile(af::range(aggregateResult.dims(0)).as(t.type()), 1, static_cast<unsigned int>(t.dims(1)));
-    // Calculating the linear regression and storing the results in the parameters passed as reference
-    gauss::regression::linear(x, aggregateResult, slope, intercept, rvalue, pvalue, stderrest);
-}
-
-void gauss::features::aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncInt aggregationFunction,
-                                            af::array &slope, af::array &intercept, af::array &rvalue,
-                                            af::array &pvalue, af::array &stderrest) {
-    // Aggregating the data using the specified chunk size and aggregation function
-    af::array aggregateResult = aggregatingOnChunks(t, chunkSize, aggregationFunction);
-    // Preparing the x vector for the linear regression. Tiling it to the number of time series
-    // contained in t
-    af::array x = af::tile(af::range(aggregateResult.dims(0)).as(t.type()), 1, static_cast<unsigned int>(t.dims(1)));
-    // Calculating the linear regression and storing the results in the parameters passed as reference
-    gauss::regression::linear(x, aggregateResult, slope, intercept, rvalue, pvalue, stderrest);
-}
+// void gauss::features::aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncInt aggregationFunction,
+//                                             af::array &slope, af::array &intercept, af::array &rvalue,
+//                                             af::array &pvalue, af::array &stderrest) {
+//     // Aggregating the data using the specified chunk size and aggregation function
+//     af::array aggregateResult = aggregatingOnChunks(t, chunkSize, aggregationFunction);
+//     // Preparing the x vector for the linear regression. Tiling it to the number of time series
+//     // contained in t
+//     af::array x = af::tile(af::range(aggregateResult.dims(0)).as(t.type()), 1, static_cast<unsigned int>(t.dims(1)));
+//     // Calculating the linear regression and storing the results in the parameters passed as reference
+//     gauss::regression::linear(x, aggregateResult, slope, intercept, rvalue, pvalue, stderrest);
+// }
 
 af::array gauss::features::approximateEntropy(const af::array &tss, int m, float r) {
     long n = static_cast<long>(tss.dims(0));
@@ -617,77 +561,8 @@ af::array gauss::features::approximateEntropy(const af::array &tss, int m, float
     return af::abs(entropy(tss, m, r) - entropy(tss, m + 1, r));
 }
 
-af::array gauss::features::crossCovariance(const af::array &xss, const af::array &yss, bool unbiased) {
-    // To be used as divisor if unbiased is false
-    long n = static_cast<long>(xss.dims(0));
-    // To be used as divisor if unbiased is true and also to determine the size of the output
-    long nobs = static_cast<long>(std::max(xss.dims(0), yss.dims(0)));
 
-    // Mean value of each time series contained in xss
-    af::array meanXss = af::mean(xss, 0);
-    // Mean value of each time series contained in yss
-    af::array meanYss = af::mean(yss, 0);
 
-    // Substracting the mean to all the elements in xss for all the time series
-    af::array xsso = xss - af::tile(meanXss, static_cast<unsigned int>(xss.dims(0)));
-    // Substracting the mean to all the elements in yss flipped for all the time series.
-    // The flip operation is required because we are using convolve later on
-    af::array ysso = af::flip(yss, 0) - af::tile(meanYss, static_cast<unsigned int>(yss.dims(0)));
-
-    af::array d;
-
-    // Determining which divisor to use
-    if (unbiased) {
-        d = af::flip(af::tile((af::range(nobs) + 1.0).as(xss.type()), 1, static_cast<unsigned int>(xss.dims(1))), 0);
-    } else {
-        d = af::constant(n, nobs, xss.dims(1), xss.type());
-    }
-
-    // The result is a cube with nobs in the first dimensions, that determines the number of lags.
-    // And the number of time series in yss as 2nd dimension and the number of time series in
-    //  xss as the 3rd dimension
-    af::array result = af::array(nobs, yss.dims(1), xss.dims(1), xss.type());
-    gfor(af::seq i, static_cast<double>(xss.dims(1))) {
-        // Flipping the result of the convolve operation because we flipped the input data
-        result(af::span, af::span, i, af::span) =
-            af::flip(af::convolve(xsso(af::span, i), ysso, AF_CONV_EXPAND)(af::seq(nobs), af::span), 0) / d;
-    }
-
-    return result;
-}
-
-af::array gauss::features::autoCovariance(const af::array &xss, bool unbiased) {
-    // Matrix with number of time series in xss as the 1st dimension and the number of time
-    // series in yss as the 2nd dimension
-    af::array result = af::array(xss.dims(0), xss.dims(1), xss.type());
-    // Calculating all the covariances in parallel, returning only the first slice of
-    // the cube since the others are just calculations that are not required.
-    // With a sequential for loop we would remove such calculations, but it might be slower
-    result = gauss::features::crossCovariance(xss, xss, unbiased)(af::span, af::span, 0);
-    return result;
-}
-
-af::array gauss::features::crossCorrelation(const af::array &xss, const af::array &yss, bool unbiased) {
-    // Standard deviation of the time series in xss
-    af::array stdevXss = af::stdev(xss, 0);
-    // Standard deviation of the time series in yss
-    af::array stdevYss = af::stdev(yss, 0);
-
-    // Cross covariance of the time series contained in css and yss
-    af::array ccov = gauss::features::crossCovariance(xss, yss, unbiased);
-
-    // Dviding by the product of their standard deviations
-    return ccov / af::tile(stdevXss * stdevYss, static_cast<unsigned int>(ccov.dims(0)), 1,
-                           static_cast<unsigned int>(ccov.dims(1)));
-}
-
-af::array gauss::features::autoCorrelation(const af::array &tss, long maxLag, bool unbiased) {
-    // Calculating the auto covariance of tss
-    af::array acov = gauss::features::autoCovariance(tss, unbiased);
-
-    // Slicing up to maxLag and normalizing by the value of lag 0
-    return acov(af::seq(maxLag), af::span) / af::tile(acov(0, af::span), static_cast<unsigned int>(maxLag));
-}
 
 af::array gauss::features::binnedEntropy(const af::array &tss, int max_bins) {
     auto len = tss.dims(0);
@@ -1048,24 +923,6 @@ af::array gauss::features::numberPeaks(af::array tss, int n) {
     }
 
     return af::sum(res.as(tss.type()), 0);
-}
-
-af::array gauss::features::partialAutocorrelation(const af::array &tss, const af::array &lags) {
-    auto n = tss.dims(0);
-    af::array m = af::max(lags, 0);
-    dim_t maxlag = m.scalar<int>();
-
-    af::array ld;
-    if (n < 1) {
-        ld = af::constant(af::NaN, maxlag + 1, tss.dims(1), tss.type());
-    } else {
-        if (n <= maxlag) {
-            maxlag = n - 1;
-        }
-        af::array acv = gauss::features::autoCovariance(tss, true);
-        ld = levinsonDurbin(acv, maxlag, true);
-    }
-    return ld;
 }
 
 af::array gauss::features::percentageOfReoccurringDatapointsToAllDatapoints(const af::array &tss, bool isSorted) {

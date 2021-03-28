@@ -1,5 +1,6 @@
 #include <gauss/internal/scopedHostPtr.h>
 #include <gauss/random.h>
+#include <iostream>
 
 #define FLOAT32_EPS 1.1920929e-07
 
@@ -263,6 +264,10 @@ af::array gauss::random::multivariate_normal(int64_t samples,
     // draw normal samples into a matrix of `samples` rows by `d` columns
     auto re = engine.value_or(af::getDefaultRandomEngine());
     auto u = af::randn(af::dim4(samples, d), dtype, re);
+    
+    af::gforSet(true);
+    auto result = check_mean + af::matmulNT(u, cho);
+    af::gforSet(false);
 
-    return check_mean + af::matmulNT(u, cho);
+    return result;
 }

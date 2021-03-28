@@ -9,6 +9,45 @@ namespace py = pybind11;
 
 void pygauss::bindings::extract_and_transform_operations(py::module &m) {
 
+    m.def("unpack",
+        [](const py::object &array_like, 
+           const int wx, const int wy,
+           const int sx, const int sy, 
+           const int px, const int py,
+           const bool is_column) {
+
+            auto a = arraylike::as_array_checked(array_like);
+            return af::unwrap(a,wx, wy, sx, sy, px, py, is_column);
+        },
+        py::arg("array_like").none(false),
+        py::arg("wx").none(false),
+        py::arg("wy").none(false),
+        py::arg("sx").none(false),
+        py::arg("sy").none(false),
+        py::arg("px") = 0,
+        py::arg("py") = 0,
+        py::arg("is_column") = true
+        );
+
+    m.def("pack",
+        [](const py::object &array_like,
+           const int ox, const int oy, const int wx, const int wy, const int sx, const int sy,
+           const int px, const int py, const bool is_column) {
+            auto a = arraylike::as_array_checked(array_like);
+            return af::wrap(a, ox, oy, wx, wy, sx, sy, px, py, is_column);
+        },
+        py::arg("array_like").none(false),
+        py::arg("ox").none(false),
+        py::arg("oy").none(false),
+        py::arg("wx").none(false),
+        py::arg("wy").none(false),
+        py::arg("sx").none(false),
+        py::arg("sy").none(false),
+        py::arg("px") = 0,
+        py::arg("py") = 0,
+        py::arg("is_column") = true
+        );
+
     m.def("pad",
           [](const py::object& array_like, const af::dim4 &begin, const af::dim4 &end, const af::borderType fill_type) {
               auto a = arraylike::as_array_checked(array_like);
@@ -199,27 +238,4 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
           py::arg("x") = py::none(),
           py::arg("y") = py::none(),
           "An array with elements from x where condition is True, and elements from y elsewhere.");
-
-//    m.def("whereInPlace",
-//          [](af::array &a, const af::array &keeping_cond, const std::variant<py::float_, af::array> &b) {
-//              if (auto pinfo = std::get_if<py::float_>(&b))
-//                  af::replace(a, keeping_cond, (double) (*pinfo));
-//              else
-//                  af::replace(a, keeping_cond, std::get<af::array>(b));
-//          },
-//          py::arg("a").none(false),
-//          py::arg("keeping_condition").none(false),
-//          py::arg("b").none(false),
-//          "Replace elements of an array based on a conditional array.  The elements kept will be those"
-//          "matching the condition (this could be a little bit counterintuitive.");
-//
-//    m.def("transposeInPlace",
-//          [](const py::object& array_like, const bool conjugate) {
-//              auto a = arraylike::cast(array_like);
-//              af::transposeInPlace(a, conjugate);
-//          },
-//          py::arg("a").none(false),
-//          py::arg("conjugate") = false,
-//          "Performs a standard matrix transpose, directly over the existing array");
-
 }

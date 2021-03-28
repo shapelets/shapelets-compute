@@ -7,7 +7,9 @@ from ._pygauss import (
     _fft, _rfft,
     _ifft, _irfft,
     fftfreq, rfftfreq,
-    fftNorm
+    fftNorm,
+    spectral_derivative,
+    fftshift
 )
 
 NormType = Literal["backward", "ortho", "forward"]
@@ -144,5 +146,7 @@ __all__ = [
     "ifft2",
     "fftn",
     "ifftn",
+    "fftshift",
+    "spectral_derivative",
     "NormType"
 ]

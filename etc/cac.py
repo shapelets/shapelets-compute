@@ -10,7 +10,7 @@ import cProfile
 current_path = pathlib.Path(__file__).parent.absolute()
 file = os.path.join(current_path, "vanilla_ice.csv")
 
-data = np.loadtxt('C:\Shapelets\dev\python-client\modules\shapelets\data\Patient1.Mix 02.amc.txt')
+data = np.loadtxt('/Users/justo.ruiz/Development/shapelets/solo_comprobacion/modules/shapelets/data/Patient1.Mix 02.amc.txt')
 
 #data = load_dataset("robot_dog.txt")
 print(data.shape)
@@ -76,4 +76,3 @@ ax2.plot(cross_count[5*w:-5*w], color="tab:red")
 plt.show()
 
 # %%
-x = cross_count[5*w:-5*w]

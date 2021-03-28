@@ -310,7 +310,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
 
     BINARY_TEMPLATE_FN(maximum, af_maxof, "Maximum of two inputs, with NaNs propagated.")
 
-    BINARY_TEMPLATE_FN_LAMBDA(fmin, maxof_no_nan, "Maximum of two inputs, ignoring NaNs")
+    BINARY_TEMPLATE_FN_LAMBDA(fmax, maxof_no_nan, "Maximum of two inputs, ignoring NaNs")
 
     m.def("argmax",
           [](const py::object &array_like, const std::optional<int> &dim) -> indexAndValues {
@@ -615,6 +615,8 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
     m.def("any_by_key",
         [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32)
+                k = k.as(af::dtype::s32);
             auto v = pygauss::arraylike::as_array_checked(vals);
             af::array out_keys, out_vals;
             af::anyTrueByKey(out_keys, out_vals, k, v, dim.value_or(-1));
@@ -627,6 +629,10 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
     m.def("all_by_key",
         [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32)
+                k = k.as(af::dtype::s32);
+
             auto v = pygauss::arraylike::as_array_checked(vals);
             af::array out_keys, out_vals;
             af::allTrueByKey(out_keys, out_vals, k, v, dim.value_or(-1));
@@ -734,7 +740,4 @@ void pygauss::bindings::parallel_algorithms(py::module &m) {
           py::arg("dim") = 0,
           py::arg("op") = af::binaryOp::AF_BINARY_ADD,
           py::arg("inclusive_scan") = true);
-
-
-
 }

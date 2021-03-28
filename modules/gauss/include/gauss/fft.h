@@ -4,10 +4,23 @@
 #include <arrayfire.h>
 #include <gauss/defines.h>
 #include <variant>
+#include <optional>
 
 namespace gauss::fft {
 
     enum class Norm { Backward, Orthonormal, Forward };
+
+    /**
+     * @brief Computes the spectral derivative of a signal
+     * 
+     * @param signal This is a column vector denoting the points of the signal.  
+     * @param kappa_spec This is the specification for building the kappa coeffients.  It could be either 
+     * a double number, denoting a domain length to scale the automatic generation of kappa vector from 
+     * -n/2 to n/2.  Alternatively, one can pass a column vector of size n for the desired values.
+     * @param shift When kappa_spec is a vector, this flag determines if it is required to adjust the values
+     * of the vector by calling `fftshift`.  Defaults to `true`.
+     */ 
+    af::array spectral_derivative(const af::array& signal, const std::variant<double, af::array> kappa_spec, const bool shift = true);
 
     /**
      * @brief Return the Discrete Fourier Transform sample frequencies 
@@ -47,7 +60,10 @@ namespace gauss::fft {
      * @return af::array An array of one column and `n` rows containing the sample 
      * frequencies.
      */ 
-    GAUSSAPI af::array fftfreq(const int32_t n, const double d = 1.0);
+    GAUSSAPI af::array fftfreq(const unsigned int n, const double d = 1.0);
+
+
+    GAUSSAPI af::array fftshift(const af::array& x, const std::optional<std::variant<int, std::vector<int>>>& axes = std::nullopt); 
 
     /**
      */ 

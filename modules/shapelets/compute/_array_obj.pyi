@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union, Optional, overload, Callable
 from .__basic_typing import ArrayLike, DataTypeLike, Backend, Shape, ShapeLike
 
 class ParallelFor:
@@ -6,6 +6,9 @@ class ParallelFor:
     def __next__(self) -> ParallelFor: ...
 
 class ShapeletsArray:
+    def __int__(self) -> int: ...
+    def __float__(self) -> float: ... 
+    def __complex__(self) -> complex: ...
     def __add__(self, other: ArrayLike) -> ShapeletsArray: ...
     def __and__(self, other: ArrayLike) -> ShapeletsArray: ...
     def __copy__(self) -> ShapeletsArray: ...
@@ -80,6 +83,16 @@ class ShapeletsArray:
     @property
     def is_vector(self) -> bool: ...
     @property
+    def is_integer(self) -> bool: ...
+    @property
+    def is_complex(self) -> bool: ...
+    @property
+    def is_bool(self) -> bool: ...
+    @property
+    def is_floating(self) -> bool: ...
+    @property
+    def is_half(self) -> bool: ...
+    @property
     def itemsize(self) -> int: ...
     @property
     def ndim(self) -> int: ...
@@ -90,7 +103,41 @@ class ShapeletsArray:
     __array_priority__ = 30
     __hash__ = None
 
+class ScopedBatch:
+    def __enter__(self) -> None: ...
+    def __exit__(self, *args) -> None: ...
+
+@overload
+def batch() -> ScopedBatch: ...
+@overload
+def batch(arg0: Callable[[], ShapeletsArray] ) -> ShapeletsArray: ...
 
 def parallel_range(arg: Union[int, slice]) -> ParallelFor: ...
-def array(array_like: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray: ...
+
+def array(array_like: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
+    """
+    Converts and interprets the input as an array or tensor.
+
+    Possible inputs are native Python constructs like lists and tuples, but also numpy arrays or
+    arrow constructs.  Basically, it will process any object that has array semantics either through
+    array methods or buffer protocols.
+
+    Parameters
+    ----------
+    array_like: ArrayLike
+    shape: ShapeLike. Defaults to None
+         When shape is set, array_like object will be adjusted to match the given dimensionality.
+    dtype: DataTypeLike
+         When dtype is not set, the type will be inferred from the actual array_like object
+
+    Examples
+    --------
+    Create a two dimensional array:
+
+    >>> import shapelets.compute as sc
+    >>> sc.array([[1,2],[3,4]])
+        [2 2 1 1]
+            1          2 
+            3          4 
+    """
 
