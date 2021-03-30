@@ -32,16 +32,16 @@ af::array binary_function(af::array &self, const py::object &other, bool reverse
 #define BINARY_OP(OP, PYTHON_FN)                                                                        \
     ka.def(#PYTHON_FN,                                                                                  \
                    [](af::array &self, const py::object &other){                                        \
-                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
+                       spd::trace("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, false, OP);                                  \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
 
 
-#define BINARY_OPR(OP, PYTHON_FN)                                                                        \
-    ka.def(#PYTHON_FN,                                                                                   \
+#define BINARY_OPR(OP, PYTHON_FN)                                                                       \
+    ka.def(#PYTHON_FN,                                                                                  \
                    [](af::array &self, const py::object &other){                                        \
-                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
+                       spd::trace("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, true, OP);                                   \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
@@ -50,9 +50,8 @@ af::array binary_function(af::array &self, const py::object &other, bool reverse
 #define BINARY_IOP(OP, PYTHON_FN)                                                                       \
     ka.def(#PYTHON_FN,                                                                                  \
                    [](af::array &self, const py::object &other){                                        \
-                       spd::debug("Binary inplace operation {}", #OP);                                  \
-                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
-                       binary_function(self, other, false, OP);                                         \
+                       spd::trace("Binary operation {} {}", #OP, GForStatus::get());                    \
+                       self = binary_function(self, other, false, OP);                                  \
                        return self;                                                                     \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
