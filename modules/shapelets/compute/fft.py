@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Literal, Optional, Sequence
 import collections
 from ._array_obj import array as as_array, ShapeletsArray

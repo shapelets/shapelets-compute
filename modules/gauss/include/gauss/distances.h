@@ -15,7 +15,6 @@ typedef struct distance_algorithm {
     std::function<af::array(const af::array&, const af::array&)> compute;
 } distance_algorithm_t;
 
-distance_algorithm_t abs_euclidean();
 distance_algorithm_t additive_symm_chi();
 distance_algorithm_t avg_l1_linf();
 distance_algorithm_t bhattacharyya();
@@ -50,7 +49,7 @@ distance_algorithm_t manhattan();
 distance_algorithm_t matusita();
 distance_algorithm_t max_symmetric_chi();
 distance_algorithm_t min_symmetric_chi();
-distance_algorithm_t minkowshi(double p);
+distance_algorithm_t minkowski(double p);
 distance_algorithm_t mpdist(int32_t w, double threshold = 0.05);
 distance_algorithm_t neyman();
 distance_algorithm_t pearson();

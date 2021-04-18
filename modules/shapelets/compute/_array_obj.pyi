@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Union, Optional, overload, Callable
 from .__basic_typing import ArrayLike, DataTypeLike, Backend, Shape, ShapeLike
 
@@ -76,6 +77,8 @@ class ShapeletsArray:
     def dtype(self) -> DataTypeLike: ...
     @property
     def is_column(self) -> bool: ...
+    @property
+    def is_empty(self) -> bool: ...
     @property
     def is_row(self) -> bool: ...
     @property

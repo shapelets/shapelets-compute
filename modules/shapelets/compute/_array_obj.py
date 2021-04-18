@@ -1,3 +1,4 @@
+from __future__ import annotations
 from ._pygauss import (
     parallel_range, array, ShapeletsArray, ParallelFor, batch, ScopedBatch
 )

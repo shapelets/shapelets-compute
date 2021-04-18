@@ -1,4 +1,4 @@
-
+from __future__ import annotations
 from ._pygauss import (
     get_backend, set_backend,
     has_backend, get_available_backends,

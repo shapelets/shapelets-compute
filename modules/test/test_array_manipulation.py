@@ -120,7 +120,7 @@ def test_pad_creation():
     a = sh.iota((3, 2), dtype="float32") + 10.
     # add one extra row at the beginning (1, 0, ...) and one at the
     # end (1, 0, 0, 0).  Values are zero.
-    pz = sh.pad(a, (1, 0, 0, 0), (1, 0, 0, 0), sh.BorderType.Zero)
+    pz = sh.pad(a, (1, 0, 0, 0), (1, 0, 0, 0), 'zero')
     assert pz.same_as([
         [0., 0],
         [10, 13],
@@ -131,7 +131,7 @@ def test_pad_creation():
 
     # add one extra column at the beginning, one extra row at the end
     # and out of bound values are clamped to the edge
-    zce = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), sh.BorderType.ClampEdge)
+    zce = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), 'clampedge')
     assert zce.same_as([
         [10., 10, 13],
         [11, 11, 14],
@@ -141,7 +141,7 @@ def test_pad_creation():
 
     # same as before but cycle out of bound values are mapped to range
     # of the dimension in cyclic fashion
-    zcc = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), sh.BorderType.Periodic)
+    zcc = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), 'periodic')
     assert zcc.same_as([
         [13., 10, 13],
         [14, 11, 14],
@@ -150,7 +150,7 @@ def test_pad_creation():
     ])
 
     # Out of bound values are symmetric over the edge
-    zcs = sh.pad(a, (1, 1, 0, 0), (1, 1, 0, 0), sh.BorderType.Symmetric)
+    zcs = sh.pad(a, (1, 1, 0, 0), (1, 1, 0, 0), 'symmetric')
     assert zcs.same_as([
         [10, 10, 13, 13],
         [10, 10, 13, 13],
@@ -240,7 +240,7 @@ def test_tile():
     c = sh.tile(b, 1, 2)
     assert c.same_as([[0, 0], [1, 1], [2, 2], [3, 3], [0, 0], [1, 1], [2, 2], [3, 3]])
     # same in one operation
-    d = sh.tile(a, (2, 2))
+    d = sh.tile(a, 2, 2)
     assert d.same_as(c)
 
 

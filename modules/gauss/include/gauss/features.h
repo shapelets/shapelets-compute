@@ -274,7 +274,7 @@ GAUSSAPI af::array firstLocationOfMinimum(const af::array &tss);
  *
  * @return af::array The coefficients for each time series.
  */
-GAUSSAPI af::array friedrichCoefficients(const af::array &tss, int m, float r);
+//GAUSSAPI af::array friedrichCoefficients(const af::array &tss, int m, float r);
 
 /**
  * @brief Computes if the input time series contain duplicated elements.
@@ -437,7 +437,7 @@ GAUSSAPI af::array longestStrikeBelowMean(const af::array &tss);
  *
  * @return af::array Largest fixed point of deterministic dynamics.
  */
-GAUSSAPI af::array maxLangevinFixedPoint(const af::array &tss, int m, float r);
+// GAUSSAPI af::array maxLangevinFixedPoint(const af::array &tss, int m, float r);
 
 /**
  * @brief Calculates the maximum value for each time series within tss.
@@ -604,7 +604,7 @@ GAUSSAPI af::array percentageOfReoccurringValuesToAllValues(const af::array &tss
  *
  * @return af::array Values at the given quantile.
  */
-GAUSSAPI af::array quantile(const af::array &tss, const af::array &q, float precision = 100000000);
+// GAUSSAPI af::array quantile(const af::array &tss, const af::array &q, float precision = 100000000);
 
 /**
  * @brief Counts observed values within the interval [min, max).

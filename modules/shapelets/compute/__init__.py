@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import platform
 
@@ -76,9 +77,6 @@ from ._device import *
 from . import _array_obj 
 from ._array_obj import *
 
-from . import _stats 
-from ._stats import *
-
 from . import _algorithms 
 from ._algorithms import *
 
@@ -99,7 +97,6 @@ from ._linear_algebra import *
 
 __all__ += _device.__all__
 __all__ += _array_obj.__all__
-__all__ += _stats.__all__
 __all__ += _algorithms.__all__
 __all__ += _logic.__all__
 __all__ += _math.__all__

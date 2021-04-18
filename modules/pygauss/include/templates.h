@@ -28,23 +28,27 @@
           HELP);
 
 
-#define BINARY_TEMPLATE_FN(NAME, OP, HELP)                                                                  \
+#define BINARY_TEMPLATE_FN(NAME, OP, FLOATING)                                                              \
     m.def(#NAME,                                                                                            \
           [](const py::object &left, const py::object &right) {                                             \
               auto result = pygauss::arraylike::as_array(left, right);                                      \
               if (!result)                                                                                  \
                 throw std::runtime_error("Operation " #NAME ": Both are scalars");                          \
-                                                                                                            \
               auto [l,r] = result.value();                                                                  \
+              if (FLOATING) {                                                                               \
+                if (!l.isfloating())                                                                        \
+                    arraylike::ensure_floating(l);                                                          \
+                if (!r.isfloating())                                                                        \
+                    arraylike::ensure_floating(r);                                                          \
+              }                                                                                             \
               af_array out = nullptr;                                                                       \
               throw_on_error(OP(&out, l.get(), r.get(), GForStatus::get()));                                \
               return af::array(out);                                                                        \
           },                                                                                                \
           py::arg("left").none(false),                                                                      \
-          py::arg("right").none(false),                                                                     \
-          HELP);
+          py::arg("right").none(false));
 
-#define BINARY_TEMPLATE_FN_LAMBDA(NAME, OP, HELP)                                                           \
+#define BINARY_TEMPLATE_FN_LAMBDA(NAME, OP, FLOATING)                                                       \
     m.def(#NAME,                                                                                            \
           [](const py::object &left, const py::object &right) {                                             \
               auto result = pygauss::arraylike::as_array(left, right);                                      \
@@ -52,10 +56,15 @@
                 throw std::runtime_error("Operation " #NAME ": Both are scalars");                          \
                                                                                                             \
               auto [l,r] = result.value();                                                                  \
+              if (FLOATING) {                                                                               \
+                if (!l.isfloating())                                                                        \
+                    arraylike::ensure_floating(l);                                                          \
+                if (!r.isfloating())                                                                        \
+                    arraylike::ensure_floating(r);                                                          \
+              }                                                                                             \
               return OP(l, r, GForStatus::get());                                                           \
           },                                                                                                \
           py::arg("left").none(false),                                                                      \
-          py::arg("right").none(false),                                                                     \
-          HELP);
+          py::arg("right").none(false));
 
 #endif  // __TEMPLATES_H__

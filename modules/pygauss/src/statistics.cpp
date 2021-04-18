@@ -6,9 +6,17 @@
 #include <pygauss.h>
 
 namespace py = pybind11;
+namespace gs = gauss::statistics;
 
 void pygauss::bindings::statistic_functions(py::module &m)
 {
+    py::enum_<gs::XCorrScale>(m, "XCorrScale", "Cross Correlation Scale")
+            .value("NoScale", gs::XCorrScale::NONE, "")
+            .value("Biased", gs::XCorrScale::BIASED, "")
+            .value("Unbiased", gs::XCorrScale::UNBIASED, "")
+            .value("Coeff", gs::XCorrScale::COEFF, "")
+            .export_values();
+
     m.def(
         "mean",
         [](const py::object &a, const py::object &weights, const std::optional<long long> dim) {
@@ -148,7 +156,7 @@ void pygauss::bindings::statistic_functions(py::module &m)
         [](const py::object &data) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gauss::statistics::skewness(tss);
+            return gs::skewness(tss);
         },
         py::arg("data").none(false));
 
@@ -157,7 +165,7 @@ void pygauss::bindings::statistic_functions(py::module &m)
         [](const py::object &data) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gauss::statistics::kurtosis(tss);
+            return gs::kurtosis(tss);
         },
         py::arg("data").none(false));
 
@@ -166,138 +174,140 @@ void pygauss::bindings::statistic_functions(py::module &m)
         [](const py::object &data, const unsigned int k) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gauss::statistics::moment(tss, k);
+            return gs::moment(tss, k);
         },
         py::arg("data").none(false),
         py::arg("k").none(false));
 
     m.def(
-        "covariance",
-        [](const py::object &data, const bool unbiased) {
+        "cov",
+        [](const py::object &data, const unsigned int ddof) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gauss::statistics::covariance(tss, unbiased);
+            return gs::covariance(tss, ddof);
         },
         py::arg("data").none(false),
-        py::arg("unbiased") = false);
+        py::arg("ddof") = 1);
 
     m.def(
-        "correlation",
-        [](const py::object &data, const bool unbiased) {
+        "corrcoef",
+        [](const py::object &data, const unsigned int ddof) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gauss::statistics::correlation(tss, unbiased);
+            return gs::corrcoef(tss, ddof);
         },
         py::arg("data").none(false),
-        py::arg("unbiased") = false);
+        py::arg("ddof") = 1);
 
     m.def(
-        "cross_covariance",
-        [](const py::object &xss, const py::object &yss, const bool unbiased) {
+        "xcov",
+        [](const py::object &xss, const py::object &yss, 
+           const std::optional<unsigned int> &maxlag, 
+           const std::optional<gs::XCorrScale> &scale) {
+
             auto x = arraylike::as_array_checked(xss);
             auto y = arraylike::as_array_checked(yss);
             arraylike::ensure_floating(x);
             arraylike::ensure_floating(y);
-            return gauss::statistics::crossCovariance(x, y, unbiased);
+            return gs::xcov(x, y, maxlag, scale);
         },
         py::arg("xss").none(false),
         py::arg("yss").none(false),
-        py::arg("unbiased") = false);
+        py::arg("maxlag") = py::none(),
+        py::arg("scale") = gs::XCorrScale::NONE);
 
     m.def(
-        "cross_correlation",
-        [](const py::object &xss, const py::object &yss, const bool unbiased) {
+        "xcorr",
+        [](const py::object &xss, const py::object &yss, 
+           const std::optional<unsigned int> &maxlag, 
+           const std::optional<gs::XCorrScale> &scale) {
+
             auto x = arraylike::as_array_checked(xss);
             auto y = arraylike::as_array_checked(yss);
             arraylike::ensure_floating(x);
             arraylike::ensure_floating(y);
-            return gauss::statistics::crossCorrelation(x, y, unbiased);
+            
+            return gs::xcorr(x, y, maxlag, scale);
         },
         py::arg("xss").none(false),
         py::arg("yss").none(false),
-        py::arg("unbiased") = false);
+        py::arg("maxlag") = py::none(),
+        py::arg("scale") = gs::XCorrScale::NONE);
 
     m.def(
-        "auto_correlation",
-        [](const py::object &data, const unsigned int max_lag, const bool unbiased) {
+        "acorr",
+        [](const py::object &data,  
+           const std::optional<unsigned int> &maxlag, 
+           const std::optional<gs::XCorrScale> &scale) {
+
             auto ss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(ss);
-            return gauss::statistics::autoCorrelation(ss, max_lag, unbiased);
+            return gs::autocorr(ss, maxlag, scale);
         },
         py::arg("data").none(false),
-        py::arg("max_lag").none(false),
-        py::arg("unbiased") = false);
+        py::arg("maxlag") = py::none(),
+        py::arg("scale") = gs::XCorrScale::NONE);
 
     m.def(
-        "auto_covariance",
-        [](const py::object &data, const bool unbiased) {
+        "acov",
+        [](const py::object &data,  
+           const std::optional<unsigned int> &maxlag, 
+           const std::optional<gs::XCorrScale> &scale) {
+
             auto ss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(ss);
-            return gauss::statistics::autoCovariance(ss, unbiased);
+            return gs::autocov(ss, maxlag, scale);
         },
         py::arg("data").none(false),
-        py::arg("unbiased") = false);
-
-    m.def(
-        "partial_auto_correlation",
-        [](const py::object &data, const py::object &lags) {
-            auto ss = arraylike::as_array_checked(data);
-            arraylike::ensure_floating(ss);
-
-            auto l = arraylike::as_itself_or_promote(lags, af::dim4(1), af::dtype::s32);
-            if (l.type() != af::dtype::s32)
-                l = l.as(af::dtype::s32);
-
-            return gauss::statistics::partialAutocorrelation(ss, l);
-        },
-        py::arg("data").none(false),
-        py::arg("lags").none(false));
+        py::arg("maxlag") = py::none(),
+        py::arg("scale") = gs::XCorrScale::NONE);
 
 
 //////
 
-    m.def(
-        "ljungbox",
-        [](const py::object &data, const unsigned int lags) {
-            auto ss = arraylike::as_array_checked(data);
-            arraylike::ensure_floating(ss);
-            return gauss::statistics::ljungBox(ss, lags);
-        },
-        py::arg("data").none(false),
-        py::arg("lags").none(false));
+    // m.def(
+    //     "ljungbox",
+    //     [](const py::object &data, const unsigned int lags) {
+    //         auto ss = arraylike::as_array_checked(data);
+    //         arraylike::ensure_floating(ss);
+    //         return gs::ljungBox(ss, lags);
+    //     },
+    //     py::arg("data").none(false),
+    //     py::arg("lags").none(false));
 
-    m.def(
-        "quantile",
-        [](const py::object &data, const py::object& quantiles, const bool is_sorted){
-            auto ss = arraylike::as_array_checked(data);
-            arraylike::ensure_floating(ss);
-            if (!is_sorted)
-                ss = af::sort(ss, 0);
+    // m.def(
+    //     "quantile",
+    //     [](const py::object &data, const py::object& quantiles, const bool is_sorted){
+    //         auto ss = arraylike::as_array_checked(data);
+    //         arraylike::ensure_floating(ss);
+    //         if (!is_sorted)
+    //             ss = af::sort(ss, 0);
 
-            auto qs = arraylike::as_itself_or_promote(quantiles, af::dim4(1), ss.type());
-            return gauss::statistics::quantile(ss, qs);
-        },
-        py::arg("data").none(false),
-        py::arg("quantiles").none(false),
-        py::arg("is_sorted") = false);
+    //         auto qs = arraylike::as_itself_or_promote(quantiles, af::dim4(1), ss.type());
+    //         return gs::quantile(ss, qs);
+    //     },
+    //     py::arg("data").none(false),
+    //     py::arg("quantiles").none(false),
+    //     py::arg("is_sorted") = false);
 
-    m.def(
-        "quantiles_cut",
-        [](const py::object &data, const unsigned int regions, const bool is_sorted) {
-            auto ss = arraylike::as_array_checked(data);
-            arraylike::ensure_floating(ss);
-            if (!is_sorted)
-                ss = af::sort(ss, 0);
-            return gauss::statistics::quantilesCut(ss, static_cast<float>(regions));
-        },
-        py::arg("data").none(false),
-        py::arg("regions").none(false),
-        py::arg("is_sorted") = false);
+    // m.def(
+    //     "quantiles_cut",
+    //     [](const py::object &data, const unsigned int regions, const bool is_sorted) {
+    //         auto ss = arraylike::as_array_checked(data);
+    //         arraylike::ensure_floating(ss);
+    //         if (!is_sorted)
+    //             ss = af::sort(ss, 0);
+    //         return gs::quantilesCut(ss, static_cast<float>(regions));
+    //     },
+    //     py::arg("data").none(false),
+    //     py::arg("regions").none(false),
+    //     py::arg("is_sorted") = false);
 
     m.def(
         "topk_max",
         [](const py::object &data, const int k) {
             auto arr = arraylike::as_array_checked(data);
+            arraylike::ensure_floating(arr);
             af::array values;
             af::array indices;
             af::topk(values, indices, arr, k, 0, af_topk_function::AF_TOPK_MAX);
@@ -314,7 +324,7 @@ void pygauss::bindings::statistic_functions(py::module &m)
         "topk_min",
         [](const py::object &data, const int k) {
             auto arr = arraylike::as_array_checked(data);
-
+            arraylike::ensure_floating(arr);
             af::array values;
             af::array indices;
             af::topk(values, indices, arr, k, 0, af_topk_function::AF_TOPK_MIN);

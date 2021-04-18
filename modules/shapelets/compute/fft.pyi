@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Literal, Optional, Sequence, Union
 from ._array_obj import ShapeletsArray
 from .__basic_typing import ArrayLike

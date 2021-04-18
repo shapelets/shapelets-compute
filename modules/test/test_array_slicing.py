@@ -190,3 +190,20 @@ def test_batch_parallel_range():
         [ 0.1411,  0.1411,  0.1411,  0.1411,  0.1411],
         [-0.7568, -0.7568, -0.7568, -0.7568, -0.7568]
     ])
+
+def test_assign_vector_with_boolean_condition():
+    a = sh.zeros(10, "bool")
+    b = sh.random.randn(10)
+    a[b<0.5] = True 
+    assert a.same_as(b<0.5)
+
+def test_assign_matrix():
+    a = sh.zeros((10,10), "int32")
+    b = sh.array([False, False, False, False, True, False, False, False, False, False], dtype="bool")
+    c = sh.array([5], 1, dtype="int32")
+    a[:, b] = sh.array([1,2,3,4,5,6,7,8,9,0]).T
+    a[:, c] = sh.array([1,2,3,4,5,6,7,8,9,0]).T
+    assert a[:,3].same_as(sh.array([0,0,0,0,0,0,0,0,0,0]).T)
+    assert a[:,4].same_as(sh.array([1,2,3,4,5,6,7,8,9,0]).T)
+    assert a[:,5].same_as(sh.array([1,2,3,4,5,6,7,8,9,0]).T)
+    assert a[:,6].same_as(sh.array([0,0,0,0,0,0,0,0,0,0]).T)

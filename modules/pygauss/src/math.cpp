@@ -58,8 +58,8 @@ void pygauss::bindings::math_operations(py::module &m) {
     UNARY_TEMPLATE_FN(arcsin, af_asin, "Trigonometric inverse sine element-wise")
     UNARY_TEMPLATE_FN(arccos, af_acos, "Trigonometric inverse cosine element-wise")
     UNARY_TEMPLATE_FN(arctan, af_atan, "Trigonometric inverse tangent element-wise")
-    BINARY_TEMPLATE_FN(hypot, af_hypot, "Given the sides of a triangle, returns the hypotenuse")
-    BINARY_TEMPLATE_FN(arctan2, af_atan2, "Element-wise arc tangent of the inputs")
+    BINARY_TEMPLATE_FN(hypot, af_hypot, true)
+    BINARY_TEMPLATE_FN(arctan2, af_atan2, true)
     UNARY_TEMPLATE_FN_LAMBDA(degrees, rad2deg, "Radians to degrees, element-wise")
     UNARY_TEMPLATE_FN_LAMBDA(rad2deg, rad2deg, "Radians to degrees, element-wise")
     UNARY_TEMPLATE_FN_LAMBDA(radians, deg2rad, "Degrees to radians, element-wise")
@@ -166,19 +166,18 @@ void pygauss::bindings::math_operations(py::module &m) {
 // modf         --> missing
 // divmod       --> missing
 
-    BINARY_TEMPLATE_FN(add, af_add, "Add arguments element-wise ")
+    BINARY_TEMPLATE_FN(add, af_add, false)
     UNARY_TEMPLATE_FN_LAMBDA(reciprocal, reciprocal, "Returns the reciprocal of the argument (1/x), element wise")
     UNARY_TEMPLATE_FN_LAMBDA(positive, positive, "Numerical positive, element-wise.")
     UNARY_TEMPLATE_FN_LAMBDA(negative, negative, "Numerical negative, element-wise.")
-    BINARY_TEMPLATE_FN(multiply, af_mul, "Multiply arguments element-wise.")
-    BINARY_TEMPLATE_FN(divide, af_div, "Returns a true division of the inputs, element-wise.")
-    BINARY_TEMPLATE_FN(true_divide, af_div, "Returns a true division of the inputs, element-wise.")
-    BINARY_TEMPLATE_FN(power, af_pow, "First array elements raised to powers from second array, element-wise.")
-    BINARY_TEMPLATE_FN(substract, af_sub, "Subtract arguments, element-wise.")
-    BINARY_TEMPLATE_FN_LAMBDA(floor_divide, floor_divide,
-                              "Return the largest integer smaller or equal to the division of the inputs.")
-    BINARY_TEMPLATE_FN(mod, af_mod, "Return element-wise remainder of division.")
-    BINARY_TEMPLATE_FN(rem, af_rem, "Return element-wise remainder of division.")
+    BINARY_TEMPLATE_FN(multiply, af_mul, false)
+    BINARY_TEMPLATE_FN(divide, af_div, false)
+    BINARY_TEMPLATE_FN(true_divide, af_div, false)
+    BINARY_TEMPLATE_FN(power, af_pow, false)
+    BINARY_TEMPLATE_FN(substract, af_sub, false)
+    BINARY_TEMPLATE_FN_LAMBDA(floor_divide, floor_divide, false)
+    BINARY_TEMPLATE_FN(mod, af_mod, false)
+    BINARY_TEMPLATE_FN(rem, af_rem, false)
 
 //
 // Handling complex numbers
@@ -193,7 +192,7 @@ void pygauss::bindings::math_operations(py::module &m) {
     UNARY_TEMPLATE_FN(angle, af_arg, "Returns the angle in radians")
     UNARY_TEMPLATE_FN_LAMBDA(angle_deg, angle_deg, "Returns the angle in degrees")
     // this one is not in np
-    BINARY_TEMPLATE_FN(complex, af_cplx2, "Constructs a new complex array two independent sources")
+    BINARY_TEMPLATE_FN(complex, af_cplx2, false)
 
 
 //
@@ -265,7 +264,7 @@ void pygauss::bindings::math_operations(py::module &m) {
     UNARY_TEMPLATE_FN(factorial, af_factorial, "Factorial function")
     UNARY_TEMPLATE_FN(tgamma, af_tgamma, "Gamma function")
     UNARY_TEMPLATE_FN(lgamma, af_lgamma, "Logarithm of absolute values of Gamma function")
-    BINARY_TEMPLATE_FN(root, af_root, "Root function")
+    BINARY_TEMPLATE_FN(root, af_root, false)
 
 
 //
@@ -273,11 +272,11 @@ void pygauss::bindings::math_operations(py::module &m) {
 //
 
 
-    BINARY_TEMPLATE_FN(bitwise_and, af_bitand, "Element-wise bitwise and.")
-    BINARY_TEMPLATE_FN(bitwise_or, af_bitor, "Element-wise bitwise or")
-    BINARY_TEMPLATE_FN(bitwise_xor, af_bitxor, "Element-wise bitwise xor")
-    BINARY_TEMPLATE_FN(left_shift, af_bitshiftl, "Element-wise shift to the left")
-    BINARY_TEMPLATE_FN(right_shift, af_bitshiftr, "Element-wise shift to the right")
+    BINARY_TEMPLATE_FN(bitwise_and, af_bitand, false)
+    BINARY_TEMPLATE_FN(bitwise_or, af_bitor, false)
+    BINARY_TEMPLATE_FN(bitwise_xor, af_bitxor, false)
+    BINARY_TEMPLATE_FN(left_shift, af_bitshiftl, false)
+    BINARY_TEMPLATE_FN(right_shift, af_bitshiftr, false)
 //  Missing in my mac build
 //  UNARY_TEMPLATE_FN(invert, af_bitnot, "Compute bit-wise inversion, or bit-wise NOT, element-wise.")
 }

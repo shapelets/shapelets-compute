@@ -18,3 +18,5 @@ cmake/opt
 .DS_Store
 cmake/_linux_af.sh
 .downloads
+/doc/_build
+/doc/reference/generated

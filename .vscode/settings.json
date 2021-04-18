@@ -107,7 +107,9 @@
         "__functional_03": "cpp",
         "__hash": "cpp",
         "core": "cpp",
-        "rope": "cpp"
+        "rope": "cpp",
+        "geometry": "cpp",
+        "lu": "cpp"
     },
     "files.exclude": {
         "**/__pycache__": true,
@@ -138,8 +140,9 @@
         "!cpp",
         "!python"
     ],
-    "python.pythonPath": "venv/bin/python",
+    "python.pythonPath": "/Users/justo.ruiz/Development/shapelets/solo_comprobacion/venv/bin/python3.8",
     "C_Cpp.errorSquiggles": "Disabled",
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": false
+    "python.linting.enabled": false,
+    "restructuredtext.confPath": "${workspaceFolder}/doc"
 }

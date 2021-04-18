@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..compute import ShapeletsArray, array as scarray
 import numpy as np
 import pathlib

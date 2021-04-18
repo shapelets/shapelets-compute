@@ -1,13 +1,48 @@
-from typing import Union
+from __future__ import annotations
+
+from typing import Union, Optional, Tuple
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
+from . import _pygauss
 
 FloatOrComplex = Union[complex, float]
 
-def mean(data: ArrayLike, weights: ArrayLike = None, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]: ... 
-def median(data: ArrayLike, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]: ...
-def var(data: ArrayLike, weigths: ArrayLike = None, dim: int = None, biased: bool = False) -> Union[FloatOrComplex, ShapeletsArray]: ... 
-def std(data: ArrayLike, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]: ... 
+class XCorrScale:
+    def __eq__(self, arg0: object) -> bool: ...
+    def __getstate__(self) -> int: ...
+    def __hash__(self) -> int: ...
+    def __init__(self, arg0: int) -> None: ...
+    def __int__(self) -> int: ...
+    def __ne__(self, arg0: object) -> bool: ...
+    def __repr__(self) -> str: ...
+    def __setstate__(self, arg0: int) -> None: ...
+    @property
+    def name(self) -> str:...
+    NoScale: _pygauss.XCorrScale
+    Biased: _pygauss.XCorrScale
+    Unbiased: _pygauss.XCorrScale
+    Coeff: _pygauss.XCorrScale
+    __members__: dict 
+
+def mean(data: ArrayLike, weights: ArrayLike = None, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    """
+    TODO
+    """
+
+def median(data: ArrayLike, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]:
+    """
+    TODO
+    """
+
+def var(data: ArrayLike, weigths: ArrayLike = None, dim: int = None, biased: bool = False) -> Union[FloatOrComplex, ShapeletsArray]: 
+    """
+    TODO
+    """
+
+def std(data: ArrayLike, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    """
+    TODO
+    """
 
 def skewness(data: ArrayLike) -> ShapeletsArray: 
     """
@@ -61,7 +96,7 @@ def moment(data: ArrayLike, k: int) -> ShapeletsArray:
     The kth moment for each series, represented as a 1xM vector.
     """
 
-def covariance(data: ArrayLike, unbiased: bool = False) -> ShapeletsArray:
+def cov(data: ArrayLike, ddof: int = 1) -> ShapeletsArray:
     """
     Returns the covariance matrix of the series contained in data.
 
@@ -69,30 +104,49 @@ def covariance(data: ArrayLike, unbiased: bool = False) -> ShapeletsArray:
     ----------
     data: ArrayLike
     A NxM two dimensional matrix, where there are M sequences of N points.
-    biased: bool 
-    Determines if the computation adjusts n to `n-1` (false) or not (true).
+    ddof: bool 
 
     Returns
     -------
     Covariance matrix of all the series in data.
     """
 
-def correlation(data: ArrayLike, unbiased: bool = False) -> ShapeletsArray: ...
+def corrcoef(data: ArrayLike, ddof: int = 1) -> ShapeletsArray:
+    """
+    TODO
+    """
+    
+def xcov(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = XCorrScale.NoScale) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+    """
+    TODO
+    """
 
-def cross_covariance(xss: ArrayLike, yss: ArrayLike, unbiased: bool = False) -> ShapeletsArray: ...
-def cross_correlation(xss: ArrayLike, yss: ArrayLike, unbiased: bool = False) -> ShapeletsArray: ...
+def xcorr(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = XCorrScale.NoScale) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+    """
+    TODO
+    """
 
-def auto_covariance(data: ArrayLike, unbiased: bool = False) -> ShapeletsArray: ...          
-def auto_correlation(data: ArrayLike, max_lag: int, unbiased: bool = False) -> ShapeletsArray: ...
+def acorr(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = XCorrScale.NoScale) -> ShapeletsArray: 
+    """
+    TODO
+    """
 
-def partial_auto_correlation(data: ArrayLike, lags: ArrayLike) -> ShapeletsArray: ...
+def acov(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = XCorrScale.NoScale) -> ShapeletsArray: 
+    """
+    TODO
+    """
+
+def topk_max(data: ArrayLike, k: int) -> ShapeletsArray: 
+    """
+    TODO
+    """
+
+def topk_min(data: ArrayLike, k: int) -> ShapeletsArray: 
+    """
+    TODO
+    """
 
 
-def ljungbox(data: ArrayLike, lags: int) -> ShapeletsArray: ...
-
-def quantile(data: ArrayLike, quantiles: ArrayLike, is_sorted: bool = False) -> ShapeletsArray: ...
-def quantiles_cut(data: ArrayLike, regions: int, is_sorted: bool = False) -> ShapeletsArray: ...
-
-
-def topk_max(data: ArrayLike, k: int) -> ShapeletsArray: ...
-def topk_min(data: ArrayLike, k: int) -> ShapeletsArray: ...
+# def ljungbox(data: ArrayLike, lags: int) -> ShapeletsArray: ...
+# def quantile(data: ArrayLike, quantiles: ArrayLike, is_sorted: bool = False) -> ShapeletsArray: ...
+# def quantiles_cut(data: ArrayLike, regions: int, is_sorted: bool = False) -> ShapeletsArray: ...

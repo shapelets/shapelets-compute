@@ -529,10 +529,8 @@ void getChains(af::array tss, long m, af::array &chains) {
         auto currArrChains = extractAllChains(res.first.second, res.second.second);
         sortChains(currArrChains);
         auto flattenedIndexesPair = buildFlattenedWithIndexes(currArrChains);
-        chains(af::seq(flattenedIndexesPair.first.size()), 0, tssIdx) =
-            gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.first);
-        chains(af::seq(flattenedIndexesPair.second.size()), 1, tssIdx) =
-            gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.second);
+        chains(af::seq(flattenedIndexesPair.first.size()), 0, tssIdx) = gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.first);
+        chains(af::seq(flattenedIndexesPair.second.size()), 1, tssIdx) = gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.second);
     }
 }
 

@@ -195,27 +195,27 @@ af::array calculateKurtosis(const af::array &tss) {
     return out;
 }
 
-af::array estimateFriedrichCoefficients(af::array tss, int m, float r) {
-    auto n = tss.dims(0);
+// af::array estimateFriedrichCoefficients(af::array tss, int m, float r) {
+//     auto n = tss.dims(0);
 
-    af::array categories = gauss::statistics::quantilesCut(tss(af::seq(n - 1), af::span), r);
+//     af::array categories = gauss::statistics::quantilesCut(tss(af::seq(n - 1), af::span), r);
 
-    af::array x = af::join(1, categories, af::reorder(tss(af::seq(n - 1), af::span), 0, 2, 1, 3));
-    x = af::join(1, x, af::reorder(af::diff1(tss, 0), 0, 2, 1, 3));
+//     af::array x = af::join(1, categories, af::reorder(tss(af::seq(n - 1), af::span), 0, 2, 1, 3));
+//     x = af::join(1, x, af::reorder(af::diff1(tss, 0), 0, 2, 1, 3));
 
-    // Doing the groupBy per input time series in tss (tss are contained along the 2nd dimension).
-    // The groupBy function cannot be applied to all time series in parallel because we do not
-    // know a priori the number of groups in each series.
+//     // Doing the groupBy per input time series in tss (tss are contained along the 2nd dimension).
+//     // The groupBy function cannot be applied to all time series in parallel because we do not
+//     // know a priori the number of groups in each series.
 
-    af::array result = af::array(m + 1, tss.dims(1), tss.type());
+//     af::array result = af::array(m + 1, tss.dims(1), tss.type());
 
-    for (int i = 0; i < tss.dims(1); i++) {
-        af::array groupped = gauss::regularization::groupBy(x(af::span, af::span, i), af::mean, 2, 2);
-        result(af::span, i) = gauss::polynomial::polyfit(groupped.col(0), groupped.col(1), m);
-    }
+//     for (int i = 0; i < tss.dims(1); i++) {
+//         af::array groupped = gauss::regularization::groupBy(x(af::span, af::span, i), af::mean, 2, 2);
+//         result(af::span, i) = gauss::polynomial::polyfit(groupped.col(0), groupped.col(1), m);
+//     }
 
-    return result;
-}
+//     return result;
+// }
 
 int indexMinValue(std::vector<int> values) {
     int result = -1;
@@ -711,9 +711,9 @@ af::array gauss::features::firstLocationOfMinimum(const af::array &tss) {
     return index.as(tss.type()) / tss.dims(0);
 }
 
-af::array gauss::features::friedrichCoefficients(const af::array &tss, int m, float r) {
-    return estimateFriedrichCoefficients(tss, m, r);
-}
+// af::array gauss::features::friedrichCoefficients(const af::array &tss, int m, float r) {
+//     return estimateFriedrichCoefficients(tss, m, r);
+// }
 
 af::array gauss::features::hasDuplicates(const af::array &tss) {
     // Array with the number of input time series in the 1st dimension of type bool
@@ -844,13 +844,13 @@ af::array gauss::features::longestStrikeBelowMean(const af::array &tss) {
     return af::max(result, 0);
 }
 
-af::array gauss::features::maxLangevinFixedPoint(const af::array &tss, int m, float r) {
-    af::array coefficients = estimateFriedrichCoefficients(tss, m, r);
+// af::array gauss::features::maxLangevinFixedPoint(const af::array &tss, int m, float r) {
+//     af::array coefficients = estimateFriedrichCoefficients(tss, m, r);
 
-    af::array roots = gauss::polynomial::roots(coefficients);
+//     af::array roots = gauss::polynomial::roots(coefficients);
 
-    return af::max(af::real(roots)).as(tss.type());
-}
+//     return af::max(af::real(roots)).as(tss.type());
+// }
 
 af::array gauss::features::maximum(const af::array &tss) { return af::max(tss, 0); }
 
@@ -974,9 +974,9 @@ af::array gauss::features::percentageOfReoccurringValuesToAllValues(const af::ar
     return result / tss.dims(0);
 }
 
-af::array gauss::features::quantile(const af::array &tss, const af::array &q, float precision) {
-    return gauss::statistics::quantile(tss, q, precision);
-}
+// af::array gauss::features::quantile(const af::array &tss, const af::array &q, float precision) {
+//     return gauss::statistics::quantile(tss, q, precision);
+// }
 
 af::array gauss::features::rangeCount(const af::array &tss, float min, float max) {
     af::array mins = (tss > min).as(tss.type());

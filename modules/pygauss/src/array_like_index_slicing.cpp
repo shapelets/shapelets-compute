@@ -48,7 +48,7 @@ namespace pygauss {
         if (py::isinstance<py::ellipsis>(selector)) {
             // the user has done something like array[...]
             // which should result in a select all operation.
-            spd::trace("Selector was ...; returning without further indexing");
+            spd::trace("Selector was just `...`; returning without further indexing");
             result_dim = arr_dim;
             result_dimensions = arr_dim.ndims();
             return {result_dimensions, result_dim, afIndex};
@@ -176,11 +176,11 @@ namespace pygauss {
                 if (ind_arr.type() == af::dtype::b8) {
                     throw_on_error(af_where(&out, ind_arr.get()));
                     double re,im;
-                    throw_on_error(af_sum_all(&re, &im, out));
+                    throw_on_error(af_sum_all(&re, &im, ind_arr.get()));
                     result_dim[i] = static_cast<dim_t>(re);
                     spd::trace("Preprocessed selector: found boolean array at pos {}", i);
                 } else {
-                    out = ind_arr.get();
+                    throw_on_error(af_retain_array(&out, ind_arr.get()));
                     throw_on_error(af_get_elements(&result_dim[i], out));
                     spd::trace("Preprocessed selector: found any array at pos {}", i);
                 }

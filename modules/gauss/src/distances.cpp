@@ -87,18 +87,18 @@ inline af::array additive_symm_chi(const af::array &p, const af::array::array_pr
 
 // The Inner Product family
 inline af::array innerproduct(const af::array &p, const af::array::array_proxy &q) {
-    return 1.0 - af::sum(p*q);
+    return af::sum(p*q);
 }
 inline af::array harmonic_mean(const af::array &p, const af::array::array_proxy &q) {
-    return 1.0 - 2.0 * af::sum(p*q/(p+q));
+    return 2.0 * af::sum(p*q/(p+q));
 }
 inline af::array cosine(const af::array &p, const af::array::array_proxy &q) {
     auto pt = af::sqrt(af::sum(af::pow(p, 2.0)));
     auto qt = af::sqrt(af::sum(af::pow(q, 2.0)));
-    return 1.0 - af::sum(p*q)/(pt*qt);
+    return af::sum(p*q)/(pt*qt);
 }
 inline af::array kumarhassebrook(const af::array &p, const af::array::array_proxy &q) {
-    return 1.0 - (af::sum(p*q)/(af::sum(af::pow(p, 2.0))+af::sum(af::pow(q, 2.0))-af::sum(p*q)));
+    return af::sum(p*q)/(af::sum(af::pow(p, 2.0))+af::sum(af::pow(q, 2.0))-af::sum(p*q));
 }
 inline af::array jaccard(const af::array &p, const af::array::array_proxy &q) {
     return 1.0 - (af::sum(af::pow(p - q, 2.0)) / af::sum(af::pow(p, 2.0) + af::pow(q, 2.0) - p*q));
@@ -109,7 +109,7 @@ inline af::array dice(const af::array &p, const af::array::array_proxy &q) {
 
 // The Fidelity family
 inline af::array fidelity(const af::array &p, const af::array::array_proxy &q) {
-    return 1.0 - af::sum(af::sqrt(p * q));
+    return af::sum(af::sqrt(p * q));
 }
 inline af::array bhattacharyya(const af::array &p, const af::array::array_proxy &q) {
     return -af::log(af::sum(af::sqrt(p * q)));
@@ -186,9 +186,6 @@ inline af::array manhattan(const af::array &p, const af::array::array_proxy &q) 
 }
 inline af::array chebyshev(const af::array &p, const af::array::array_proxy &q) {
     return af::max(af::abs(p - q));
-}
-inline af::array abs_euclidean(const af::array &p, const af::array::array_proxy &q) {
-    return af::sqrt(af::sum(af::pow(af::abs(p - q), 2.0)));
 }
 }
 
@@ -299,16 +296,10 @@ LOCK_STEP_DST_ALGORITHM(max_symmetric_chi, true)
 //      euclidean
 //      manhattan
 //      chebyshev
-//      abs_euclidean
+//      minkowski
 LOCK_STEP_DST_ALGORITHM(manhattan, true)
 LOCK_STEP_DST_ALGORITHM(chebyshev, true)
-LOCK_STEP_DST_ALGORITHM(abs_euclidean, true)
 LOCK_STEP_DST_ALGORITHM(euclidean, true)
-
-
-
-
-
 
 
 distance_algorithm_t mpdist(int32_t w, double threshold) {
@@ -352,7 +343,7 @@ distance_algorithm_t hamming() {
     };
 }
 
-distance_algorithm_t minkowshi(double p) {
+distance_algorithm_t minkowski(double p) {
     return { 
         true,               // all same length
         true,               // is symmetric
@@ -444,8 +435,6 @@ distance_algorithm_t dtw() {
         }
     };
 }
-
-
 
 /**
  * Runs the algo for every column in xa to all the others.

@@ -140,7 +140,6 @@ void pygauss::bindings::array_construction_operations(py::module &m)
         py::arg("stop").none(false),
         py::arg("dtype") = af::dtype::f32);
 
-
     m.def(
         "arange",
         [](const std::variant<py::int_, py::float_> &start, 
@@ -157,7 +156,7 @@ void pygauss::bindings::array_construction_operations(py::module &m)
                 : py::cast<double>(std::get<py::float_>(stop));
 
             auto cstep = step.index() == 0 
-                ?  py::cast<double>(std::get<py::int_>(step)) 
+                ? py::cast<double>(std::get<py::int_>(step)) 
                 : py::cast<double>(std::get<py::float_>(step));
 
             auto len = static_cast<long long>(std::ceil((cstop - cstart) / cstep));

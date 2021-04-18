@@ -151,6 +151,11 @@ void pygauss::bindings::array_obj(py::module &m) {
                                  return self.isvector();
                              });
 
+    ka.def_property_readonly("is_empty",
+                             [](const af::array &self) { 
+                                 return self.isempty();
+                             });                         
+
     ka.def_property_readonly("is_single",
                              [](const af::array &self) {
                                  return self.issingle();
@@ -482,6 +487,12 @@ void pygauss::bindings::array_obj(py::module &m) {
            },
            py::arg("other").none(false),
            "Matrix multiplication");
+
+
+    ka.def("__abs__",
+           [](const af::array &self) {
+               return af::abs(self);
+           });
 
     BINARY_OP(af_add, __add__)
     BINARY_OPR(af_add, __radd__)
