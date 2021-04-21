@@ -9,16 +9,9 @@ namespace spd = spdlog;
 
 typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs, const bool batch);
 
-
 af::array binary_function(af::array &self, const py::object &other, bool reverse, binaryFn fn) {
     af::array rhs = pygauss::arraylike::as_itself_or_promote(other, self.dims(), self.type());
-
-    auto batch = pygauss::GForStatus::get();
-    if (!batch) {
-        // check if we can broadcast by either tiling or setting the batch flag.
-        // TODO
-    }
-
+    auto batch = pygauss::GForStatus::get() || self.dims() != rhs.dims();
     af_array out = nullptr;
     if (!reverse)
         pygauss::throw_on_error((*fn)(&out, self.get(), rhs.get(), batch));
@@ -27,7 +20,6 @@ af::array binary_function(af::array &self, const py::object &other, bool reverse
 
     return af::array(out);
 }
-
 
 #define BINARY_OP(OP, PYTHON_FN)                                                                        \
     ka.def(#PYTHON_FN,                                                                                  \
@@ -568,13 +560,4 @@ void pygauss::bindings::array_obj(py::module &m) {
               }
           },
           "Forces the evaluation of all the arrays");
-
-    ka.def(
-        "assign",
-        [](af::array &self, const af::array &indices, const af::array &rhs){
-            self(indices)=rhs;
-            return self;
-        },
-        py::arg("indices").none(false),
-        py::arg("rhs").none(false));
 }

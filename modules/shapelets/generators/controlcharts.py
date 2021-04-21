@@ -334,7 +334,7 @@ if __name__ == '__main__':
 
     import matplotlib.pyplot as plt 
 
-    x = sc.random.default_rng()
+    x = sc.random.random_engine()
 
     program = [
         # white_noise(),
@@ -357,13 +357,13 @@ if __name__ == '__main__':
     # sc.random.permutation(arr, 1).display()
     # sc.random.permutation(10).display()
 
-    sh_rnd = sc.random.default_rng()
-    print(cc_increasing().generate_delta(10, sh_rnd).dtype)
-    print(cc_decreasing().generate_delta(10, sh_rnd).dtype)
+    # sh_rnd = sc.random.default_rng()
+    # print(cc_increasing().generate_delta(10, sh_rnd).dtype)
+    # print(cc_decreasing().generate_delta(10, sh_rnd).dtype)
     # print((cc_downward() + 0.3*white_noise()).generate_delta(10, sh_rnd).dtype)
     # print((cc_upward() + 0.3*white_noise()).generate_delta(10, sh_rnd).dtype)
 
-    # r = generate(program, 1000, start_level=100.0, repetitions=10)
-    # plt.plot(r)
-    # plt.show()
+    r = generate(program, 1000, start_level=100.0, repetitions=10)
+    plt.plot(r)
+    plt.show()
     

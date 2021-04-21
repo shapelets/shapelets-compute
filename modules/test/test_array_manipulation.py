@@ -287,7 +287,9 @@ def test_memory_view():
     assert not b.c_contiguous
 
     # data is shared for CPU backend.
-    sh.set_backend(sh.Backend.CPU)
+    sh.set_backend('cpu')
+    assert sh.get_backend() == 'cpu'
+    
     # memoryview doesn't have indexing
     # implemented
     a = sh.iota(10)

@@ -26,6 +26,7 @@ class XCorrScale:
 
 def mean(data: ArrayLike, weights: ArrayLike = None, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]: 
     """
+    
     TODO
     """
 

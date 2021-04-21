@@ -83,12 +83,12 @@ void pygauss::bindings::random_numbers(py::module &m) {
                  "Draw samples from a Wald, or inverse Gaussian, distribution.")
 
             .def("normal",
-                 [](af::randomEngine &self, const double loc, const double scale, const af::dim4 &shape,
+                 [](af::randomEngine &self, const double mean, const double sigma, const af::dim4 &shape,
                     const af::dtype &dtype) {
-                     return gauss::random::normal(loc, scale, shape, dtype, self);
+                     return gauss::random::normal(mean, sigma, shape, dtype, self);
                  },
-                 py::arg("loc") = 0.0,
-                 py::arg("scale") = 1.0,
+                 py::arg("mean") = 0.0,
+                 py::arg("sigma") = 1.0,
                  py::arg("shape") = af::dim4(1, 1, 1, 1),
                  py::arg("dtype") = af::dtype::f32,
                  "Draw random samples from a normal (Gaussian) distribution.")

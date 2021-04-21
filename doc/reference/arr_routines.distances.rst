@@ -22,6 +22,17 @@ Time Series Specific
    mpdist
    sbd
 
+
+Minkowski family
+----------------
+.. autosummary::
+   :toctree: generated/
+
+   chebyshev
+   euclidean
+   manhattan
+   minkowski
+
 Fidelity family
 ---------------
 .. autosummary::
@@ -66,6 +77,9 @@ Intersection family
    
    czekanowski
    intersection
+   motyka
+   ruzicka
+   tanimoto
    wavehedges
 
 The L1 Family
@@ -100,25 +114,5 @@ Combinations family
    avg_l1_linf
    kumar_johnson
    taneja
-
-Vicissitude family
-------------------
-.. autosummary::
-   :toctree: generated/
-
-   max_symmetric_chi
-   min_symmetric_chi
-   vicis_wave_hedges
-
-Minkowski family
-----------------
-.. autosummary::
-   :toctree: generated/
-
-   chebyshev
-   euclidean
-   manhattan
-   minkowski
-
 
 

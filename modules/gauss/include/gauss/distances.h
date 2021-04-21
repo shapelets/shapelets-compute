@@ -64,6 +64,9 @@ distance_algorithm_t taneja();
 distance_algorithm_t topsoe();
 distance_algorithm_t vicis_wave_hedges();
 distance_algorithm_t wavehedges();
+distance_algorithm_t tanimoto();
+distance_algorithm_t ruzicka();
+distance_algorithm_t motyka();
 
 af::array compute(const distance_algorithm_t& algo, const af::array& xa);
 af::array compute(const distance_algorithm_t& algo, const af::array& xa, const af::array &xb);

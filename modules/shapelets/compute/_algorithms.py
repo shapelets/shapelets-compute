@@ -24,26 +24,32 @@ def __map_scan_op(scanop: ScanOp):
 
 def argmin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, float], Tuple[int, complex], Tuple[ShapeletsArray, ShapeletsArray]]:
     """
+
     """
     return _pygauss.argmin(array_like, dim)
 
 def nanargmin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]:
     """
+
     """
     return _pygauss.nanargmin(array_like, dim)
 
-def minimum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
+def argmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
     """
     """
-    return _pygauss.minimum(left, right)
+    return _pygauss.argmax(array_like, dim) 
 
-def fmin(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+def nanargmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
     """
     """
-    return _pygauss.fmin(left, right) 
+    return _pygauss.nanargmax(array_like, dim) 
+
+
+
 
 def amax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
     """
+
     """
     return _pygauss.amax(array_like, dim)  
 
@@ -62,15 +68,7 @@ def fmax(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.fmax(left, right) 
 
-def argmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
-    """
-    """
-    return _pygauss.argmax(array_like, dim) 
 
-def nanargmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
-    """
-    """
-    return _pygauss.nanargmax(array_like, dim) 
 
 def count_nonzero(array_like: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
     """
@@ -231,6 +229,16 @@ def nan_to_num(array_like: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> Sha
     """
     return _pygauss.nan_to_num(array_like, nan, inf)
 
+def minimum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
+    """
+    """
+    return _pygauss.minimum(left, right)
+
+def fmin(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+    """
+    """
+    return _pygauss.fmin(left, right) 
+
 def amin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
     """
     Returns the minimum of an array or the minimum along an axis, propagating NaNs.
@@ -255,29 +263,39 @@ def amin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, S
     """
     return _pygauss.amin(array_like, dim)
 
-def nanmin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+def nanmin(x: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
     """
     The minimum value of an array along a given axis, ignoring any NaNs.
 
     Parameters
     ----------
-    array_like: ArrayLike
+    x: ArrayLike
+        Input array
+
     dim: Optioal int.  Defaults to None.
+        Axis along the minimum is computed. 
 
     Returns
     -------
-    A scalar value, representing the minimum value of the tensor when no `dim` is specified; otherwise,
-    it returns an array, representing the minimum value through a particular axis.
+    Union[FloatOrComplex, ShapeletsArray]
+        A scalar value, representing the minimum value of the tensor when no `dim` is specified; otherwise,
+        it returns an array, representing the minimum value through a particular axis.
 
     See Also
     --------
-    amin: The minimum value of an array along a given axis, propagating any NaNs.
-    minimum: Element-wise minimum of two arrays, propagating any NaNs.
-    fmin: Element-wise minimum of two arrays, ignoring any NaNs.
-    argmin: Return the indices of the minimum values, propagating any NaNs.
-    nanargmin:  Return the indices of the minimum values, ignoring any NaNs.
+    amin
+        The minimum value of an array along a given axis, propagating any NaNs.
+    minimum
+        Element-wise minimum of two arrays, propagating any NaNs.
+    fmin
+        Element-wise minimum of two arrays, ignoring any NaNs.
+    argmin
+        Return the indices of the minimum values, propagating any NaNs.
+    nanargmin
+        Return the indices of the minimum values, ignoring any NaNs.
+
     """
-    return _pygauss.nanmin(array_like, dim)
+    return _pygauss.nanmin(x, dim)
 
 
     # // amin -> Return the minimum of an array or minimum along an axis, propagating NaNs
@@ -305,12 +323,15 @@ def all(array_like: ArrayLike, dim: Optional[int] = None) -> Union[bool, Shapele
 
     Returns
     -------
-    Either a boolean flag or an array of boolean values, depending on the `dim` parameter.
+    Union[bool, ShapeletsArray]
+        Either a boolean flag or an array of boolean values, depending on the `dim` parameter.
 
     See Also
     --------
-    any: Tests if any array element along a particular axis is `True`
-    all_by_key: Similar to any, but grouping by keys.    
+    any
+        Tests if any array element along a particular axis is `True`
+    all_by_key
+        Similar to any, but grouping by keys.    
 
     Examples
     --------
@@ -337,29 +358,41 @@ def any(array_like: ArrayLike, dim: Optional[int] = None) -> Union[bool, Shapele
     Parameters
     ----------
     array_like: ArrayLike
-    A valid array expression.
+        A valid array expression.
 
     dim: Optional int, defaults to None
-    Dimension or axis where the reduction takes place; when left unspecified, the all tensor 
-    elements will participate in the operation
+        Dimension or axis where the reduction takes place; when left unspecified, the all tensor 
+        elements will participate in the operation
 
     Returns
     -------
-    Either a boolean flag or an array of boolean values, depending on the `dim` parameter.
+    Union[bool, ShapeletsArray]
+        Either a boolean flag or an array of boolean values, depending on the `dim` parameter.
 
     See Also
     --------
-    all: Tests if all array elements along a particular axis are `True`
-    any_by_key: Similar to any, but grouping by keys.
+    all
+        Tests if all array elements along a particular axis are `True`
+
+    any_by_key
+        Similar to any, but grouping by keys.
 
     Examples
     --------
+    Invoke ``any`` to all elements in the array:
+    
     >>> a = [[True, True], [False, False], [True, False]]
     >>> sc.any(a)
     True
+
+    Over the same array, but this time, reduce by rows...
+
     >>> sc.any(a, 0)
     [1 2 1 1]
          1          1
+    
+    Or by columns...
+
     >>> sc.any(a, 1)      
     [3 1 1 1]
          1 

@@ -59,7 +59,7 @@ plt.show()
 
 ## Running multiple queries at once!
 sample_region = load_mat('ItalianPowerDemand.mat')[15000:16000,2]
-queries = sc.unwrap(sample_region, 200, 1, 200, 1)
+queries = sc.unpack(sample_region, 200, 1, 200, 1)
 print(queries.shape)
 fig, ax = plt.subplots(5, 1, figsize=(18, 8))
 for i in range(5):
@@ -72,7 +72,7 @@ multiple_results = sc.matrixprofile.mass(queries, data)
 indices, distances = sc.argmin(multiple_results, 0)
 fig, ax = plt.subplots(5, 1, figsize=(18, 8))
 for i in range(5):
-    start = np.array(indices[i])[0]
+    start = indices[0,i]
     end = start + 200
     ax[i].plot(data[start:end])
     ax[i].plot(queries[:, i])
@@ -85,7 +85,7 @@ sc.distances.mpdist(queries[:, 0], queries[:, 1], w=20)
 
 # %%
 l=["Ts1", "Ts2", "Ts3", "Ts4", "Ts5"]
-dst = sc.distances.pdist(queries, DistanceType.MPDist, w=25)
+dst = sc.distances.pdist(queries, 'mpdist', w=25)
 # %%
 
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -97,7 +97,7 @@ plt.show()
 # %%
 
 # With SBD Distance
-dists = squareform(sc.distances.pdist(queries, DistanceType.SBD))
+dists = squareform(sc.distances.pdist(queries, 'sbd'))
 linkage_matrix = linkage(dists, "single")
 dendrogram(linkage_matrix, labels=l)
 plt.show()
@@ -105,7 +105,7 @@ plt.show()
 # %%
 
 # With Euclidian Distance
-dists = squareform(sc.distances.pdist(queries, DistanceType.Euclidean))
+dists = squareform(sc.distances.pdist(queries, 'euclidean'))
 linkage_matrix = linkage(dists, "single")
 dendrogram(linkage_matrix, labels=l)
 plt.show()

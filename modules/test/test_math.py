@@ -44,4 +44,15 @@ def test_arctan2():
     y = sc.array([1., 1, -1, -1])
     x = sc.array([1., 2, 1, 2])
     assert sc.arctan2(y, x).same_as([0.7854, 1.1071, 2.3562, 2.0344])
-    
+
+def test_arith_bcast():
+    x = sc.array([1,2,3])
+    y = sc.array([1,2,3,4]).T 
+
+    (x+y).display()
+    (y+x).display()
+
+    xx = np.array([1,2,3])
+    yy = np.array([1,2,3,4]).T 
+    print(np.add(xx[:,np.newaxis],yy))
+

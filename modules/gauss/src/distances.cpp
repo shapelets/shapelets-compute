@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <iostream>
 
+// Comprehensive Survey on Distance/Similarity Measures between Probability Density Functions 
+// http://www.fisica.edu.uy/~cris/teaching/Cha_pdf_distances_2007.pdf
+
 namespace gauss::distances {
 
 #define LOCK_STEP_DST_ALGORITHM(ALGO, SYMM) \
@@ -31,33 +34,53 @@ namespace builtin {
 inline af::array gower(const af::array &p, const af::array::array_proxy &q) {
     return (1.0/p.dims(0)) * af::sum(af::abs(p - q));
 }
+
 inline af::array soergel(const af::array &p, const af::array::array_proxy &q) {
     return af::sum(af::abs(p - q)) / af::sum(af::max(p, q));
 }
+
 inline af::array kulczynski(const af::array &p, const af::array::array_proxy &q) {
     return af::sum(af::abs(p-q) / af::sum(af::min(p,q)));
 }
+
 inline af::array sorensen(const af::array &p, const af::array::array_proxy &q) {
     return af::sum(af::abs(p - q)) / af::sum(p + q);
 }
+
 inline af::array lorentzian(const af::array &p, const af::array::array_proxy &q) {
     return af::sum(af::log1p(af::abs(p - q)));
 }
+
 inline af::array canberra(const af::array &p, const af::array::array_proxy &q) {
     return af::sum(af::abs(p - q) / (p + q));
 }
 
 // The Intersection family
 inline af::array intersection(const af::array &p, const af::array::array_proxy &q) {
-    return 0.5 * af::sum(af::abs(p - q));
+    return af::sum(af::min(p, q));
 }
 inline af::array wavehedges(const af::array &p, const af::array::array_proxy &q) {
     return af::sum(1.0 - af::min(p, q) / af::max(p, q));
 }
 inline af::array czekanowski(const af::array &p, const af::array::array_proxy &q) {
-    return af::sum(af::abs(p - q)) / af::sum(p + q);
+    return 2.0 * af::sum(af::min(p, q)) / af::sum(p + q);
 }
-// missing tanimoto, ruzicka, kulczynski? and motyka
+inline af::array motyka(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::min(p, q)) / af::sum(p + q);
+}
+inline af::array ruzicka(const af::array &p, const af::array::array_proxy &q) {
+    return af::sum(af::min(p, q)) / af::sum(af::max(p, q));
+}
+inline af::array tanimoto(const af::array &p, const af::array::array_proxy &q) {
+    auto sp = af::sum(p);
+    auto sq = af::sum(q);
+    auto smin = af::sum(af::min(p,q));
+    return (sp + sq - 2.0 * smin) / (sp + sq - smin);
+}
+
+
+
+
 
 // The Squared L2 family
 inline af::array squared_euclidean(const af::array &p, const af::array::array_proxy &q) {
@@ -212,7 +235,9 @@ LOCK_STEP_DST_ALGORITHM(canberra, true)
 LOCK_STEP_DST_ALGORITHM(intersection, true)
 LOCK_STEP_DST_ALGORITHM(wavehedges, true)
 LOCK_STEP_DST_ALGORITHM(czekanowski, true)
-
+LOCK_STEP_DST_ALGORITHM(tanimoto, true)
+LOCK_STEP_DST_ALGORITHM(ruzicka, true)
+LOCK_STEP_DST_ALGORITHM(motyka, true)
 
 // The Squared L2 family
 //      squared_euclidean
@@ -224,13 +249,13 @@ LOCK_STEP_DST_ALGORITHM(czekanowski, true)
 //      clark
 //      additive_symm_chi
 LOCK_STEP_DST_ALGORITHM(squared_euclidean, true)
-LOCK_STEP_DST_ALGORITHM(pearson, true)
+LOCK_STEP_DST_ALGORITHM(pearson, false)
 LOCK_STEP_DST_ALGORITHM(additive_symm_chi, true)
 LOCK_STEP_DST_ALGORITHM(squared_chi, true)
 LOCK_STEP_DST_ALGORITHM(prob_symmetric_chi, true)
 LOCK_STEP_DST_ALGORITHM(divergence, true)
 LOCK_STEP_DST_ALGORITHM(clark, true)
-LOCK_STEP_DST_ALGORITHM(neyman, true)
+LOCK_STEP_DST_ALGORITHM(neyman, false)
 
 // The Inner Product family
 //      innerproduct

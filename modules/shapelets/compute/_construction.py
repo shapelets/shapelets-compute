@@ -8,11 +8,11 @@ from . import _pygauss
 
 AnyScalar = _ScalarLike
 
-def linspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, dtype: DataTypeLike = "float32") -> ShapeletsArray: 
+def linspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0, dtype: DataTypeLike = "float32") -> ShapeletsArray: 
     """
     Creates a new array whose values are evenly spaced over an interval.
     """
-    return _pygauss.linspace(start, end, num, endpoint, dtype)
+    return _pygauss.linspace(start, end, num, endpoint, axis, dtype)
 
 def logspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: float = 10.0, dtype: DataTypeLike = "float32") -> ShapeletsArray: 
     """
@@ -54,12 +54,13 @@ def empty(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     ----------
     shape : ShapeLike
         A scalar or a sequence of integers defining the number of elements per tensor dimension.
+
     dtype: DataTypeLike
         The type of elements this tensor is going to hold
 
     Returns
     -------   
-    I : tensor of shape (N,M)
+    ShapeletsArray
         An uninitialized tensor where all elements are of type `dtype`.
 
     See Also
@@ -70,6 +71,7 @@ def empty(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
 
     Examples
     --------
+
     >>> import shapelets.compute as sc
     >>> sc.empty((3,3))
         [3 3 1 1]
@@ -85,20 +87,23 @@ def eye(N: int, M: Optional[int] = None, k: int = 0, dtype: DataTypeLike = 'floa
 
     Parameters
     ----------
-    N : int
+    N: int
         Number of rows in the output.
-    M : int, optional
+
+    M: int, optional
         Number of columns in the output. If None, defaults to `N`.
-    k : int, optional
+
+    k: int, optional
         Index of the diagonal: 0 (the default) refers to the main diagonal,
         a positive value refers to an upper diagonal, and a negative value
         to a lower diagonal.
-    dtype : data-type, optional
+
+    dtype: data-type, optional
         Data-type of the returned array.
 
     Returns
     -------
-    I : tensor of shape (N,M)
+    ShapeletsArray
         An array where all elements are equal to zero, except for the `k`-th
         diagonal, whose values are equal to one.    
     """
@@ -113,8 +118,10 @@ def full(shape: ShapeLike, fill_value: AnyScalar, dtype: DataTypeLike = 'float32
     ----------
     shape : int or tuple of ints
         Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+        
     fill_value : scalar or array_like
         Fill value.
+
     dtype : data-type, optional
         The desired data-type for the array  If not specified it will
         default to "float".
