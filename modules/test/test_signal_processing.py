@@ -7,8 +7,8 @@ def test_1d_cases():
     assert sh.fft.fft(a, norm="forward").same_as(np.fft.fft(a, norm="forward"))
     assert sh.fft.fft(a, norm="ortho").same_as(np.fft.fft(a, norm="ortho"))
     assert sh.fft.fft(a, norm="backward").same_as(np.fft.fft(a, norm="backward"))
-    assert sh.fft.fft(a,n=5).same_as(np.fft.fft(a,n=5))
-    assert sh.fft.fft(a,n=15).same_as(np.fft.fft(a,n=15))
+    assert sh.fft.fft(a, shape=5).same_as(np.fft.fft(a,n=5))
+    assert sh.fft.fft(a, shape=15).same_as(np.fft.fft(a,n=15))
     
     b = np.fft.fft(a)
     assert sh.fft.ifft(b).same_as(np.fft.ifft(b))
