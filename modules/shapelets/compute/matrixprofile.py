@@ -12,6 +12,7 @@ from ._pygauss import (
     Snippet, 
     )
 
+
 ## Matrix Profile
 # def matrixprofile(ta: ArrayLike, m: int, tb: Optional[ArrayLike] = None) -> Tuple[ShapeletsArray, ShapeletsArray]:...
 # def matrixprofileLR(ta: ArrayLike, m: int) -> Dict[str, Tuple[ShapeletsArray, ShapeletsArray]]:...

@@ -1,6 +1,7 @@
 #include <gauss/fft.h>
 #include <variant>
 #include <optional>
+#include <iostream>
 
 namespace gauss::fft {
 
@@ -184,7 +185,7 @@ af::array fftfreq(const unsigned int n, const double d) {
     double v = 1.0 / (n * d);
     auto N = static_cast<long long>(((n - 1) >> 1) + 1);
     auto r1 = af::range(af::dim4(N));
-    af::array r2 = af::seq(-(n >> 1), -1);
+    af::array r2 = af::seq(-static_cast<signed int>(n >> 1) , -1);
     return af::join(0, r1, r2.as(r1.type())) * v;
 }
 

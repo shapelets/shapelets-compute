@@ -15,3 +15,4 @@ Array Routines
    arr_routines.special
    arr_routines.linearalg
    arr_routines.distances
+   arr_routines.signalproc

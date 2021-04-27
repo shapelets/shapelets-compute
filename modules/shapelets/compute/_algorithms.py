@@ -8,6 +8,7 @@ from . import _pygauss
 
 AnyScalar = _ScalarLike
 FloatOrComplex = Union[complex, float]
+
 ScanOp = Literal['add', 'max', 'min', 'mul']
 
 def __map_scan_op(scanop: ScanOp): 

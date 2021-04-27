@@ -2,12 +2,12 @@
 #include <pybind11/pybind11.h>
 #include <pygauss.h>
 
+#include <optional>
+
 namespace py = pybind11;
 
 void pygauss::bindings::signal_processing_functions(py::module &m)
 {
-
-
     py::enum_<gauss::fft::Norm>(m, "fftNorm", "Gauss FFT Normalisation")
             .value("Backward", gauss::fft::Norm::Backward, "signal -> freq: 1.0, freq -> signal: 1.0/n")
             .value("Ortho", gauss::fft::Norm::Orthonormal, "signal -> freq: 1.0/sqrt(n), freq -> signal: 1.0/sqrt(n)")
@@ -15,53 +15,52 @@ void pygauss::bindings::signal_processing_functions(py::module &m)
             .export_values();
 
     m.def(
-        "_fft",
-        [](const py::object &signal, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+        "fft",
+        [](const py::object &signal, const std::variant<gauss::fft::Norm, double>& norm, const std::optional<af::dim4>& shape) {
             af::array s = arraylike::as_array_checked(signal);
             arraylike::ensure_floating(s);
-
-            return gauss::fft::fft(s, norm, shape);
+            auto checked_shape = shape.value_or(s.dims());
+            return gauss::fft::fft(s, norm, checked_shape);
         },
         py::arg("signal").none(false),
         py::arg("norm").none(false),
-        py::arg("shape").none(false),
-        "TODO");
+        py::arg("shape") = std::nullopt);
 
     m.def(
-        "_ifft",
-        [](const py::object &coef, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+        "ifft",
+        [](const py::object &coef, const std::variant<gauss::fft::Norm, double>& norm, const std::optional<af::dim4>& shape) {
             af::array c = arraylike::as_array_checked(coef);
             arraylike::ensure_floating(c);
-            return gauss::fft::ifft(c, norm, shape);
+            auto checked_shape = shape.value_or(c.dims());
+            return gauss::fft::ifft(c, norm, checked_shape);
         },
         py::arg("coef").none(false),
         py::arg("norm").none(false),
-        py::arg("shape").none(false),
-        "TODO");
+        py::arg("shape") = std::nullopt);
 
     m.def(
-        "_rfft",
-        [](const py::object &signal, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+        "rfft",
+        [](const py::object &signal, const std::variant<gauss::fft::Norm, double>& norm, const std::optional<af::dim4>& shape) {
             af::array s = arraylike::as_array_checked(signal);
             arraylike::ensure_floating(s);
-            return gauss::fft::rfft(s, norm, shape);
+            auto checked_shape = shape.value_or(s.dims());
+            return gauss::fft::rfft(s, norm, checked_shape);
         },
         py::arg("signal").none(false),
         py::arg("norm").none(false),
-        py::arg("shape").none(false),
-        "TODO");
+        py::arg("shape") = std::nullopt);
 
     m.def(
-        "_irfft",
-        [](const py::object &coef, const std::variant<gauss::fft::Norm, double>& norm, const af::dim4& shape) {
+        "irfft",
+        [](const py::object &coef, const std::variant<gauss::fft::Norm, double>& norm, const std::optional<af::dim4>& shape) {
             af::array c = arraylike::as_array_checked(coef);
             arraylike::ensure_floating(c);
-            return gauss::fft::irfft(c, norm, shape);
+            auto checked_shape = shape.value_or(c.dims());
+            return gauss::fft::irfft(c, norm, checked_shape);
         },
         py::arg("coef").none(false),
         py::arg("norm").none(false),
-        py::arg("shape").none(false),
-        "TODO");
+        py::arg("shape") = std::nullopt);
 
     m.def(
         "rfftfreq",
@@ -69,16 +68,14 @@ void pygauss::bindings::signal_processing_functions(py::module &m)
             return gauss::fft::rfftfreq(n, d);
         },
         py::arg("n").none(false),
-        py::arg("d") = 1.0,
-        "");
+        py::arg("d") = 1.0);
 
     m.def("fftfreq",         
         [](const int n, const double d) {
             return gauss::fft::fftfreq(n, d);
         },
         py::arg("n").none(false),
-        py::arg("d") = 1.0,
-        "");
+        py::arg("d") = 1.0);
 
     m.def("spectral_derivative",
         [](const py::object &signal, const py::object& kappa_spec, const bool shift) {
@@ -100,8 +97,7 @@ void pygauss::bindings::signal_processing_functions(py::module &m)
         },
         py::arg("signal").none(false),
         py::arg("kappa_spec") = 1.0,
-        py::arg("shift") = true,
-        "");
+        py::arg("shift") = true);
 
     m.def("fftshift",
         [](const py::object &x, const std::optional<std::variant<int, std::vector<int>>>& axes) {
@@ -110,7 +106,6 @@ void pygauss::bindings::signal_processing_functions(py::module &m)
             return gauss::fft::fftshift(s, axes);
         },
         py::arg("x").none(false),
-        py::arg("axes") = py::none(),
-        "");
+        py::arg("axes") = py::none());
 }
 
