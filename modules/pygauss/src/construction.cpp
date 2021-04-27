@@ -44,7 +44,8 @@ af::array linspace(af::array &s, af::array &e, int num, bool endpoint, int axis)
         newDims[axis] = 1;
     }
 
-    af::array arr_objs[num];
+    // af::array arr_objs[num];
+    af::array *arr_objs = alloca(num * sizeof(af::array));
     arr_objs[0] = af::moddims(s.copy(), newDims);
     for (auto i=1; i < num; i++) {
         s = s + inc;
