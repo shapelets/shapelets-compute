@@ -21,4 +21,17 @@ else:
     from . import data
     __all__ = ["compute", "generators", "data"]
 
+    backends = compute.get_available_backends()
+    if len(backends) == 1:
+        msg = "Only one compute device found: " + repr(backends)
+        if backends[0] == 'cpu':
+            msg += """
+                Most of the operations won't be accelerated since the only device found is CPU.  Consider 
+                adding OpenCL or CUDA support to your environment to benefit from the accelerated versions of the 
+                algorithms this library provides.
+                """
+        import warnings
+        warnings.warn(msg, RuntimeWarning)
+    del backends
+
 del stderr

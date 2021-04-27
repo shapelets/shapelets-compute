@@ -7,7 +7,6 @@ import platform
 # os.environ["AF_SHOW_LOAD_PATH"]="1"
 # os.environ["AF_PRINT_ERRORS"]="1"
 
-
 # Pro
 library_dir = None 
 
