@@ -64,23 +64,19 @@ add_custom_command(TARGET PyGauss POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
         $<TARGET_FILE_DIR:PyGauss>/.libs)  
 
-
-
-
-
-get_property(ABC TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO)
-get_filename_component(ABCDIR ${ABC} DIRECTORY)
+get_property(AFLIB TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO)
+get_filename_component(AFLIBDIR ${AFLIB} DIRECTORY)
 file(GLOB_RECURSE AF_DEPS
-        ${ABCDIR}/*.dll 
-        ${ABCDIR}/*.so  
-        ${ABCDIR}/*.dylib)
+        ${AFLIBDIR}/*.dll 
+        ${AFLIBDIR}/*.so  
+        ${AFLIBDIR}/*.dylib)
 
-foreach( file_i ${AF_DEPS})
+foreach(file_i ${AF_DEPS})
         add_custom_command(TARGET PyGauss POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 ${file_i}
                 $<TARGET_FILE_DIR:PyGauss>/.libs)
-endforeach( file_i )
+endforeach(file_i)
 
 #########
 ## STUBS

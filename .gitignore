@@ -7,7 +7,7 @@
 /cmake-build-debug
 /pkg
 /dist
-/modules/shapelets-compute.egg-info
+/modules/shapelets_compute.egg-info
 /modules/shapelets/compute/*.so
 /modules/shapelets/compute/*.dll
 /modules/shapelets/compute/*.pyd
