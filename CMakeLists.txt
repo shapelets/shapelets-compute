@@ -31,7 +31,6 @@ include(LocalArrayFire)
 # END: Pre-Project Setup
 ####
 
-
 project(ShapeletsSolo)
 
 # Options

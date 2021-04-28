@@ -5,6 +5,11 @@ project(PyGauss)
 # Find the ArrayFire package.
 find_package(ArrayFire CONFIG REQUIRED)
 
+# set_target_properties(ArrayFire PROPERTIES
+#         MAP_IMPORTED_CONFIG_RELEASE RelWithDebInfo
+#         MAP_IMPORTED_CONFIG_DEBUG RelWithDebInfo
+#         MAP_IMPORTED_CONFIG_RELWITHDEBUGINFO RelWithDebInfo)
+
 # Logging support
 # find_package(spdlog CONFIG REQUIRED)
 
@@ -55,6 +60,27 @@ target_link_libraries(PyGauss
        # spdlog::spdlog_header_only
         ${CMAKE_DL_LIBS})
 
+add_custom_command(TARGET PyGauss POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+        $<TARGET_FILE_DIR:PyGauss>/.libs)  
+
+
+
+
+
+get_property(ABC TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO)
+get_filename_component(ABCDIR ${ABC} DIRECTORY)
+file(GLOB_RECURSE AF_DEPS
+        ${ABCDIR}/*.dll 
+        ${ABCDIR}/*.so  
+        ${ABCDIR}/*.dylib)
+
+foreach( file_i ${AF_DEPS})
+        add_custom_command(TARGET PyGauss POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${file_i}
+                $<TARGET_FILE_DIR:PyGauss>/.libs)
+endforeach( file_i )
 
 #########
 ## STUBS

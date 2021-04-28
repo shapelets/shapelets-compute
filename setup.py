@@ -95,10 +95,11 @@ class CMakeBuild(cmdclass["build_ext"]):
         extdir = os.path.join(extdir, ext.output_dir)
         cmake_args = [
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-            '-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE'
+            '-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE',
+            '-Wno-dev'
         ]
         
-        cfg = 'Debug' if self.debug else 'Release'
+        cfg = 'Debug' if self.debug else 'Release' # 'RelWithDebInfo'
         build_args = ['--config', cfg]  # cfg]
 
         if platform.system() == "Windows":
@@ -139,13 +140,14 @@ def create_metadata(full_version, doc_url):
         package_dir={'': 'modules'},
         test_suite="pytest",
         ext_modules=[CMakeExtension("pygauss",
-                                    debug=True,
+                                    debug=False,
                                     output_dir='shapelets/compute',
                                     target=["PyGauss"])],
         python_requires='>=3.7',
         package_data={
-            'shapelets': ['*.pyi', 'py.typed'],
+            'shapelets': ['data/*.txt', 'compute/.libs/*.*'],
         },
+        include_package_data = True,
     )
 
 
@@ -163,7 +165,7 @@ def setup_package():
     ver_details = process_version_information(ver_info)
 
     if sys.version_info >= (3, 10):
-        fmt = "Shapelets {} may not yet support Python {}.{}."
+        fmt = "Shapelets Compute {} may not yet support Python {}.{}."
         warnings.warn(fmt.format(ver_details["textual"], *sys.version_info[:2]), RuntimeWarning)
         del fmt
 
@@ -181,29 +183,3 @@ def setup_package():
 if __name__ == '__main__':
     setup_package()
 
-# from pybind11_stubgen import ModuleStubsGenerator
-# module = ModuleStubsGenerator("khiva")
-# module.parse()
-# module.write_setup_py = False
-#
-# with open(cur_file_path + "/khiva.pyi", "w") as fp:
-#     fp.write("#\n# AUTOMATICALLY GENERATED FILE, DO NOT EDIT!\n#\n\n")
-#     fp.write("\n".join(module.to_lines()))
-
-
-# class PostDevelopCommand(develop):
-#     """Post-installation for development mode."""
-#     def run(self):
-#         develop.run(self)
-#         # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
-#
-# class PostInstallCommand(install):
-#     """Post-installation for installation mode."""
-#     def run(self):
-#         install.run(self)
-#         # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
-#
-#     # cmdclass={
-#     #              'develop': PostDevelopCommand,
-#     #              'install': PostInstallCommand,
-#     #          },

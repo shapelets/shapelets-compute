@@ -14,10 +14,7 @@ library_dir = None
 compute_dir = compute_dir = os.path.abspath(os.path.dirname(__file__))
 
 # look if the production directory exists...
-if os.name == 'posix' and platform.system() == "Darwin":
-    library_dir = os.path.join(compute_dir, '..', '.dylib')
-else:
-    library_dir = os.path.join(compute_dir, '..', '.libs')
+library_dir = os.path.join(compute_dir, '.libs')
 
 # In development, fall back to external / arrayfire / lib folder
 if not os.path.exists(library_dir):

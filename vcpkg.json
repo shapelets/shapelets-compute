@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
-    "name": "shapelets-solo",
+    "name": "shapelets-compute",
     "version": "0.0.1",
     "dependencies": [
         "eigen3",
