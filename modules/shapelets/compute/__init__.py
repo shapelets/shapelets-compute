@@ -7,24 +7,17 @@ import platform
 # os.environ["AF_SHOW_LOAD_PATH"]="1"
 # os.environ["AF_PRINT_ERRORS"]="1"
 
-# Pro
-library_dir = None 
-
 # current location
-compute_dir = compute_dir = os.path.abspath(os.path.dirname(__file__))
+compute_dir = os.path.abspath(os.path.dirname(__file__)) 
 
 # look if the production directory exists...
 library_dir = os.path.join(compute_dir, '.libs')
 
-# In development, fall back to external / arrayfire / lib folder
-if not os.path.exists(library_dir):
-    if os.name == "posix" and platform.system() != "Darwin":
-        library_dir = os.path.join(compute_dir, '..', '..', '..', 'external', 'arrayfire', 'lib64')
-    else:
-        library_dir = os.path.join(compute_dir, '..', '..', '..', 'external', 'arrayfire', 'lib')
-
 if not os.path.exists(library_dir):
     raise RuntimeError("No valid location can be stablished for native libraries. " + library_dir)
+
+if os.name == "posix" and platform.system() != 'Darwin':
+    pass
 
 # Let AF know where the RT libraries are
 os.environ["AF_PATH"] = library_dir

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.4...3.18)
 
 project(PyGauss)
 
+
+
 # Find the ArrayFire package.
 find_package(ArrayFire CONFIG REQUIRED)
 
@@ -52,31 +54,38 @@ target_include_directories(PyGauss
 target_compile_definitions(PyGauss PRIVATE AF_UNIFIED)
 
 target_link_libraries(PyGauss
+        PUBLIC 
+                ArrayFire::af
         PRIVATE
-        ArrayFire::af
-        gauss
-        $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cufft>
-        $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cudart>
-       # spdlog::spdlog_header_only
-        ${CMAKE_DL_LIBS})
+                gauss
+                $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cufft>
+                $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cudart>
+        # spdlog::spdlog_header_only
+                ${CMAKE_DL_LIBS})
 
 add_custom_command(TARGET PyGauss POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
         $<TARGET_FILE_DIR:PyGauss>/.libs)  
 
-get_property(AFLIB TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO)
-get_filename_component(AFLIBDIR ${AFLIB} DIRECTORY)
-file(GLOB_RECURSE AF_DEPS
-        ${AFLIBDIR}/*.dll 
-        ${AFLIBDIR}/*.so  
-        ${AFLIBDIR}/*.dylib)
+get_property(AFLIBIMPCFG TARGET ArrayFire::af PROPERTY IMPORTED_CONFIGURATIONS)
+get_property(AFLIB TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_${AFLIBIMPCFG})
+get_filename_component(AFLIBDIR "${AFLIB}" DIRECTORY)
 
-foreach(file_i ${AF_DEPS})
+IF (WIN32)
+        file(GLOB AF_DEPS ${AFLIBDIR}/*.dll)
+        foreach(file_i ${AF_DEPS})
+                message("Copying ${file_i}...")
+                add_custom_command(TARGET PyGauss POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        ${file_i}
+                        $<TARGET_FILE_DIR:PyGauss>/.libs)
+        endforeach(file_i)
+else()
         add_custom_command(TARGET PyGauss POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${file_i}
+                COMMAND cp ARGS -R
+                ${AFLIBDIR}/
                 $<TARGET_FILE_DIR:PyGauss>/.libs)
-endforeach(file_i)
+endif()
 
 #########
 ## STUBS
@@ -117,3 +126,40 @@ endforeach(file_i)
 # set_target_properties(stubcl
 #         PROPERTIES
 #         OUTPUT_NAME "stubcl")
+
+
+
+
+# # Get all propreties that cmake supports
+# execute_process(COMMAND cmake --help-property-list OUTPUT_VARIABLE CMAKE_PROPERTY_LIST)
+
+# # Convert command output into a CMake list
+# STRING(REGEX REPLACE ";" "\\\\;" CMAKE_PROPERTY_LIST "${CMAKE_PROPERTY_LIST}")
+# STRING(REGEX REPLACE "\n" ";" CMAKE_PROPERTY_LIST "${CMAKE_PROPERTY_LIST}")
+
+# function(print_properties)
+#     message ("CMAKE_PROPERTY_LIST = ${CMAKE_PROPERTY_LIST}")
+# endfunction(print_properties)
+
+# function(print_target_properties tgt)
+#     if(NOT TARGET ${tgt})
+#       message("There is no target named '${tgt}'")
+#       return()
+#     endif()
+
+#     foreach (prop ${CMAKE_PROPERTY_LIST})
+#         string(REPLACE "<CONFIG>" "${CMAKE_BUILD_TYPE}" prop ${prop})
+#     # Fix https://stackoverflow.com/questions/32197663/how-can-i-remove-the-the-location-property-may-not-be-read-from-target-error-i
+#     if(prop STREQUAL "LOCATION" OR prop MATCHES "^LOCATION_" OR prop MATCHES "_LOCATION$")
+#         continue()
+#     endif()
+#         # message ("Checking ${prop}")
+#         get_property(propval TARGET ${tgt} PROPERTY ${prop} SET)
+#         if (propval)
+#             get_target_property(propval ${tgt} ${prop})
+#             message ("${tgt} ${prop} = ${propval}")
+#         endif()
+#     endforeach(prop)
+# endfunction(print_target_properties)
+
+# print_target_properties(ArrayFire::af)

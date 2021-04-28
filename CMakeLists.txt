@@ -33,6 +33,20 @@ include(LocalArrayFire)
 
 project(ShapeletsSolo)
 
+
+set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH 1)
+    set(CMAKE_BUILD_RPATH "@loader_path/.libs")
+    set(CMAKE_INSTALL_RPATH "@loader_path/.libs")
+else()
+    set(CMAKE_BUILD_RPATH "$ORIGIN/.libs")
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/.libs")
+endif()
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+
+
 # Options
 option(SOLO_ENABLE_COVERAGE "This flag anables Code Coverage of the code" OFF)
 
