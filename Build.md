@@ -73,3 +73,6 @@ rt dependencies should be determined through virtual envs.
 vcpkg does a very odd thing here: it forces the compilation with the external fmt library, rather than using the header only 
 version that ships with spdlog.  there is no way of fixing this since it "compiles" at instalation fixing the external nature 
 of fmt (which then becomes dynamically linked regardless of preferences in windows.)
+
+
+export LD_PRELOAD=/workspaces/shapelets/modules/shapelets/compute/.libs/libmkl_def.so:/workspaces/shapelets/modules/shapelets/compute/.libs/libmkl_avx2.so:/workspaces/shapelets/modules/shapelets/compute/.libs/libmkl_core.so:/workspaces/shapelets/modules/shapelets/compute/.libs/libmkl_intel_lp64.so:/workspaces/shapelets/modules/shapelets/compute/.libs/libmkl_intel_thread.so:/workspaces/shapelets/modules/shapelets/compute/.libs/libiomp5.so
