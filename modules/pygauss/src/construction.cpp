@@ -68,7 +68,7 @@ af::array linspace(af::array &s, af::array &e, int num, bool endpoint, int axis)
         }
     }
     return acc;
-};
+}
 
 
 void pygauss::bindings::array_construction_operations(py::module &m)
