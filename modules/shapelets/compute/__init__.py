@@ -16,8 +16,6 @@ library_dir = os.path.join(compute_dir, '.libs')
 if not os.path.exists(library_dir):
     raise RuntimeError("No valid location can be stablished for native libraries. " + library_dir)
 
-if os.name == "posix" and platform.system() != 'Darwin':
-    pass
 
 # Let AF know where the RT libraries are
 os.environ["AF_PATH"] = library_dir
