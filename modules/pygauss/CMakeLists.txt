@@ -71,7 +71,20 @@ get_property(AFLIBIMPCFG TARGET ArrayFire::af PROPERTY IMPORTED_CONFIGURATIONS)
 get_property(AFLIB TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_${AFLIBIMPCFG})
 get_filename_component(AFLIBDIR "${AFLIB}" DIRECTORY)
 
-IF (WIN32)
+IF (APPLE)
+        add_custom_command(TARGET PyGauss POST_BUILD
+                COMMAND cp ARGS -R
+                ${AFLIBDIR}/
+                $<TARGET_FILE_DIR:PyGauss>/.libs)
+elseif(UNIX)
+        add_custom_command(TARGET PyGauss POST_BUILD
+                COMMAND cp ARGS -P
+                ${AFLIBDIR}/*
+                $<TARGET_FILE_DIR:PyGauss>/.libs)
+        add_custom_command(TARGET PyGauss POST_BUILD
+                COMMAND rm
+                $<TARGET_FILE_DIR:PyGauss>/.libs/*.debug)                
+else()
         file(GLOB AF_DEPS ${AFLIBDIR}/*.dll)
         foreach(file_i ${AF_DEPS})
                 message("Copying ${file_i}...")
@@ -80,11 +93,6 @@ IF (WIN32)
                         ${file_i}
                         $<TARGET_FILE_DIR:PyGauss>/.libs)
         endforeach(file_i)
-else()
-        add_custom_command(TARGET PyGauss POST_BUILD
-                COMMAND cp ARGS -R
-                ${AFLIBDIR}/
-                $<TARGET_FILE_DIR:PyGauss>/.libs)
 endif()
 
 #########
