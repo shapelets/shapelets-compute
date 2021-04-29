@@ -114,7 +114,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
     m.def("reorder",
           [](const py::object& array_like, const uint32_t x, const uint32_t y, const uint32_t z, const uint32_t w) {
               auto a = arraylike::as_array_checked(array_like);
-              return af::reorder(a, x, y, z);
+              return af::reorder(a, x, y, z, w);
           },
           py::arg("array_like").none(false),
           py::arg("x").none(false),
