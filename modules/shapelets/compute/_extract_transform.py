@@ -1,5 +1,9 @@
 from __future__ import annotations
-from typing import List, overload, Literal
+from typing import List
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from .__basic_typing import ArrayLike, Shape, DataTypeLike
 from ._array_obj import ShapeletsArray

@@ -1,5 +1,10 @@
 from __future__ import annotations
-from typing import Optional, Sequence, Union, Literal
+from typing import Optional, Sequence, Union
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+    
 from ._pygauss import (DeviceInfo, DeviceMemory)
 from . import _pygauss
 

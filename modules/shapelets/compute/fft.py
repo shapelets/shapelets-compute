@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union, List
+from typing import Optional, Union, List
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+    
 from ._array_obj import ShapeletsArray
 from .__basic_typing import ArrayLike, ShapeLike
 from . import _pygauss

@@ -1,5 +1,10 @@
 from __future__ import annotations
-from typing import Optional, Union, Literal
+from typing import Optional, Union
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+    
 from .__basic_typing import ArrayLike, _ScalarLike
 from ._array_obj import ShapeletsArray
 from . import _pygauss
