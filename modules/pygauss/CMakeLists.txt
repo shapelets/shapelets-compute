@@ -2,23 +2,8 @@ cmake_minimum_required(VERSION 3.4...3.18)
 
 project(PyGauss)
 
-
-
 # Find the ArrayFire package.
 find_package(ArrayFire CONFIG REQUIRED)
-
-# set_target_properties(ArrayFire PROPERTIES
-#         MAP_IMPORTED_CONFIG_RELEASE RelWithDebInfo
-#         MAP_IMPORTED_CONFIG_DEBUG RelWithDebInfo
-#         MAP_IMPORTED_CONFIG_RELWITHDEBUGINFO RelWithDebInfo)
-
-# Logging support
-# find_package(spdlog CONFIG REQUIRED)
-
-# Find the pybind11 package
-# find_package(Python COMPONENTS Interpreter Development)
-# find_package(pybind11 CONFIG)
-# find_package(pybind11 REQUIRED)
 
 # Find arrow
 # find_package(Arrow CONFIG REQUIRED)
