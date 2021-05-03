@@ -119,11 +119,6 @@ mass_t mass_prepare(const af::array &t, const int32_t w) {
     internal::meanStdev(t, aux, w, mean, stdev);
     
     auto fft = af::fft(t, 0);
-
-    std::cout << t.dims() << std::endl;
-    std::cout << fft.dims() << std::endl;
-    std::cout << std::endl;
-
     return {aux, mean, stdev, t, fft, w};
 }
 
