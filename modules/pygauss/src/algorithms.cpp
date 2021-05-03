@@ -1,7 +1,7 @@
 #include <arrayfire.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
+#include <pybind11/numpy.h>
 #include <pygauss.h>
 
 namespace py = pybind11;
@@ -163,19 +163,24 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
     // argmin -> Return the indices of the minimum values.
     //
 
-    using numberOrArray = std::variant<double, std::complex<double>, af::array>;
-    using indexAndValues = std::variant<std::tuple<unsigned int, double>,
-                                        std::tuple<unsigned int, std::complex<double>>,
-                                        std::tuple<af::array, af::array>>;
+    typedef std::variant<std::complex<double>, af::array, py::float_> numberOrArray;
+    typedef std::variant<std::tuple<unsigned int, std::complex<double>>, std::tuple<af::array, af::array>, std::tuple<unsigned int, py::float_>> indexAndValues;
 
     m.def(
         "amin",
         [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
             auto a = pygauss::arraylike::as_array_checked(array_like);
+            numberOrArray result;
 
             if (!dim.has_value()) // NOLINT(bugprone-branch-clone)
-                return a.iscomplex() ? reduce_all_complex(a, af_min_all) : reduce_all_real(a, af_min_all);
-            return reduce_dim(a, dim.value(), af_min);
+                if (a.iscomplex())
+                    result = reduce_all_complex(a, af_min_all);
+                else
+                    result = py::float_(reduce_all_real(a, af_min_all));
+            else
+                result = reduce_dim(a, dim.value(), af_min);
+
+            return result;
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
@@ -198,10 +203,15 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             // Values of "a" are replaced with corresponding values of max, when cond is false.
             af::replace(a, !nanLocations, max);
 
+            numberOrArray result;
             if (!dim.has_value()) // NOLINT(bugprone-branch-clone)
-                return a.iscomplex() ? reduce_all_complex(a, af_min_all) : reduce_all_real(a, af_min_all);
-
-            return reduce_dim(a, dim.value(), af_min);
+                if (a.iscomplex())
+                    result = reduce_all_complex(a, af_min_all);
+                else
+                    result = py::float_(reduce_all_real(a, af_min_all));
+            else
+                result = reduce_dim(a, dim.value(), af_min);
+            return result;
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
@@ -221,7 +231,13 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
                 double real, imag;
                 unsigned int index;
                 throw_on_error(af_imin_all(&real, &imag, &index, a.get()));
-                return a.iscomplex() ? std::make_tuple(index, std::complex<double>(real, imag)) : std::make_tuple(index, real);
+
+                indexAndValues result;
+                if (a.iscomplex())
+                    result = std::make_tuple(index, std::complex<double>(real, imag));
+                else
+                    result = std::make_tuple(index, py::float_(real));
+                return result;
             }
 
             af_array out = nullptr;
@@ -256,8 +272,14 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
                 double real, imag;
                 unsigned int index;
                 throw_on_error(af_imin_all(&real, &imag, &index, a.get()));
-                return a.iscomplex() ? std::make_tuple(index, std::complex<double>(real, imag)) : std::make_tuple(index, real);
+                indexAndValues result;
+                if (a.iscomplex())
+                    result = std::make_tuple(index, std::complex<double>(real, imag));
+                else
+                    result = std::make_tuple(index, py::float_(real));
+                return result;
             }
+
             af_array out = nullptr;
             af_array index = nullptr;
             throw_on_error(af_imin(&out, &index, a.get(), dim.value()));
@@ -278,10 +300,16 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
             auto a = pygauss::arraylike::as_array_checked(array_like);
 
+            numberOrArray result;
             if (!dim.has_value()) // NOLINT(bugprone-branch-clone)
-                return a.iscomplex() ? reduce_all_complex(a, af_max_all) : reduce_all_real(a, af_max_all);
+                if (a.iscomplex())
+                    result = reduce_all_complex(a, af_max_all);
+                else
+                    result = py::float_(reduce_all_real(a, af_max_all));
+            else
+                result = reduce_dim(a, dim.value(), af_max);
 
-            return reduce_dim(a, dim.value(), af_max);
+            return result;
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
@@ -304,10 +332,16 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             // Values of "a" are replaced with corresponding values of max, when cond is false.
             af::replace(a, !nanLocations, min);
 
+            numberOrArray result; 
             if (!dim.has_value()) // NOLINT(bugprone-branch-clone)
-                return a.iscomplex() ? reduce_all_complex(a, af_max_all) : reduce_all_real(a, af_max_all);
+                if (a.iscomplex())
+                    result = reduce_all_complex(a, af_max_all);
+                else
+                    result = py::float_(reduce_all_real(a, af_max_all));
+            else 
+                result = reduce_dim(a, dim.value(), af_max);
 
-            return reduce_dim(a, dim.value(), af_max);
+            return result;
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
@@ -324,10 +358,15 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
 
             if (!dim.has_value())
             {
+                indexAndValues result;
                 double real, imag;
                 unsigned int index;
                 throw_on_error(af_imax_all(&real, &imag, &index, a.get()));
-                return a.iscomplex() ? std::make_tuple(index, std::complex<double>(real, imag)) : std::make_tuple(index, real);
+                if (a.iscomplex()) 
+                    result = std::make_tuple(index, std::complex<double>(real, imag));
+                else
+                    result = std::make_tuple(index, py::float_(real));
+                return result;
             }
 
             af_array out = nullptr;
@@ -362,7 +401,12 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
                 double real, imag;
                 unsigned int index;
                 throw_on_error(af_imax_all(&real, &imag, &index, a.get()));
-                return a.iscomplex() ? std::make_tuple(index, std::complex<double>(real, imag)) : std::make_tuple(index, real);
+                indexAndValues result;
+                if (a.iscomplex()) 
+                    result = std::make_tuple(index, std::complex<double>(real, imag));
+                else
+                    result = std::make_tuple(index, py::float_(real));
+                return result;
             }
 
             af_array out = nullptr;
@@ -379,9 +423,12 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
             auto a = pygauss::arraylike::as_array_checked(array_like);
 
+            numberOrArray result;
             if (!dim.has_value())
-                return reduce_all_real(a, af_count_all);
-            return reduce_dim(a, dim.value(), af_count);
+                result = py::float_(reduce_all_real(a, af_count_all));
+            else
+                result = reduce_dim(a, dim.value(), af_count);
+            return result;
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
@@ -393,15 +440,29 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
            const std::optional<double> &nan_value) -> numberOrArray {
             auto a = pygauss::arraylike::as_array_checked(array_like);
 
+            numberOrArray result;
+
             if (!dim.has_value())
             {
                 if (!nan_value.has_value())
-                    return a.iscomplex() ? reduce_all_complex(a, af_sum_all) : reduce_all_real(a, af_sum_all);
-
-                return a.iscomplex() ? reduce_all_complex_nan(a, nan_value.value(), af_sum_nan_all) : reduce_all_real_nan(a, nan_value.value(), af_sum_nan_all);
+                    if (a.iscomplex())
+                        result = reduce_all_complex(a, af_sum_all);
+                    else
+                        result = py::float_(reduce_all_real(a, af_sum_all));
+                else if (a.iscomplex())
+                    result = reduce_all_complex_nan(a, nan_value.value(), af_sum_nan_all);
+                else
+                    result = py::float_(reduce_all_real_nan(a, nan_value.value(), af_sum_nan_all));
+            }
+            else
+            {
+                if (!nan_value.has_value())
+                    result = reduce_dim(a, dim.value(), af_sum);
+                else
+                    result = reduce_dim_nan(a, dim.value(), nan_value.value(), af_sum_nan);
             }
 
-            return !nan_value.has_value() ? reduce_dim(a, dim.value(), af_sum) : reduce_dim_nan(a, dim.value(), nan_value.value(), af_sum_nan);
+            return result;
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
@@ -418,15 +479,27 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
            const std::optional<double> &nan_value) -> numberOrArray {
             auto a = pygauss::arraylike::as_array_checked(array_like);
 
+            numberOrArray result;
             if (!dim.has_value())
             {
                 if (!nan_value.has_value())
-                    return a.iscomplex() ? reduce_all_complex(a, af_product_all) : reduce_all_real(a, af_product_all);
-
-                return a.iscomplex() ? reduce_all_complex_nan(a, nan_value.value(), af_product_nan_all) : reduce_all_real_nan(a, nan_value.value(), af_product_nan_all);
+                    if (a.iscomplex())
+                        result = reduce_all_complex(a, af_product_all);
+                    else
+                        result = py::float_(reduce_all_real(a, af_product_all));
+                else if (a.iscomplex())
+                    result = reduce_all_complex_nan(a, nan_value.value(), af_product_nan_all);
+                else
+                    result = py::float_(reduce_all_real_nan(a, nan_value.value(), af_product_nan_all));
             }
-
-            return !nan_value.has_value() ? reduce_dim(a, dim.value(), af_product) : reduce_dim_nan(a, dim.value(), nan_value.value(), af_product_nan);
+            else
+            {
+                if (!nan_value.has_value())
+                    result = reduce_dim(a, dim.value(), af_product);
+                else
+                    result = reduce_dim_nan(a, dim.value(), nan_value.value(), af_product_nan);
+            }
+            return result;
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
@@ -439,7 +512,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
 
     m.def(
         "cumsum",
-        [](const py::object &array_like, int dim) -> numberOrArray {
+        [](const py::object &array_like, int dim) {
             auto a = pygauss::arraylike::as_array_checked(array_like);
             return reduce_dim(a, dim, af_accum);
         },
@@ -449,7 +522,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
 
     m.def(
         "nancumsum",
-        [](const py::object &array_like, int dim) -> numberOrArray {
+        [](const py::object &array_like, int dim) {
             auto a = pygauss::arraylike::as_array_checked(array_like);
             // array containing 1's where input is NaN, and 0 otherwise.
             auto nanLocations = af::isNaN(a);
@@ -463,7 +536,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
 
     m.def(
         "cumprod",
-        [](const py::object &array_like, int dim) -> numberOrArray {
+        [](const py::object &array_like, int dim) {
             auto a = pygauss::arraylike::as_array_checked(array_like);
             return af::scan(a, dim, AF_BINARY_MUL, true);
         },
@@ -473,7 +546,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
 
     m.def(
         "nancumprod",
-        [](const py::object &array_like, int dim) -> numberOrArray {
+        [](const py::object &array_like, int dim) {
             auto a = pygauss::arraylike::as_array_checked(array_like);
             // array containing 1's where input is NaN, and 0 otherwise.
             auto nanLocations = af::isNaN(a);
