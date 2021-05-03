@@ -24,3 +24,5 @@ cmake/_linux_af.sh
 /modules/shapelets/compute/.libs
 .tox
 .python-version
+.vscode
+
