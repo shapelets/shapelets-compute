@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import overload
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 
@@ -46,13 +45,6 @@ def conjugate(array_like: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.conjugate(array_like)
 
-@overload
-def complex(array_like: ArrayLike) -> ShapeletsArray: 
-    """
-    """
-    return _pygauss.complex(array_like)
-
-@overload
 def complex(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     """

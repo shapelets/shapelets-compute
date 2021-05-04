@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Union, Optional, overload
+from typing import Union, Optional
 
 from .__basic_typing import ArrayLike, Shape, DataTypeLike, ShapeLike, _ScalarLike
 from ._array_obj import ShapeletsArray
@@ -196,19 +196,11 @@ def geomspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = 
     """
     return _pygauss.geomspace(start, end, num, endpoint, axis, dtype)
 
-@overload
-def arange(stop: Union[int, float], dtype: DataTypeLike = "float32") -> ShapeletsArray: 
-    """
-    Creates a new array whose values are evenly spaced in a given interval.
-    """
-    # return _pygauss.arange(stop, dtype)
-
-@overload
 def arange(start: Union[int, float], stop: Union[int, float], step: Union[int, float], dtype: DataTypeLike = "float32") -> ShapeletsArray:
     """
     Creates a new array whose values are evenly spaced in a given interval.
     """
-    # return _pygauss.arange(start, stop, step, dtype)
+    return _pygauss.arange(start, stop, step, dtype)
 
 def empty(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """

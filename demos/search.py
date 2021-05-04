@@ -5,6 +5,9 @@ import shapelets.compute as sc
 from shapelets.compute.distances import DistanceType 
 from shapelets.data import load_mat, load_dataset 
 
+import warnings
+warnings.filterwarnings("ignore")
+
 data = load_mat('ItalianPowerDemand.mat')[0:15000,2]
 fig, ax = plt.subplots(figsize=(18, 8))
 ax.plot(data)

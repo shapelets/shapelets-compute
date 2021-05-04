@@ -12,7 +12,7 @@ from ._array_obj import ShapeletsArray
 from . import _pygauss
 
 AnyScalar = _ScalarLike
-FloatOrComplex = Union[complex, float]
+FloatOrComplex = Union[float, complex]
 
 ScanOp = Literal['add', 'max', 'min', 'mul']
 
@@ -49,9 +49,6 @@ def nanargmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[i
     """
     """
     return _pygauss.nanargmax(array_like, dim) 
-
-
-
 
 def amax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
     """
