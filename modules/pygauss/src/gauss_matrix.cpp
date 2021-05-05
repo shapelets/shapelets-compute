@@ -31,7 +31,7 @@ void pygauss::bindings::matrix_profile_functions(py::module &m)
 
     m.def(
         "cac",
-        [](const py::object &profile, const py::object &index, const uint32_t window_size) {
+        [](const py::object &profile, const py::object &index, const unsigned int window_size) {
             auto p = arraylike::as_array_checked(profile);
             auto i = arraylike::as_array_checked(index);
             return gmatrix::cac(p, i, window_size);
@@ -39,6 +39,19 @@ void pygauss::bindings::matrix_profile_functions(py::module &m)
         py::arg("profile").none(false),
         py::arg("index").none(false),
         py::arg("window_size").none(false));
+
+    m.def(
+        "segment",
+        [](const py::object &profile, const py::object &index, const unsigned int window_size, const int num_reg, const unsigned int ez) {
+            auto p = arraylike::as_array_checked(profile);
+            auto i = arraylike::as_array_checked(index);
+            return gmatrix::segment(p, i, window_size, num_reg, ez);
+        },
+        py::arg("profile").none(false),
+        py::arg("index").none(false),
+        py::arg("window_size").none(false),
+        py::arg("num_reg") = -1,
+        py::arg("ez") = 5);        
 
     m.def(
         "snippets",
@@ -57,10 +70,8 @@ void pygauss::bindings::matrix_profile_functions(py::module &m)
             auto a = arraylike::as_array_checked(tsa);
             auto b = arraylike::as_array_checked(tsb);
 
-            if (threshold.has_value())
-            {
+            if (threshold.has_value()) 
                 return gmatrix::mpdist_vector(a, b, w, threshold.value());
-            }
 
             return gmatrix::mpdist_vector(a, b, w);
         },
@@ -82,35 +93,31 @@ void pygauss::bindings::matrix_profile_functions(py::module &m)
             return distances;
         },
         py::arg("queries").none(false),
-        py::arg("series").none(false),
-        "TODO");
+        py::arg("series").none(false));
 
     m.def(
         "matrixprofile",
-        [](const py::object &series_a, const int32_t m, const std::optional<py::object> &series_b) {
+        [](const py::object &series_a, const long m, const std::optional<py::object> &series_b) {
             auto ta = arraylike::as_array_checked(series_a);
             arraylike::ensure_floating(ta);
 
             af::array profile;
             af::array index;
 
-            if (series_b.has_value())
-            {
+            if (series_b.has_value()) {
                 auto tb = arraylike::as_array_checked(series_b.value());
                 arraylike::ensure_floating(tb);
                 gmatrix::matrixProfile(ta, tb, m, profile, index);
             }
-            else
-            {
+            else {
                 gmatrix::matrixProfile(ta, m, profile, index);
             }
 
-            return py::make_tuple(profile, index);
+            return py::make_tuple(profile, index, m);
         },
         py::arg("series_a").none(false),
         py::arg("m").none(false),
-        py::arg("series_b") = py::none(),
-        "TODO");
+        py::arg("series_b") = py::none());
 
     m.def(
         "matrixprofileLR",
@@ -125,12 +132,11 @@ void pygauss::bindings::matrix_profile_functions(py::module &m)
 
             gmatrix::matrixProfileLR(ta, m, left_profile, left_index, right_profile, right_index);
 
-            py::dict result;
-            result["left"] = py::make_tuple(left_profile, left_index);
-            result["right"] = py::make_tuple(right_profile, right_index);
-            return result;
+            return py::make_tuple(
+                py::make_tuple(left_profile, left_index, m),
+                py::make_tuple(right_profile, right_index, m)
+            );
         },
         py::arg("ta").none(false),
-        py::arg("m").none(false),
-        "TODO");
+        py::arg("m").none(false));
 }

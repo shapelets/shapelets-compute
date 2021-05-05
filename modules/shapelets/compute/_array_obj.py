@@ -5,7 +5,7 @@ from ._pygauss import (
 
 from ._device import Backend
 from . import _pygauss
-from typing import Union, Optional, overload, Callable
+from typing import Union, Optional
 from .__basic_typing import ArrayLike, DataTypeLike, Shape, ShapeLike
 
 class ShapeletsArray:

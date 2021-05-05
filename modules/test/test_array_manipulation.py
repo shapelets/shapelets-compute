@@ -311,3 +311,14 @@ def test_join():
     assert sh.join([a, b, c], 0).same_as([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     # join on columns
     assert sh.join([a, b, c], 1).same_as([[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]])
+
+def test_linspace():
+    sh.linspace(1, 100, num=10).same_as(np.linspace(1, 100, num=10))
+    sh.linspace(1, 100, num=10, endpoint=False).same_as(np.linspace(1, 100, num=10, endpoint=False))
+    sh.linspace(1, 100, num=10, endpoint=True).same_as(np.linspace(1, 100, num=10, endpoint=True))
+    sh.geomspace(1, 100, num=10).same_as(np.geomspace(1, 100, num=10))
+    sh.geomspace(1, 100, num=10, endpoint=False).same_as(np.geomspace(1, 100, num=10, endpoint=False))
+    sh.geomspace(1, 100, num=10, endpoint=True).same_as(np.geomspace(1, 100, num=10, endpoint=True))
+    sh.logspace(1, 100, num=10).same_as(np.logspace(1, 100, num=10))
+    sh.logspace(1, 100, num=10, endpoint=False).same_as(np.logspace(1, 100, num=10, endpoint=False))
+    sh.logspace(1, 100, num=10, endpoint=True).same_as(np.logspace(1, 100, num=10, endpoint=True))

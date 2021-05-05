@@ -12,10 +12,10 @@ using namespace pygauss::bindings;
 
 PYBIND11_MODULE(_pygauss, m) {
 
-    spd::set_level(spd::level::level_enum::debug);
+    // spd::set_level(spd::level::level_enum::debug);
 
 #ifndef NDEBUG
-    // spd::set_level(spd::level::level_enum::debug);
+    spd::set_level(spd::level::level_enum::debug);
 #endif
 
     m.def("manual_eval_enabled",

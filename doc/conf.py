@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(file_loc), '.'))
 
 import shapelets
 
-project = 'Shapelets Solo'
+project = 'Shapelets Compute'
 copyright = '2021, Shapelets'
 author = 'Shapelets'
 

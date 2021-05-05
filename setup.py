@@ -98,6 +98,8 @@ class CMakeBuild(cmdclass["build_ext"]):
             '-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE',
             '-Wno-dev'
         ]
+
+
         
         cfg = 'Debug' if self.debug else 'Release' # 'RelWithDebInfo'
         build_args = ['--config', cfg]  # cfg]

@@ -70,19 +70,28 @@ function (vcpkg_install)
     if(NOT DEFINED AUTO_VCPKG_ROOT)
         if (DEFINED ENV{VCPKG_ROOT}) 
             set(AUTO_VCPKG_ROOT "$ENV{VCPKG_ROOT}" CACHE STRING "")    
+        elseif(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+            set(AUTO_VCPKG_ROOT "$ENV{VCPKG_INSTALLATION_ROOT}" CACHE STRING "")    
         else()
             set(AUTO_VCPKG_ROOT ${DEFAULT_AUTO_VCPKG_ROOT} CACHE STRING "")    
         endif()
     endif()
     
     # if we have the variable set, try to find the executable
-    find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT})
+    find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT} 
+        NO_DEFAULT_PATH 
+        NO_CMAKE_ENVIRONMENT_PATH
+        NO_SYSTEM_ENVIRONMENT_PATH)
 
     # if not found, download and/or bootstrap
     if (NOT AUTO_VCPKG_EXECUTABLE)
         message(STATUS "Couldn't find vcpkg in ${AUTO_VCPKG_ROOT}; downloading and building...")
         vcpkg_download()
-        find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT})
+        find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT}
+            NO_DEFAULT_PATH 
+            NO_CMAKE_ENVIRONMENT_PATH 
+            NO_SYSTEM_ENVIRONMENT_PATH)
+
         if (NOT AUTO_VCPKG_EXECUTABLE)
             message(FATAL_ERROR "Cannot find vcpkg executable")
         endif ()

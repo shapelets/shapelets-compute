@@ -4,13 +4,14 @@
 #include <pybind11/pytypes.h>
 #include <variant>
 #include <pygauss.h>
+#include <iostream>
 
 namespace py = pybind11;
 
 af::array linspace(af::array &s, af::array &e, int num, bool endpoint, int axis) {
     if (axis >= 4)
         throw std::invalid_argument("Axis should be in range [0..3]");
-
+    
     if (e.type() != s.type()) {
         if (s.iscomplex() && !e.iscomplex())
             e = e.as(s.type());
@@ -44,8 +45,7 @@ af::array linspace(af::array &s, af::array &e, int num, bool endpoint, int axis)
         newDims[axis] = 1;
     }
 
-    // af::array arr_objs[num];
-    af::array *arr_objs = static_cast<af::array*>(alloca(num * sizeof(af::array)));
+    af::array* arr_objs = new af::array[num];
     arr_objs[0] = af::moddims(s.copy(), newDims);
     for (auto i=1; i < num; i++) {
         s = s + inc;
@@ -67,6 +67,7 @@ af::array linspace(af::array &s, af::array &e, int num, bool endpoint, int axis)
             i += 1;
         }
     }
+    delete [] arr_objs;
     return acc;
 }
 
@@ -76,19 +77,16 @@ void pygauss::bindings::array_construction_operations(py::module &m)
     m.def(
         "geomspace",
         [](const py::object &start, const py::object &end, int num, bool endpoint, int axis, const af::dtype &dtype) {
-            auto comp_type = af::isDoubleAvailable(af::getDevice()) ? af::dtype::f64 : af::dtype::f32;
-            auto s = arraylike::as_itself_or_promote(start, af::dim4(1), comp_type);
-            auto e = arraylike::as_itself_or_promote(end, af::dim4(1), comp_type);
+            auto s = arraylike::as_itself_or_promote(start, af::dim4(1), dtype);
+            auto e = arraylike::as_itself_or_promote(end, af::dim4(1), dtype);
             
             if (af::anyTrue<bool>(af::iszero(s) || af::iszero(e)))
                 throw std::invalid_argument("Zero values are not supported in geometric space");
 
             auto log_s = af::log10(s);
             auto log_e = af::log10(e);
-            auto r = af::pow(10.0, linspace(log_s, log_e, num, endpoint, axis));
-            if (r.type() != dtype) 
-                return r.as(dtype);
-            return r;                
+
+            return af::pow(10.0, linspace(log_s, log_e, num, endpoint, axis));
         },
         py::arg("start").none(false),
         py::arg("end").none(false),
@@ -116,10 +114,10 @@ void pygauss::bindings::array_construction_operations(py::module &m)
     m.def(
         "linspace", 
         [](const py::object &start, const py::object &end, int num, bool endpoint, int axis, const af::dtype &dtype) {
+
             auto s = arraylike::as_itself_or_promote(start, af::dim4(1), dtype);
             auto e = arraylike::as_itself_or_promote(end, af::dim4(1), dtype);
             return linspace(s, e, num, endpoint, axis);
-
         },
         py::arg("start").none(false),
         py::arg("end").none(false),

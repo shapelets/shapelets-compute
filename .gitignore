@@ -22,3 +22,7 @@ cmake/_linux_af.sh
 /doc/reference/generated
 .pypirc
 /modules/shapelets/compute/.libs
+.tox
+.python-version
+.vscode
+

@@ -212,6 +212,8 @@ GAUSSAPI std::vector<snippet_t> snippets(const af::array& tss,
 
 
 GAUSSAPI af::array cac(const af::array& profile, const af::array& index, const long w);
+GAUSSAPI std::vector<unsigned int> segment(const af::array& profile, const af::array& index, const unsigned int w, const int num_reg = -1, const unsigned int ez = 5);
+
 
 }  // namespace gauss
 

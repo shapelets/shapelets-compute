@@ -4,8 +4,7 @@
 machine learning tasks over time series using OpenCL and CUDA devices.  
 
 `Shapelets Compute` provides:
-  * Accelerated array operations, based on [ArrayFile](https://arrayfire.com/), including
-  broadcasting, linear algebra, Fourier transform and radom number capabilities. 
+  * Accelerated array operations, based on [ArrayFile](https://arrayfire.com/), including broadcasting, linear algebra, Fourier transform and radom number capabilities. 
   * A similiar API to [NumPy](https://numpy.org/)
   * Fastest implementation of [Matrix Profile](https://www.cs.ucr.edu/~eamonn/MatrixProfile.html) for CPU and GPU architectures ([SCAMP](https://github.com/zpzim/SCAMP)).
   * One of the largest collection of distance meassures.

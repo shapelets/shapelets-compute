@@ -5,6 +5,9 @@ import shapelets.compute as sc
 from shapelets.compute.distances import DistanceType 
 from shapelets.data import load_mat, load_dataset 
 
+import warnings
+warnings.filterwarnings("ignore")
+
 data = load_mat('ItalianPowerDemand.mat')[0:15000,2]
 fig, ax = plt.subplots(figsize=(18, 8))
 ax.plot(data)
@@ -86,6 +89,7 @@ sc.distances.mpdist(queries[:, 0], queries[:, 1], w=20)
 # %%
 l=["Ts1", "Ts2", "Ts3", "Ts4", "Ts5"]
 dst = sc.distances.pdist(queries, 'mpdist', w=25)
+
 # %%
 
 from scipy.cluster.hierarchy import dendrogram, linkage

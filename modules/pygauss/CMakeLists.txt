@@ -2,23 +2,8 @@ cmake_minimum_required(VERSION 3.4...3.18)
 
 project(PyGauss)
 
-
-
 # Find the ArrayFire package.
 find_package(ArrayFire CONFIG REQUIRED)
-
-# set_target_properties(ArrayFire PROPERTIES
-#         MAP_IMPORTED_CONFIG_RELEASE RelWithDebInfo
-#         MAP_IMPORTED_CONFIG_DEBUG RelWithDebInfo
-#         MAP_IMPORTED_CONFIG_RELWITHDEBUGINFO RelWithDebInfo)
-
-# Logging support
-# find_package(spdlog CONFIG REQUIRED)
-
-# Find the pybind11 package
-# find_package(Python COMPONENTS Interpreter Development)
-# find_package(pybind11 CONFIG)
-# find_package(pybind11 REQUIRED)
 
 # Find arrow
 # find_package(Arrow CONFIG REQUIRED)
@@ -72,10 +57,25 @@ get_property(AFLIB TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_${AFLIBIMPCFG
 get_filename_component(AFLIBDIR "${AFLIB}" DIRECTORY)
 
 IF (APPLE)
-        add_custom_command(TARGET PyGauss POST_BUILD
-                COMMAND cp ARGS -R
-                ${AFLIBDIR}/
-                $<TARGET_FILE_DIR:PyGauss>/.libs)
+        set(RUNTIME_LIBS 
+                ${AFLIBDIR}/libaf.3.dylib 
+                ${AFLIBDIR}/libafcpu.3.dylib
+                ${AFLIBDIR}/libafcuda.3.dylib
+                ${AFLIBDIR}/libafopencl.3.dylib
+                ${AFLIBDIR}/libcudart.10.1.dylib
+                ${AFLIBDIR}/libcudnn.dylib
+                ${AFLIBDIR}/libiomp5.dylib
+                ${AFLIBDIR}/libiompstubs5.dylib
+                ${AFLIBDIR}/libmkl_avx.dylib
+                ${AFLIBDIR}/libmkl_avx2.dylib
+                ${AFLIBDIR}/libmkl_avx512.dylib
+                ${AFLIBDIR}/libmkl_core.dylib
+                ${AFLIBDIR}/libmkl_intel_lp64.dylib
+                ${AFLIBDIR}/libmkl_intel_thread.dylib
+                ${AFLIBDIR}/libmkl_mc.dylib
+                ${AFLIBDIR}/libmkl_mc3.dylib
+                ${AFLIBDIR}/libnvrtc-builtins.dylib
+                ${AFLIBDIR}/libnvrtc.10.1.dylib)
 elseif(UNIX)
         add_custom_command(TARGET PyGauss POST_BUILD
                 COMMAND cp ARGS -P
@@ -85,15 +85,15 @@ elseif(UNIX)
                 COMMAND rm
                 $<TARGET_FILE_DIR:PyGauss>/.libs/*.debug)                
 else()
-        file(GLOB AF_DEPS ${AFLIBDIR}/*.dll)
-        foreach(file_i ${AF_DEPS})
-                message("Copying ${file_i}...")
-                add_custom_command(TARGET PyGauss POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        ${file_i}
-                        $<TARGET_FILE_DIR:PyGauss>/.libs)
-        endforeach(file_i)
+        file(GLOB RUNTIME_LIBS ${AFLIBDIR}/*.dll)
 endif()
+
+foreach(file_i ${RUNTIME_LIBS})
+        add_custom_command(TARGET PyGauss POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${file_i}
+        $<TARGET_FILE_DIR:PyGauss>/.libs)
+endforeach(file_i)
 
 #########
 ## STUBS
