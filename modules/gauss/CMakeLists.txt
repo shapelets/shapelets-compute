@@ -188,8 +188,7 @@ set(GAUSSLIB_SOURCES ${GAUSSLIB_SRC}/clustering.cpp
                      ${GAUSSLIB_SRC}/random.cpp
                      ${GAUSSLIB_SRC}/regression.cpp
                      ${GAUSSLIB_SRC}/regularization.cpp
-                     ${GAUSSLIB_SRC}/statistics.cpp
-                     ${GAUSSLIB_SRC}/util.cpp)
+                     ${GAUSSLIB_SRC}/statistics.cpp)
 
 # Headers to add to compilation
 set(GAUSSLIB_HEADERS ${GAUSSLIB_INC}/gauss/clustering.h
@@ -206,11 +205,9 @@ set(GAUSSLIB_HEADERS ${GAUSSLIB_INC}/gauss/clustering.h
                      ${GAUSSLIB_INC}/gauss/regression.h
                      ${GAUSSLIB_INC}/gauss/regularization.h
                      ${GAUSSLIB_INC}/gauss/statistics.h
-                     ${GAUSSLIB_INC}/gauss/utils.h
                      ${GAUSSLIB_INC}/gauss/internal/libraryInternal.h
                      ${GAUSSLIB_INC}/gauss/internal/matrixInternal.h
                      ${GAUSSLIB_INC}/gauss/internal/scopedHostPtr.h
-                     ${GAUSSLIB_INC}/gauss/internal/util.h
                      ${GAUSSLIB_INC}/gauss/internal/vectorUtil.h)
 
 # The output is a static library
