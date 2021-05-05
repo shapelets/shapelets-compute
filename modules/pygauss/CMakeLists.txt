@@ -77,13 +77,25 @@ IF (APPLE)
                 ${AFLIBDIR}/libnvrtc-builtins.dylib
                 ${AFLIBDIR}/libnvrtc.10.1.dylib)
 elseif(UNIX)
-        add_custom_command(TARGET PyGauss POST_BUILD
-                COMMAND cp ARGS -P
-                ${AFLIBDIR}/*
-                $<TARGET_FILE_DIR:PyGauss>/.libs)
-        add_custom_command(TARGET PyGauss POST_BUILD
-                COMMAND rm
-                $<TARGET_FILE_DIR:PyGauss>/.libs/*.debug)                
+        set(RUNTIME_LIBS 
+                ${AFLIBDIR}/libaf.so.3
+                ${AFLIBDIR}/libafcpu.so.3
+                ${AFLIBDIR}/libafcuda.so.3
+                ${AFLIBDIR}/libafopencl.so.3
+                ${AFLIBDIR}/libcudnn.so.7.6.5
+                ${AFLIBDIR}/libiomp5.so
+                ${AFLIBDIR}/libmkl_avx.so
+                ${AFLIBDIR}/libmkl_avx2.so
+                ${AFLIBDIR}/libmkl_avx512.so
+                ${AFLIBDIR}/libmkl_core.so
+                ${AFLIBDIR}/libmkl_def.so
+                ${AFLIBDIR}/libmkl_intel_lp64.so
+                ${AFLIBDIR}/libmkl_intel_thread.so
+                ${AFLIBDIR}/libmkl_mc.so
+                ${AFLIBDIR}/libmkl_mc3.so
+                ${AFLIBDIR}/libnvrtc-builtins.so
+                ${AFLIBDIR}/libnvrtc.so.11.1
+                ${AFLIBDIR}/libOpenCL.so.1)
 else()
         file(GLOB RUNTIME_LIBS ${AFLIBDIR}/*.dll)
 endif()

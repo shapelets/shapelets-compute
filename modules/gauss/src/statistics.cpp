@@ -160,9 +160,8 @@ namespace gauss::statistics
             rms_mat = af::tile(rms_mat, result.dims(0));
             result = result / af::sqrt(rms_mat);
         }
-        if (ml < n - 1)
-        {
-            std::cout << "Reducing size" << n - ml - 1 << " " << ml - n - 1 << std::endl;
+        
+        if (ml < n - 1) {
             result = result(af::seq(n - ml - 1, ml - n, 1.0), af::span);
         }
 
