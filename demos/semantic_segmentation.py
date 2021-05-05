@@ -57,6 +57,16 @@ ax[1].plot(data)
 ax[1].axvspan(minPoint, minPoint+wLen, facecolor="yellow", edgecolor='none', alpha=0.5)
 plt.show()
 
+# %%
+
+medts = load_dataset('ecg-heartbeat-av.txt')
+wLen = 80
+profile, index, _ = sc.matrixprofile.matrix_profile(medts, wLen)
+r = sc.matrixprofile.segment(profile, index, wLen)
+if len(r) > 0:
+    plt.plot(medts,'--g')
+    plt.plot(r, medts[sc.array(r)], 'rD')
+    plt.show()
 
 # %%
 wLen = 800

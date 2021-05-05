@@ -89,6 +89,7 @@ sc.distances.mpdist(queries[:, 0], queries[:, 1], w=20)
 # %%
 l=["Ts1", "Ts2", "Ts3", "Ts4", "Ts5"]
 dst = sc.distances.pdist(queries, 'mpdist', w=25)
+
 # %%
 
 from scipy.cluster.hierarchy import dendrogram, linkage
