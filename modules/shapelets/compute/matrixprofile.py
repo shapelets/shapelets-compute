@@ -1,11 +1,6 @@
 from __future__ import annotations
 
 from typing import Any, List, NamedTuple, Optional
-try:
-    from typing import TypedDict
-except ImportError:
-    from typing_extensions import TypedDict
-
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 
