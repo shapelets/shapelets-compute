@@ -54,7 +54,7 @@ def test_stats_cross_correlation():
     b = sc.array([[3., 4, 5, 6], [7., 8, 9, 0]]).T
 
     # verified with octave
-    (indices, corr) = sc.statistics.xcorr(a, b, None, sc.statistics.XCorrScale.NoScale)
+    (indices, corr) = sc.statistics.xcorr(a, b, None, 'noscale')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([6, 17, 32, 50, 38, 25, 12])
@@ -65,7 +65,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([0, 18, 43, 74, 98, 68, 35])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, None, sc.statistics.XCorrScale.Biased)
+    (indices, corr) = sc.statistics.xcorr(a, b, None, 'biased')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([1.5, 4.25, 8.0, 12.5, 9.5, 6.25, 3.0])
@@ -76,7 +76,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([0.0, 4.5, 10.75, 18.5, 24.5, 17.0, 8.75])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, None, sc.statistics.XCorrScale.Unbiased)
+    (indices, corr) = sc.statistics.xcorr(a, b, None, 'unbiased')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([6.0, 8.5, 10.6667, 12.50, 12.6667, 12.50, 12.0])
@@ -87,7 +87,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([0.0, 9.0, 14.3333, 18.50, 32.6667, 34.0, 35.0])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, None, sc.statistics.XCorrScale.Coeff)
+    (indices, corr) = sc.statistics.xcorr(a, b, None, 'coeff')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([0.1181, 0.3347, 0.6300, 0.9844, 0.7481, 0.4922, 0.2362])
@@ -99,7 +99,7 @@ def test_stats_cross_correlation():
     assert corr[:, 1, 1].same_as([0.0000, 0.1759, 0.4201, 0.7230, 0.9575, 0.6644, 0.3420])
 
     # verified with octave
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, sc.statistics.XCorrScale.NoScale)
+    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'noscale')
     assert indices.same_as([-2, -1, 0, 1, 2.])
     corr.display()
     # first column on a with first column in b
@@ -111,7 +111,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([18, 43, 74, 98, 68])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, sc.statistics.XCorrScale.Biased)
+    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'biased')
     assert indices.same_as([-2, -1, 0, 1, 2])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([4.25, 8.0, 12.5, 9.5, 6.25])
@@ -122,7 +122,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([4.5, 10.75, 18.5, 24.5, 17.0])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, sc.statistics.XCorrScale.Unbiased)
+    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'unbiased')
     assert indices.same_as([-2, -1, 0, 1, 2])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([8.5, 10.6667, 12.50, 12.6667, 12.50])
@@ -133,7 +133,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([9.0, 14.3333, 18.50, 32.6667, 34.0])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, sc.statistics.XCorrScale.Coeff)
+    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'coeff')
     assert indices.same_as([-2, -1, 0, 1, 2])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([0.3347, 0.6300, 0.9844, 0.7481, 0.4922])

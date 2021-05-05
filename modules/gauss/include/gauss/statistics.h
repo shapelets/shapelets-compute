@@ -10,14 +10,16 @@ namespace gauss::statistics {
 
 enum class XCorrScale { BIASED, UNBIASED, COEFF, NONE };
 
-af::array stdev(const af::array &tss, const unsigned int ddof = 1);
-af::array var(const af::array &tss, const unsigned int ddof = 1);
+af::array stdev(const af::array &tss, const unsigned int ddof = 1, const unsigned int dim = 0);
+af::array var(const af::array &tss, const unsigned int ddof = 1, const unsigned int dim = 0);
+af::array moment(const af::array &tss, unsigned int k, const unsigned int dim = 0);
+af::array skewness(const af::array &tss, const unsigned int dim = 0);
+af::array kurtosis(const af::array &tss, const unsigned int dim = 0);
+
+
 af::array covariance(const af::array &x, const unsigned int ddof = 1);
 af::array corrcoef(const af::array &x, const unsigned int ddof = 1);
 
-af::array skewness(const af::array &tss);
-af::array kurtosis(const af::array &tss);
-af::array moment(const af::array &tss, unsigned int k);
 
 std::tuple<af::array, af::array> xcorr(const af::array &x, 
                                        const af::array &y, 

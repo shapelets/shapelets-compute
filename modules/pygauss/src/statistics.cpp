@@ -85,99 +85,59 @@ void pygauss::bindings::statistic_functions(py::module &m)
         py::arg("dim") = py::none());
 
     m.def(
-        "var",
-        [](const py::object &a, const py::object &weights, const std::optional<long long> dim, const bool biased) {
+        "std",
+        [](const py::object &a, const unsigned int ddof, const unsigned int dim) {
             auto array = arraylike::as_array_checked(a);
-            auto hasWeights = !weights.is_none();
-            auto isAggregated = !dim.has_value();
-
-            std::variant<double, std::complex<double>, af::array> result;
-
-            if (isAggregated)
-            {
-                double real, imag;
-                af_err err;
-                if (hasWeights)
-                    err = af_var_all_weighted(&real, &imag, array.get(), arraylike::as_array_checked(weights).get());
-                else
-                    err = af_var_all(&real, &imag, array.get(), biased);
-
-                throw_on_error(err);
-
-                if (array.iscomplex())
-                    result = std::complex<double>(real, imag);
-                else
-                    result = real;
-            }
-            else
-            {
-                if (hasWeights)
-                    result = af::var(array, arraylike::as_array_checked(weights), dim.value());
-                else
-                    result = af::var(array, biased, dim.value());
-            }
-
-            return result;
+            arraylike::ensure_floating(array);
+            return gs::stdev(array, ddof, dim);
         },
         py::arg("a").none(false),
-        py::arg("weights") = py::none(),
-        py::arg("dim") = py::none(),
-        py::arg("biased") = false);
+        py::arg("ddof") = 1,
+        py::arg("dim") = 0);
 
     m.def(
-        "std",
-        [](const py::object &a, const std::optional<long long> dim) {
+        "var",
+        [](const py::object &a, const unsigned int ddof, const unsigned int dim) {
             auto array = arraylike::as_array_checked(a);
-            std::variant<double, std::complex<double>, af::array> result;
-            auto isAggregated = !dim.has_value();
-
-            if (isAggregated)
-            {
-                double real, imag;
-                throw_on_error(af_stdev_all(&real, &imag, array.get()));
-
-                if (array.iscomplex())
-                    result = std::complex<double>(real, imag);
-                else
-                    result = real;
-            }
-            else
-            {
-                result = af::stdev(array, dim.value());
-            }
-
-            return result;
+            arraylike::ensure_floating(array);
+            return gs::var(array, ddof, dim);
         },
         py::arg("a").none(false),
-        py::arg("dim") = py::none());
+        py::arg("ddof") = 1,
+        py::arg("dim") = 0);        
 
     m.def(
         "skewness",
-        [](const py::object &data) {
+        [](const py::object &data, const unsigned int dim) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gs::skewness(tss);
+            return gs::skewness(tss, dim);
         },
-        py::arg("data").none(false));
+        py::arg("data").none(false),
+        py::arg("dim") = 0);
 
     m.def(
         "kurtosis",
-        [](const py::object &data) {
+        [](const py::object &data, const unsigned int dim) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gs::kurtosis(tss);
+            return gs::kurtosis(tss, dim);
         },
-        py::arg("data").none(false));
+        py::arg("data").none(false),
+        py::arg("dim") = 0);
 
     m.def(
         "moment",
-        [](const py::object &data, const unsigned int k) {
+        [](const py::object &data, const unsigned int k, const unsigned int dim) {
             auto tss = arraylike::as_array_checked(data);
             arraylike::ensure_floating(tss);
-            return gs::moment(tss, k);
+            return gs::moment(tss, k, dim);
         },
         py::arg("data").none(false),
-        py::arg("k").none(false));
+        py::arg("k").none(false),
+        py::arg("dim") = 0);
+
+
 
     m.def(
         "cov",

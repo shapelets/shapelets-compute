@@ -19,54 +19,72 @@ namespace gauss::statistics
      * of a hypothetical infinite population. ddof=0 provides a maximum likelihood estimate 
      * of the variance for normally distributed variables.
      */
-    af::array stdev(const af::array &tss, const unsigned int ddof)
+    af::array stdev(const af::array &tss, const unsigned int ddof, const unsigned int dim)
     {
-        auto n = static_cast<double>(tss.dims(0));
-        auto mean = af::mean(tss, 0);
-        auto mean_tiled = af::tile(mean, static_cast<unsigned int>(tss.dims(0)));
+        auto l = tss.dims(dim);
+        auto tile_dims = af::dim4(1,1,1,1);
+        tile_dims[dim] = l;
+
+        auto mean = af::mean(tss, dim);
+        auto mean_tiled = af::tile(mean, tile_dims);
         auto diff = tss - mean_tiled;
+
         auto diff2 = af::pow(diff, 2.0);
-        auto sigma = af::sum(diff2, 0);
-        auto sigma_adj = sigma / (n - ddof);
+        auto sigma = af::sum(diff2, dim);
+        auto sigma_adj = sigma / (static_cast<double>(l) - ddof);
         return af::sqrt(sigma_adj);
     }
 
-    af::array var(const af::array &tss, const unsigned int ddof)
+    af::array var(const af::array &tss, const unsigned int ddof, const unsigned int dim)
     {
-        auto n = static_cast<double>(tss.dims(0));
-        auto mean = af::mean(tss, 0);
-        auto mean_tiled = af::tile(mean, static_cast<unsigned int>(tss.dims(0)));
+        auto l = tss.dims(dim);
+        auto tile_dims = af::dim4(1,1,1,1);
+        tile_dims[dim] = l;
+
+        auto mean = af::mean(tss, dim);
+        auto mean_tiled = af::tile(mean, tile_dims);
         auto diff = tss - mean_tiled;
+
         auto diff2 = af::pow(diff, 2.0);
-        auto sigma = af::sum(diff2, 0);
-        return sigma / (n - ddof);
+        auto sigma = af::sum(diff2, dim);
+        return sigma / (static_cast<double>(l) - ddof);
     }
 
-    af::array skewness(const af::array &tss)
+    af::array moment(const af::array &tss, unsigned int k, const unsigned int dim)
     {
-        auto n = static_cast<double>(tss.dims(0));
-        af::array tssMinusMean = (tss - af::tile(af::mean(tss, 0), tss.dims(0)));
-        af::array m3 = moment(tssMinusMean, 3);
-        af::array s3 = af::pow(statistics::stdev(tss, 0), 3);
+        auto n = static_cast<double>(tss.dims(dim));
+        return af::sum(af::pow(tss, static_cast<double>(k)), dim) / n;
+    }
+
+    af::array skewness(const af::array &tss, const unsigned int dim)
+    {
+        auto n = static_cast<double>(tss.dims(dim));
+        auto l = tss.dims(dim);
+        auto tile_dims = af::dim4(1,1,1,1);
+        tile_dims[dim] = l;
+
+        af::array tssMinusMean = (tss - af::tile(af::mean(tss, dim), tile_dims));
+        af::array m3 = moment(tssMinusMean, 3, dim);
+        af::array s3 = af::pow(statistics::stdev(tss, 0, dim), 3);
         return (std::pow(n, 2.0) / ((n - 1) * (n - 2))) * m3 / s3;
     }
 
-    af::array kurtosis(const af::array &tss)
+    af::array kurtosis(const af::array &tss, const unsigned int dim)
     {
-        auto n = static_cast<double>(tss.dims(0));
+        auto l = tss.dims(dim);
+        auto n = static_cast<double>(tss.dims(dim));
         auto a = (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3));
-        af::array tssMinusMean = (tss - af::tile(af::mean(tss, 0), tss.dims(0)));
-        af::array sstdev = af::tile(statistics::stdev(tss, 0), tss.dims(0));
+
+        auto tile_dims = af::dim4(1,1,1,1);
+        tile_dims[dim] = l;
+
+        af::array tssMinusMean = (tss - af::tile(af::mean(tss, dim), tile_dims));
+        af::array sstdev = af::tile(statistics::stdev(tss, 0, dim), tile_dims);
         af::array b = af::sum(af::pow(tssMinusMean / sstdev, 4), 0);
         auto c = (3 * std::pow(n - 1, 2)) / ((n - 2) * (n - 3));
         return a * b - c;
     }
 
-    af::array moment(const af::array &tss, unsigned int k)
-    {
-        auto n = static_cast<double>(tss.dims(0));
-        return af::sum(af::pow(tss, static_cast<double>(k)), 0) / n;
-    }
 
     af::array covariance(const af::array &x, const unsigned int ddof)
     {
