@@ -1,5 +1,7 @@
 #include <gauss/normalization.h>
 
+
+
 void gauss::normalization::decimalScalingNormInPlace(af::array &tss) {
     auto maxAbs = af::max(af::abs(tss), 0);
     auto const10 = af::constant(10, 1, tss.dims(1));
@@ -47,6 +49,10 @@ void clip_near_zero(af::array& arr) {
         eps = 1e-8;
     
     arr(af::abs(arr) < eps) = eps;
+}
+
+af::array gauss::normalization::detrend(const af::array &tss) {
+    return data - af::tile(af::mean(data, 0), static_cast<unsigned int>(data.dims(0)));
 }
 
 af::array gauss::normalization::decimalScalingNorm(const af::array &tss) {

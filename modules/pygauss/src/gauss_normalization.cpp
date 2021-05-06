@@ -16,6 +16,14 @@ namespace gnorm = gauss::normalization;
 void pygauss::bindings::gauss_normalization_functions(py::module &m) {
 
     m.def(
+        "detrend",
+        [](const py::object& array_like) {
+            auto arr = arraylike::as_array_checked(array_like);
+            return gnorm::detrend(arr);
+        },
+        py::arg("array_like").none(false));
+
+    m.def(
         "decimal_scaling", 
         [](const py::object& array_like) {
             auto arr = arraylike::as_array_checked(array_like);
