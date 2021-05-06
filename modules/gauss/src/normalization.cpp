@@ -52,7 +52,7 @@ void clip_near_zero(af::array& arr) {
 }
 
 af::array gauss::normalization::detrend(const af::array &tss) {
-    return data - af::tile(af::mean(data, 0), static_cast<unsigned int>(data.dims(0)));
+    return tss - af::tile(af::mean(tss, 0), static_cast<unsigned int>(tss.dims(0)));
 }
 
 af::array gauss::normalization::decimalScalingNorm(const af::array &tss) {

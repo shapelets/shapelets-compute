@@ -11,7 +11,7 @@ namespace gauss::normalization {
  * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
  * dimension one indicates the number of time series.
  */  
-GAUSSAPI af::array gauss::normalization::detrend(const af::array &tss) ;
+GAUSSAPI af::array detrend(const af::array &tss) ;
 
 /**
  * @brief Normalizes the given time series according to its maximum value and adjusts each value within the range
