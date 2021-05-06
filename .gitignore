@@ -2,6 +2,7 @@
 /.pytest_cache/
 /build/
 /external/arrayfire
+/external/vcpkg
 /cmake/_mac_af.pkg
 /.idea
 /cmake-build-debug
