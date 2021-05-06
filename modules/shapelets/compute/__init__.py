@@ -40,6 +40,7 @@ os.environ["AF_BUILD_LIB_CUSTOM_PATH"] = library_dir
 if os.name == 'nt':
     import warnings 
     import glob
+    import sys 
     try:
         from ctypes import PyDLL
         # Ensure present folder is present in the path
@@ -48,12 +49,18 @@ if os.name == 'nt':
         warnings.warn('Unable to perform initialization', stacklevel=2)    
     else:
         filenames = []
+        pyver = sys.version_info 
+        has_winmode = pyver.major >= 3 and pyver.minor >= 8
         # For some reason, we are forced to load the library using 
         # the semantics of LoadLibrary and not LoadLibraryEx in 
         # windows system.  It requires more investigation but it may 
         # have something to do with the fact we are loading arrayfire 
-        for filename in glob.glob(os.path.join(compute_dir, '_pygauss*.pyd')):  
-            PyDLL(filename, winmode= 0)  
+        for filename in glob.glob(os.path.join(compute_dir, '_pygauss*.pyd')): 
+            if has_winmode:
+                PyDLL(filename, winmode= 0)  
+            else:
+                PyDLL(filename)
+                
             filenames.append(filename)
 
         if len(filenames) > 1:
