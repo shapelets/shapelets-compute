@@ -26,6 +26,7 @@ single_search = sc.matrixprofile.mass(query, data)
 
 # %%
 pos, _ = sc.argmin(single_search)
+
 # %%
 fig, ax = plt.subplots(figsize=(18, 8))
 ax.plot(data[pos:pos+200])
@@ -71,6 +72,7 @@ plt.show()
 
 # %%
 multiple_results = sc.matrixprofile.mass(queries, data)
+
 # %%
 indices, distances = sc.argmin(multiple_results, 0)
 fig, ax = plt.subplots(5, 1, figsize=(18, 8))

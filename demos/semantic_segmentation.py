@@ -60,7 +60,7 @@ plt.show()
 # %%
 
 medts = load_dataset('ecg-heartbeat-av.txt')
-wLen = 80
+wLen = 150
 profile, index, _ = sc.matrixprofile.matrix_profile(medts, wLen)
 r = sc.matrixprofile.segment(profile, index, wLen)
 if len(r) > 0:
