@@ -56,45 +56,42 @@ af::array reduce_dim_nan(const af::array &a, const int dim, double nan, const re
     return af::array(result);
 }
 
-af::array minof_no_nan(af::array &a, af::array &b, bool broadcast)
+af::array minof_keep_nan(af::array &a, af::array &b, bool broadcast)
 {
-    // choose a sensible max value to replace the nans
-    double max = std::numeric_limits<float>::max();
-    if (a.isdouble())
-        max = std::numeric_limits<double>::max();
-    else if (a.ishalf())
-        max = 65504.0f;
+    auto nan_a = af::isNaN(a);
+    auto nan_b = af::isNaN(b);
 
-    // Values of "a" are replaced with corresponding values of max, when cond is false.
-    af::replace(a, !af::isNaN(a), max);
-    af::replace(b, !af::isNaN(b), max);
+    af_array p_nan_mask = nullptr;
+    pygauss::throw_on_error(af_or(&p_nan_mask, nan_a.get(), nan_b.get(), broadcast));
+    auto nan_mask = af::array(p_nan_mask);
+
     af_array out = nullptr;
     pygauss::throw_on_error(af_minof(&out, a.get(), b.get(), broadcast));
-    return af::array(out);
+    auto result = af::array(out);
+
+    result(nan_mask) = af::NaN;
+    return result;
 }
 
-af::array maxof_no_nan(af::array &a, af::array &b, bool broadcast)
+af::array maxof_keep_nan(af::array &a, af::array &b, bool broadcast)
 {
-    // choose a sensible max value to replace the nans
-    double min = -std::numeric_limits<float>::max();
-    if (a.isdouble())
-        min = -std::numeric_limits<double>::max();
-    else if (a.ishalf())
-        min = -65504.0f;
+    auto nan_a = af::isNaN(a);
+    auto nan_b = af::isNaN(b);
 
-    // Values of "a" are replaced with corresponding values of max, when cond is false.
-    af::replace(a, !af::isNaN(a), min);
-    af::replace(b, !af::isNaN(b), min);
+    af_array p_nan_mask = nullptr;
+    pygauss::throw_on_error(af_or(&p_nan_mask, nan_a.get(), nan_b.get(), broadcast));
+    auto nan_mask = af::array(p_nan_mask);
+
     af_array out = nullptr;
     pygauss::throw_on_error(af_maxof(&out, a.get(), b.get(), broadcast));
-    return af::array(out);
-}
+    auto result = af::array(out);
 
-typedef std::variant<int, float, std::complex<float>, std::complex<double>, py::array> MyType;
+    result(nan_mask) = af::NaN;
+    return result;
+}
 
 void pygauss::bindings::parallel_algorithms(py::module &m)
 {
-
     //
     // all and any from logic
     //
@@ -163,6 +160,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
     // argmin -> Return the indices of the minimum values.
     //
 
+    typedef std::variant<af::array, py::int_> intOrArray;
     typedef std::variant<std::complex<double>, af::array, py::float_> numberOrArray;
     typedef std::variant<std::tuple<unsigned int, std::complex<double>>, std::tuple<af::array, af::array>, std::tuple<unsigned int, py::float_>> indexAndValues;
 
@@ -217,9 +215,9 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         py::arg("dim").none(true) = py::none(),
         "The minimum value of an array along a given axis, ignoring any NaNs.");
 
-    BINARY_TEMPLATE_FN(minimum, af_minof, "Minimum of two inputs, with NaNs propagated.")
+    BINARY_TEMPLATE_FN_LAMBDA(minimum, minof_keep_nan, "Minimum of two inputs, with NaNs propagated.")
 
-    BINARY_TEMPLATE_FN_LAMBDA(fmin, minof_no_nan, "Minimum of two inputs, ignoring NaNs")
+    BINARY_TEMPLATE_FN(fmin, af_minof, "Minimum of two inputs, ignoring NaNs")
 
     m.def(
         "argmin",
@@ -347,9 +345,9 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         py::arg("dim").none(true) = py::none(),
         "The maximum value of an array along a given axis, ignoring any NaNs.");
 
-    BINARY_TEMPLATE_FN(maximum, af_maxof, "Maximum of two inputs, with NaNs propagated.")
+    BINARY_TEMPLATE_FN_LAMBDA(maximum, maxof_keep_nan, "Maximum of two inputs, with NaNs propagated.")
 
-    BINARY_TEMPLATE_FN_LAMBDA(fmax, maxof_no_nan, "Maximum of two inputs, ignoring NaNs")
+    BINARY_TEMPLATE_FN(fmax, af_maxof, "Maximum of two inputs, ignoring NaNs")
 
     m.def(
         "argmax",
@@ -420,12 +418,12 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
 
     m.def(
         "count_nonzero",
-        [](const py::object &array_like, const std::optional<int> &dim) -> numberOrArray {
+        [](const py::object &array_like, const std::optional<int> &dim) -> intOrArray {
             auto a = pygauss::arraylike::as_array_checked(array_like);
 
-            numberOrArray result;
+            intOrArray result;
             if (!dim.has_value())
-                result = py::float_(reduce_all_real(a, af_count_all));
+                result = py::int_(static_cast<unsigned long long>(reduce_all_real(a, af_count_all)));
             else
                 result = reduce_dim(a, dim.value(), af_count);
             return result;
@@ -551,7 +549,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             // array containing 1's where input is NaN, and 0 otherwise.
             auto nanLocations = af::isNaN(a);
             // Values of "a" are replaced with zero, when cond is false.
-            af::replace(a, !nanLocations, 0.0);
+            af::replace(a, !nanLocations, 1.0);
 
             return af::scan(a, dim, AF_BINARY_MUL, true);
         },
@@ -729,12 +727,17 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+
             af::array out_keys, out_vals;
             af::countByKey(out_keys, out_vals, k, v, dim.value_or(-1));
             return {out_keys, out_vals};
         },
         py::arg("keys").none(false),
-        py::arg("vals").none(true),
+        py::arg("vals").none(false),
         py::arg("dim") = py::none());
 
     m.def(
@@ -742,12 +745,17 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+
             af::array out_keys, out_vals;
             af::maxByKey(out_keys, out_vals, k, v, dim.value_or(-1));
             return {out_keys, out_vals};
         },
         py::arg("keys").none(false),
-        py::arg("vals").none(true),
+        py::arg("vals").none(false),
         py::arg("dim") = py::none());
 
     m.def(
@@ -755,12 +763,17 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+            
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+
             af::array out_keys, out_vals;
             af::minByKey(out_keys, out_vals, k, v, dim.value_or(-1));
             return {out_keys, out_vals};
         },
         py::arg("keys").none(false),
-        py::arg("vals").none(true),
+        py::arg("vals").none(false),
         py::arg("dim") = py::none());
 
     m.def(
@@ -768,12 +781,17 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+
             af::array out_keys, out_vals;
             af::productByKey(out_keys, out_vals, k, v, dim.value_or(-1));
             return {out_keys, out_vals};
         },
         py::arg("keys").none(false),
-        py::arg("vals").none(true),
+        py::arg("vals").none(false),
         py::arg("dim") = py::none());
 
     m.def(
@@ -781,8 +799,20 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, const double nan_value, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+
+            // there is a bug in AF with dim value == -1
+            auto i = 0;
+            while (i < 4 && v.dims(i) == 1) { i += 1; };
+
+            if (i == 4)
+                i = 0;
+
             af::array out_keys, out_vals;
-            af::productByKey(out_keys, out_vals, k, v, dim.value_or(-1), nan_value);
+            af::productByKey(out_keys, out_vals, k, v, dim.value_or(i), nan_value);
             return {out_keys, out_vals};
         },
         py::arg("keys").none(false),
@@ -795,6 +825,11 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+
             af::array out_keys, out_vals;
             af::sumByKey(out_keys, out_vals, k, v, dim.value_or(-1));
             return {out_keys, out_vals};
@@ -808,8 +843,20 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, const double nan_value, const std::optional<int> &dim) -> std::tuple<af::array, af::array> {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+            
+            // there is a bug in AF with dim value == -1
+            auto i = 0;
+            while (i < 4 && v.dims(i) == 1) { i += 1; };
+
+            if (i == 4)
+                i = 0;
+
             af::array out_keys, out_vals;
-            af::sumByKey(out_keys, out_vals, k, v, dim.value_or(-1), nan_value);
+            af::sumByKey(out_keys, out_vals, k, v, dim.value_or(i), nan_value);
             return {out_keys, out_vals};
         },
         py::arg("keys").none(false),
@@ -822,6 +869,11 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         [](const py::object &keys, const py::object &vals, int dim, const af::binaryOp &op, const bool &inclusive_scan) {
             auto k = pygauss::arraylike::as_array_checked(keys);
             auto v = pygauss::arraylike::as_array_checked(vals);
+
+            if (k.type() != af::dtype::s32 || k.type() != af::dtype::u32) {
+                k = k.as(af::dtype::s32);
+            }
+
             return af::scanByKey(k, v, dim, op, inclusive_scan);
         },
         py::arg("keys").none(false),
