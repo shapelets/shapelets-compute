@@ -74,11 +74,10 @@ from . import fft
 from . import distances 
 from . import matrixprofile
 from . import normalization
-from . import statistics
 from . import dimensionality
 from . import clustering
 
-__all__ = ["random", "fft", "distances", "matrixprofile", "normalization", "statistics", "dimensionality", "clustering"]
+__all__ = ["random", "fft", "distances", "matrixprofile", "normalization", "dimensionality", "clustering"]
 
 # direct imports
 from . import _device 
@@ -105,6 +104,9 @@ from ._extract_transform import *
 from . import _linear_algebra 
 from ._linear_algebra import *
 
+from . import _statistics
+from ._statistics import *
+
 __all__ += _device.__all__
 __all__ += _array_obj.__all__
 __all__ += _algorithms.__all__
@@ -113,3 +115,4 @@ __all__ += _math.__all__
 __all__ += _construction.__all__
 __all__ += _extract_transform.__all__
 __all__ += _linear_algebra.__all__
+__all__ += _statistics.__all__

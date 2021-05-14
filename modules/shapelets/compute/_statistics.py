@@ -575,7 +575,7 @@ def topk_min(data: ArrayLike, k: int, dim: int = 0) -> TopKResult:
 
 __all__ = [
     "mean", "median", "std", "var", "moment",
-    "kurtosis", "skewness", "cov", "corrcoef", "xcorr",
+    "kurtosis", "skewness", "cov", "corrcoef", "xcorr", "xcov",
     "acorr", "acov", "topk_max", "topk_min",
-    "XCoResults", "TopKResult"
+    "XCoResults", "TopKResult", "XCorrScale"
 ]

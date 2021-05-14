@@ -1,6 +1,6 @@
 import shapelets.compute as sc
 import numpy as np
-from shapelets.compute.statistics import XCorrScale
+from shapelets.compute import XCorrScale
 
 
 def test_stats_skewness_kurtosis_moments():
@@ -9,19 +9,19 @@ def test_stats_skewness_kurtosis_moments():
     # too much acc errors...
     test_data = rng.exponential(shape=(10000000, 1), dtype="float64")
     # using exact solution for exponential distribution
-    result = sc.statistics.skewness(test_data)
+    result = sc.skewness(test_data)
     assert result.same_as([2.0], eps=0.02)
     assert result.shape == (1, 1)
-    result = sc.statistics.kurtosis(test_data)
+    result = sc.kurtosis(test_data)
     assert result.same_as([6.0], eps=0.02)
     assert result.shape == (1, 1)
     # since scale is 1.0 -> lambda is also 1.0
     # then, exponential moments are n!, where
     # n is the moment number
-    m1 = sc.statistics.moment(test_data, 1)
-    m2 = sc.statistics.moment(test_data, 2)
-    m3 = sc.statistics.moment(test_data, 3)
-    m4 = sc.statistics.moment(test_data, 4)
+    m1 = sc.moment(test_data, 1)
+    m2 = sc.moment(test_data, 2)
+    m3 = sc.moment(test_data, 3)
+    m4 = sc.moment(test_data, 4)
     assert m1.same_as(1.0, eps=0.02)
     assert m2.same_as(2.0, eps=0.02)
     assert m3.same_as(6.0, eps=0.02)
@@ -30,7 +30,7 @@ def test_stats_skewness_kurtosis_moments():
 def test_stats_correlation():
     data = [[1., 2, 3, 4], [2., 3, 4, 5], [3., 4, 5, 6], [7., 8, 9, 0]]
     npr = np.corrcoef(data, rowvar=False)
-    sr = sc.statistics.corrcoef(data)
+    sr = sc.corrcoef(data)
     assert sr.same_as(npr)
 
 
@@ -41,7 +41,7 @@ def test_stats_covariance():
             [7., 8, 9, 0]]
 
     npr = np.cov(data, rowvar=False)
-    sr = sc.statistics.cov(data)
+    sr = sc.cov(data)
     assert sr.same_as(npr)
 
 
@@ -50,7 +50,7 @@ def test_stats_cross_correlation():
     b = sc.array([[3., 4, 5, 6], [7., 8, 9, 0]]).T
 
     # verified with octave
-    (indices, corr) = sc.statistics.xcorr(a, b, None, 'noscale')
+    (indices, corr) = sc.xcorr(a, b, None, 'noscale')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([6, 17, 32, 50, 38, 25, 12])
@@ -61,7 +61,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([0, 18, 43, 74, 98, 68, 35])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, None, 'biased')
+    (indices, corr) = sc.xcorr(a, b, None, 'biased')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([1.5, 4.25, 8.0, 12.5, 9.5, 6.25, 3.0])
@@ -72,7 +72,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([0.0, 4.5, 10.75, 18.5, 24.5, 17.0, 8.75])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, None, 'unbiased')
+    (indices, corr) = sc.xcorr(a, b, None, 'unbiased')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([6.0, 8.5, 10.6667, 12.50, 12.6667, 12.50, 12.0])
@@ -83,7 +83,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([0.0, 9.0, 14.3333, 18.50, 32.6667, 34.0, 35.0])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, None, 'coeff')
+    (indices, corr) = sc.xcorr(a, b, None, 'coeff')
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([0.1181, 0.3347, 0.6300, 0.9844, 0.7481, 0.4922, 0.2362])
@@ -95,7 +95,7 @@ def test_stats_cross_correlation():
     assert corr[:, 1, 1].same_as([0.0000, 0.1759, 0.4201, 0.7230, 0.9575, 0.6644, 0.3420])
 
     # verified with octave
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'noscale')
+    (indices, corr) = sc.xcorr(a, b, 2, 'noscale')
     assert indices.same_as([-2, -1, 0, 1, 2.])
     corr.display()
     # first column on a with first column in b
@@ -107,7 +107,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([18, 43, 74, 98, 68])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'biased')
+    (indices, corr) = sc.xcorr(a, b, 2, 'biased')
     assert indices.same_as([-2, -1, 0, 1, 2])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([4.25, 8.0, 12.5, 9.5, 6.25])
@@ -118,7 +118,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([4.5, 10.75, 18.5, 24.5, 17.0])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'unbiased')
+    (indices, corr) = sc.xcorr(a, b, 2, 'unbiased')
     assert indices.same_as([-2, -1, 0, 1, 2])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([8.5, 10.6667, 12.50, 12.6667, 12.50])
@@ -129,7 +129,7 @@ def test_stats_cross_correlation():
     # second column on a with second column on b
     assert corr[:, 1, 1].same_as([9.0, 14.3333, 18.50, 32.6667, 34.0])
 
-    (indices, corr) = sc.statistics.xcorr(a, b, 2, 'coeff')
+    (indices, corr) = sc.xcorr(a, b, 2, 'coeff')
     assert indices.same_as([-2, -1, 0, 1, 2])
     # first column on a with first column in b
     assert corr[:, 0, 0].same_as([0.3347, 0.6300, 0.9844, 0.7481, 0.4922])
@@ -149,7 +149,7 @@ def test_stats_cross_covariance():
     # since xcov is just xcorr with means substracted, the test
     # simply checks for correct results for this scenario matching
     # octave results.
-    (indices, cov) = sc.statistics.xcov(a, b)
+    (indices, cov) = sc.xcov(a, b)
     assert indices.same_as([-3, -2, -1, 0, 1, 2, 3.])
     # first column on a with first column in b
     assert cov[:, 0, 0].same_as([-2.25, -1.5, 1.25, 5.0, 1.25, -1.5, -2.25])
@@ -164,33 +164,33 @@ def test_stats_cross_covariance():
 def test_stats_autocorrelation():
     a = sc.array([[1., 2, 3, 4], [2., 3, 4, 5]]).T
     # checked with octave
-    results = sc.statistics.acorr(a)
+    results = sc.acorr(a)
     assert results[:, 0].same_as([4, 11, 20, 30, 20, 11, 4])
     assert results[:, 1].same_as([10, 23, 38, 54, 38, 23, 10])
-    # print(sc.statistics.acorr(a, scale=XCorrScale.Coeff))
+    # print(sc.acorr(a, scale=XCorrScale.Coeff))
 
 
 def test_stats_autocovariance():
     a = sc.array([[1., 2, 3, 4], [2., 3, 4, 5]]).T
     # checked with octave
     # the vectors are identical from a auto cov perspective
-    results = sc.statistics.acov(a)
+    results = sc.acov(a)
     assert results[:, 0].same_as([-2.25, -1.5, 1.25, 5.0, 1.25, -1.5, -2.25])
     assert results[:, 1].same_as([-2.25, -1.5, 1.25, 5.0, 1.25, -1.5, -2.25])
 
 def test_stats_topk():
     test_data = sc.array([8, 3, 0, 7, 1, 5, 4, 6, 9, 2], dtype="float32")
-    (vals, indices) = sc.statistics.topk_max(test_data, 5)
+    (vals, indices) = sc.topk_max(test_data, 5)
     assert vals.same_as([9,8,7,6,5])
     assert indices.same_as([8,0,3,7,5])
-    (vals, indices) = sc.statistics.topk_min(test_data, 5)
+    (vals, indices) = sc.topk_min(test_data, 5)
     assert vals.same_as([0,1,2,3,4])
     assert indices.same_as([2,4,9,1,6])
-    (vals, indices) = sc.statistics.topk_min(sc.reshape(test_data, (5,2)), 1, 0)
+    (vals, indices) = sc.topk_min(sc.reshape(test_data, (5,2)), 1, 0)
     assert vals.same_as([[0],[2]])
     assert indices.same_as([[2],[4]])
     
     test_data[0] = -np.nan
-    print(sc.statistics.topk_min(test_data, 2, 0))
+    print(sc.topk_min(test_data, 2, 0))
 
 
