@@ -124,8 +124,7 @@ void pygauss::bindings::linear_algebra_operations(py::module &m)
 
             return result;
         },
-        py::arg("array_like").none(false),
-        "Computes the determinant of a matrix.");
+        py::arg("array_like").none(false));
 
     m.def(
         "inverse",

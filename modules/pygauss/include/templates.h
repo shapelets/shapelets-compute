@@ -1,7 +1,7 @@
 #ifndef __TEMPLATES_H__
 #define __TEMPLATES_H__
 
-#define UNARY_TEMPLATE_FN_LAMBDA(NAME, OP, HELP)                    \
+#define UNARY_TEMPLATE_FN_LAMBDA(NAME, OP)                          \
     m.def(                                                          \
         #NAME,                                                      \
         [](const py::object &array_like) {                          \
@@ -10,10 +10,9 @@
                 throw std::runtime_error(#NAME ": Expected array"); \
             return OP(conv.value());                                \
         },                                                          \
-        py::arg("array_like").none(false),                          \
-        HELP);
+        py::arg("array_like").none(false));                          
 
-#define UNARY_TEMPLATE_FN(NAME, OP, HELP)                           \
+#define UNARY_TEMPLATE_FN(NAME, OP)                                 \
     m.def(                                                          \
         #NAME,                                                      \
         [](const py::object &array_like) {                          \
@@ -25,8 +24,7 @@
             throw_on_error(OP(&out, conv.value().get()));           \
             return af::array(out);                                  \
         },                                                          \
-        py::arg("array_like").none(false),                          \
-        HELP);
+        py::arg("array_like").none(false));                          
 
 #define BINARY_TEMPLATE_FN(NAME, OP, FLOATING)                                     \
     m.def(                                                                         \

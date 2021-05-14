@@ -21,22 +21,14 @@ PYBIND11_MODULE(_pygauss, m) {
     m.def("manual_eval_enabled",
           []() {
               return af::getManualEvalFlag();
-          },
-          "Informs if computations would only be triggered when a eval is directly requested.");
+          });
 
     m.def("enable_manual_eval",
           [](const bool &new_value) {
               spd::debug("Manual Evaluation is now {}", new_value ? "ENABLED" : "DISABLED");
               return af::setManualEvalFlag(new_value);
           },
-          py::arg("new_value").none(false),
-          "Changes the way results are computed.  "
-          "\n"
-          "When manually evaluation is disabled, the system will compute as soon as possible, "
-          "reducing the opportunities for kernel fusion; however, when manual evaluation is "
-          "enabled, computations have a better chance of merging, resulting in a far more "
-          "effective computation.  When enabled, results should be requested through `eval` "
-          "methods and `sync` to ensure device's work queue is completed.");
+          py::arg("new_value").none(false));
 
     shared_enum_types(m);
     device_operations(m);

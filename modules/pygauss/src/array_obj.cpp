@@ -76,12 +76,9 @@ void pygauss::bindings::array_obj(py::module &m) {
                return af::allTrue<bool>(af::abs(non_nan_self - non_nan_other) < (double) eps);
            },
            py::arg("arr_like").none(false),
-           py::arg("eps") = 1e-4,
-           "Performs a element wise comparison between the arrays and returns "
-           "True if the two arrays are the same (same dimensions, same values).");
+           py::arg("eps") = 1e-4);
 
-    ka.def_readonly_static("__array_priority__", &array_priority,
-                           "Ensure priority in resolved in favour of our built-in methods");
+    ka.def_readonly_static("__array_priority__", &array_priority);
 
     ka.def("__getitem__",
            [](const af::array &self, const py::object &selector) {
@@ -91,8 +88,7 @@ void pygauss::bindings::array_obj(py::module &m) {
                throw_on_error(af_release_indexers(index));
                return af::array(out);
            },
-           py::arg("selector").none(false),
-           "");
+           py::arg("selector").none(false));
 
     ka.def("__setitem__",
            [](af::array &self, const py::object &selector, const py::object &value) {
@@ -116,12 +112,12 @@ void pygauss::bindings::array_obj(py::module &m) {
     ka.def("__copy__",
            [](const af::array &self) {
                return af::array(self);
-           }, "Shallow copy");
+           });
 
     ka.def("__deepcopy__",
            [](const af::array &self, const py::object& memo) {
                return self.copy();
-           }, py::arg("memo"), "Deep copy");
+           }, py::arg("memo"));
 
     ka.def("__len__",
            [](const af::array &self) {
@@ -194,43 +190,42 @@ void pygauss::bindings::array_obj(py::module &m) {
     ka.def_property_readonly("size",
                              [](const af::array &self) {
                                  return self.elements();
-                             }, "Returns the total number of elements of this array.");
-
+                             });
 
     ka.def_property_readonly("ndim",
                              [](const af::array &self) {
                                  return self.numdims();
-                             }, "Returns the number of dimensions.");
+                             });
 
     ka.def_property_readonly("itemsize",
                              [](const af::array &self) {
                                  return arraylike::scalar_size(self.type());
-                             }, "Returns the size in bytes of each individual item held by this array");
+                             });
 
     ka.def_property_readonly("dtype",
                              [](const af::array &self) {
                                  return self.type();
-                             }, "Returns the numpy dtype describing the type of elements held by this array");
+                             });
 
     ka.def_property_readonly("T",
                              [](const af::array &self) {
                                  return self.T();
-                             }, "Get the transposed the array");
+                             });
 
     ka.def_property_readonly("H",
                              [](const af::array &self) {
                                  return self.H();
-                             }, "Get the conjugate-transpose of the current array");
+                             });
 
     ka.def_property_readonly("real",
                              [](const af::array &self) {
                                 return af::real(self);
-                             }, "Returns the real part of this tensor");
+                             });
 
     ka.def_property_readonly("imag",
                              [](const af::array &self) {
                                  return af::imag(self);
-                             }, "Returns the imaginary part of this tensor");
+                             });
 
     ka.def("eval",
            [](const af::array &self){
@@ -241,14 +236,14 @@ void pygauss::bindings::array_obj(py::module &m) {
            [](const af::array &self, const af::dtype &type) {
                return self.as(type);
            },
-           py::arg("type").none(false),
-           "converts the array into a new array with the specified type");
+           py::arg("type").none(false));
 
     ka.def("__int__", 
         [](const af::array &self){
             
             if (self.elements() != 1)
                 throw std::runtime_error("Only arrays of one element can be converted to Python scalars");
+
             switch (self.type())
             {
             case af::dtype::b8: {
@@ -474,8 +469,7 @@ void pygauss::bindings::array_obj(py::module &m) {
                throw_on_error(af_matmul(&out, self.get(), rhs.get(), AF_MAT_NONE, AF_MAT_NONE));
                return af::array(out);
            },
-           py::arg("other").none(false),
-           "Matrix multiplication");
+           py::arg("other").none(false));
 
     ka.def("__rmatmul__",
            [](const af::array &self, const py::object &other) {
@@ -485,9 +479,7 @@ void pygauss::bindings::array_obj(py::module &m) {
                throw_on_error(af_matmul(&out, rhs.get(), self.get(), AF_MAT_NONE, AF_MAT_NONE));
                return af::array(out);
            },
-           py::arg("other").none(false),
-           "Matrix multiplication");
-
+           py::arg("other").none(false));
 
     ka.def("__abs__",
            [](const af::array &self) {
@@ -576,6 +568,5 @@ void pygauss::bindings::array_obj(py::module &m) {
               if (!lst.empty()) {
                   throw_on_error(af_eval_multiple(lst.size(), lst.data()));
               }
-          },
-          "Forces the evaluation of all the arrays");
+          });
 }

@@ -92,9 +92,6 @@ af::array maxof_keep_nan(af::array &a, af::array &b, bool broadcast)
 
 void pygauss::bindings::parallel_algorithms(py::module &m)
 {
-    //
-    // all and any from logic
-    //
     m.def(
         "any",
         [](const py::object &array_like, const std::optional<int> &dim) {
@@ -109,8 +106,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return result;
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(true) = py::none(),
-        "Check if any the elements along a specified dimension are true.");
+        py::arg("dim").none(true) = py::none());
 
     m.def(
         "all",
@@ -126,8 +122,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return result;
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(true) = py::none(),
-        "Check if all the elements along a specified dimension are true.");
+        py::arg("dim").none(true) = py::none());
 
     m.def(
         "nan_to_num",
@@ -147,18 +142,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         },
         py::arg("array_like").none(false),
         py::arg("nan") = 0.0,
-        py::arg("inf") = 0.0,
-        "Return the minimum of an array or minimum along an axis, propagating NaNs");
-
-    //
-    // amin, nanmin, minimum, fmin, argmin
-    //
-    // amin -> Return the minimum of an array or minimum along an axis, propagating NaNs
-    // nanmin -> The minimum value of an array along a given axis, ignoring any NaNs.
-    // minimum -> Element-wise minimum of two arrays, propagating any NaNs.
-    // fmin -> Element-wise minimum of two arrays, ignoring any NaNs.
-    // argmin -> Return the indices of the minimum values.
-    //
+        py::arg("inf") = 0.0);
 
     typedef std::variant<af::array, py::int_> intOrArray;
     typedef std::variant<std::complex<double>, af::array, py::float_> numberOrArray;
@@ -181,8 +165,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return result;
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(true) = py::none(),
-        "Return the minimum of an array or minimum along an axis, propagating NaNs");
+        py::arg("dim").none(true) = py::none());
 
     m.def(
         "nanmin",
@@ -212,12 +195,10 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return result;
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(true) = py::none(),
-        "The minimum value of an array along a given axis, ignoring any NaNs.");
+        py::arg("dim").none(true) = py::none());
 
-    BINARY_TEMPLATE_FN_LAMBDA(minimum, minof_keep_nan, "Minimum of two inputs, with NaNs propagated.")
-
-    BINARY_TEMPLATE_FN(fmin, af_minof, "Minimum of two inputs, ignoring NaNs")
+    BINARY_TEMPLATE_FN_LAMBDA(minimum, minof_keep_nan, false)
+    BINARY_TEMPLATE_FN(fmin, af_minof, false)
 
     m.def(
         "argmin",
@@ -244,8 +225,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return std::make_tuple(af::array(index), af::array(out));
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = py::none(),
-        "Returns the indices and values of the minimum values along an axis, propagating NaNs");
+        py::arg("dim") = py::none());
 
     m.def(
         "nanargmin",
@@ -284,14 +264,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return std::make_tuple(af::array(index), af::array(out));
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = py::none(),
-        "Returns the indices and values of the minimum values along an axis, ignoring NaN");
-
-    //
-    // amax, nanmax, maximum, fmax, argmax
-    //
-    // Same as before, but with max
-    //
+        py::arg("dim") = py::none());
 
     m.def(
         "amax",
@@ -310,8 +283,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return result;
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(true) = py::none(),
-        "Return the maximum of an array or minimum along an axis, propagating NaNs");
+        py::arg("dim").none(true) = py::none());
 
     m.def(
         "nanmax",
@@ -342,12 +314,10 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return result;
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(true) = py::none(),
-        "The maximum value of an array along a given axis, ignoring any NaNs.");
+        py::arg("dim").none(true) = py::none());
 
-    BINARY_TEMPLATE_FN_LAMBDA(maximum, maxof_keep_nan, "Maximum of two inputs, with NaNs propagated.")
-
-    BINARY_TEMPLATE_FN(fmax, af_maxof, "Maximum of two inputs, ignoring NaNs")
+    BINARY_TEMPLATE_FN_LAMBDA(maximum, maxof_keep_nan, false)
+    BINARY_TEMPLATE_FN(fmax, af_maxof, false)
 
     m.def(
         "argmax",
@@ -373,8 +343,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return std::make_tuple(af::array(index), af::array(out));
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = py::none(),
-        "Returns the indices and values of the maximum values along an axis, with NaNs propagated.");
+        py::arg("dim") = py::none());
 
     m.def(
         "nanargmax",
@@ -413,8 +382,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return std::make_tuple(af::array(index), af::array(out));
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = py::none(),
-        "Returns the indices and values of the maximum values along an axis, with NaNs propagated.");
+        py::arg("dim") = py::none());
 
     m.def(
         "count_nonzero",
@@ -429,8 +397,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return result;
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(true) = py::none(),
-        "Count the number of non zero elements in an array along a specified dimension");
+        py::arg("dim").none(true) = py::none());
 
     m.def(
         "sum",
@@ -464,12 +431,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
-        py::arg("nan_value").none(true) = py::none(),
-        "Calculate the sum of all the elements along a specified dimension.\n"
-        "\n"
-        "This function is equivalent to both sum and nansum in numpy; simply set the value "
-        "of `nan_value` parameter to either include NaNs in the sumation (None) or replace "
-        "NaN values with your choice.");
+        py::arg("nan_value").none(true) = py::none());
 
     m.def(
         "product",
@@ -501,12 +463,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         },
         py::arg("array_like").none(false),
         py::arg("dim").none(true) = py::none(),
-        py::arg("nan_value").none(true) = py::none(),
-        "Calculate the product of all the elements along a specified dimension.\n"
-        "\n"
-        "This function is equivalent to both prod and nanprod in numpy; simply set the value "
-        "of `nan_value` parameter to either include NaNs in the multiplication (None) or replace "
-        "NaN values with your choice.");
+        py::arg("nan_value").none(true) = py::none());
 
     m.def(
         "cumsum",
@@ -515,8 +472,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return reduce_dim(a, dim, af_accum);
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = 0,
-        "Cumulative sum of an array along a specified dimension, propagating NaNs");
+        py::arg("dim") = 0);
 
     m.def(
         "nancumsum",
@@ -529,8 +485,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return reduce_dim(a, dim, af_accum);
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = 0,
-        "Cumulative sum of an array along a specified dimension, ignoring NaNs");
+        py::arg("dim") = 0);
 
     m.def(
         "cumprod",
@@ -539,8 +494,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return af::scan(a, dim, AF_BINARY_MUL, true);
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = 0,
-        "Cumulative product of an array along a specified dimension, propagating NaNs");
+        py::arg("dim") = 0);
 
     m.def(
         "nancumprod",
@@ -554,8 +508,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return af::scan(a, dim, AF_BINARY_MUL, true);
         },
         py::arg("array_like").none(false),
-        py::arg("dim") = 0,
-        "Cumulative product of an array along a specified dimension, ignoring NaNs");
+        py::arg("dim") = 0);
 
     m.def(
         "scan",
@@ -566,8 +519,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         py::arg("array_like").none(false),
         py::arg("dim") = 0,
         py::arg("op") = af::binaryOp::AF_BINARY_ADD,
-        py::arg("inclusive_scan") = true,
-        "Generalized scan of an array, which can the operations defined in ScanOp.");
+        py::arg("inclusive_scan") = true);
     //
     m.def(
         "nanscan",
@@ -583,9 +535,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         py::arg("dim") = 0,
         py::arg("nan") = 0.0,
         py::arg("op") = af::binaryOp::AF_BINARY_ADD,
-        py::arg("inclusive_scan") = true,
-        "Generalized scan of an array, which can the operations defined in ScanOp; this function replaces NaN "
-        "values with the value provided in parameter `nan`, which defaults to 0.0");
+        py::arg("inclusive_scan") = true);
 
     m.def(
         "diff1",
@@ -594,8 +544,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return reduce_dim(a, dim, af_diff1);
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(false),
-        "Find the first order differences along specified dimensions");
+        py::arg("dim").none(false));
 
     m.def(
         "diff2",
@@ -604,8 +553,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return reduce_dim(a, dim, af_diff2);
         },
         py::arg("array_like").none(false),
-        py::arg("dim").none(false),
-        "Find the second order differences along specified dimensions");
+        py::arg("dim").none(false));
 
     m.def(
         "sort",
@@ -615,8 +563,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         },
         py::arg("array_like").none(false),
         py::arg("dim") = 0,
-        py::arg("asc") = true,
-        "Sort the array along a specified dimension");
+        py::arg("asc") = true);
 
     m.def(
         "sort_index",
@@ -653,8 +600,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             auto a = pygauss::arraylike::as_array_checked(array_like);
             return af::where(a);
         },
-        py::arg("array_like").none(false),
-        "Return indices that are non-zero in the flattened version of a");
+        py::arg("array_like").none(false));
 
     m.def(
         "unique",
@@ -663,8 +609,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             return af::setUnique(a, is_sorted);
         },
         py::arg("array_like").none(false),
-        py::arg("is_sorted") = py::bool_(false),
-        "Find the unique elements of an array.");
+        py::arg("is_sorted") = py::bool_(false));
 
     m.def(
         "union",
@@ -675,8 +620,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         },
         py::arg("x1").none(false),
         py::arg("x2").none(false),
-        py::arg("is_unique") = py::bool_(false),
-        "Find the union of two arrays.");
+        py::arg("is_unique") = py::bool_(false));
 
     m.def(
         "intersect",
@@ -687,8 +631,7 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
         },
         py::arg("x1").none(false),
         py::arg("x2").none(false),
-        py::arg("is_unique") = py::bool_(false),
-        "Find the union of two arrays.");
+        py::arg("is_unique") = py::bool_(false));
 
     m.def(
         "any_by_key",
