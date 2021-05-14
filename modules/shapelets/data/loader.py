@@ -5,11 +5,11 @@ import numpy as np
 import pathlib
 import os
 
-def load_dataset(name:str) -> ShapeletsArray:
+def load_dataset(name:str, dtype: np.dtype) -> ShapeletsArray:
     current_path = pathlib.Path(__file__).parent.absolute()
     file = os.path.join(current_path, name)
     data = np.loadtxt(file)
-    return scarray(data)
+    return scarray(data, dtype=dtype)
 
 def load_mat(name: str, section: str = "data") -> ShapeletsArray:
     current_path = pathlib.Path(__file__).parent.absolute()

@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import Callable, List, Tuple, Union
 
-from .. import compute as sc
+import shapelets.compute as sc
 
 import math
 import random
@@ -304,7 +304,7 @@ def generate(program: List = [], lengths: Union[int, List[int]] = 10, start_leve
         raise ValueError("No valid configuration provided")
 
     seed=random.randint(0, 1000000)
-    sh_rnd = sc.random.default_rng(seed = seed)
+    sh_rnd = sc.random.random_engine(seed = seed)
     py_rnd = random.Random(seed)
 
     if isinstance(lengths, int):
@@ -341,13 +341,13 @@ if __name__ == '__main__':
         # brown_noise(),
         # violet_noise() + white_noise()
         # cc_increasing() + cc_decreasing() + cc_cyclic() + cc_normal() + cc_upward()+cc_downward(),
-        # [cc_upward(), cc_normal()],
-        # [[cc_cyclic(), cc_normal()], [.9, .1]],
-        # cc_decreasing()+cc_cyclic(),
-        cc_increasing(),
-        cc_decreasing(),
-        cc_downward() + 0.3*white_noise(),
-        cc_upward() + 0.3*white_noise(),
+        [cc_upward(), cc_normal()],
+        [[cc_cyclic(), cc_normal()], [.9, .1]],
+        cc_decreasing() + cc_cyclic() + white_noise(),
+        # cc_increasing(),
+        # cc_decreasing(),
+        # cc_downward() + 0.3*white_noise(),
+        # cc_upward() + 0.3*white_noise(),
         
     ]
 
@@ -363,7 +363,7 @@ if __name__ == '__main__':
     # print((cc_downward() + 0.3*white_noise()).generate_delta(10, sh_rnd).dtype)
     # print((cc_upward() + 0.3*white_noise()).generate_delta(10, sh_rnd).dtype)
 
-    r = generate(program, 1000, start_level=100.0, repetitions=10)
+    r = generate(program, 100, start_level=100.0, repetitions=1)
     plt.plot(r)
     plt.show()
     

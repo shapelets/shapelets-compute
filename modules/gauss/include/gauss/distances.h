@@ -8,12 +8,44 @@
 
 namespace gauss::distances {
 
+/**
+ * Structure that describes a distance / similitude algorithm
+ */ 
 typedef struct distance_algorithm {
+    // Requires all column vectors to be of the same length
     bool same_length;
+
+    // Informs of possible optimisations when d_ij=d_ji
     bool is_symmetric;
+    
+    // Optionally describes the preferred result type of 
+    // the computation.  This is used to allocate the 
+    // result matrix in compute (see below) public 
+    // methods
     std::optional<af::dtype> resultType;
+    
+    // Computes the distance of the column vector in the 
+    // first parameters against all column vectors in the 
+    // second argument.
     std::function<af::array(const af::array&, const af::array&)> compute;
+
 } distance_algorithm_t;
+
+/**
+ * @brief Runs the algo for every column in xa to all the others.
+ * if the algorithm is symmetric, it will only do half of the work
+ */ 
+af::array compute(const distance_algorithm_t& algo, const af::array& xa);
+
+/**
+ * @brief Runs algo for every column in xa against all columns in xb
+ */ 
+af::array compute(const distance_algorithm_t& algo, const af::array& xa, const af::array &xb);
+
+
+/////////////////
+// Built-in Algos
+/////////////////
 
 distance_algorithm_t additive_symm_chi();
 distance_algorithm_t avg_l1_linf();
@@ -67,9 +99,6 @@ distance_algorithm_t wavehedges();
 distance_algorithm_t tanimoto();
 distance_algorithm_t ruzicka();
 distance_algorithm_t motyka();
-
-af::array compute(const distance_algorithm_t& algo, const af::array& xa);
-af::array compute(const distance_algorithm_t& algo, const af::array& xa, const af::array &xb);
 
 }  // namespace gauss
 

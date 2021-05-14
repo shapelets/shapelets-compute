@@ -48,6 +48,12 @@ class ShapeletsArray:
         """
         Element-wise equality test
         """
+
+    def __floordiv__(self, other: ArrayLike) -> ShapeletsArray:
+        """
+        Element-wise floor division
+        """
+
     def __ge__(self, other: ArrayLike) -> ShapeletsArray: 
         """
         Element-wise greater than or equal test
@@ -107,6 +113,11 @@ class ShapeletsArray:
         Inplace element-wise true division
         """
 
+    def __ifloordiv__(self, other: ArrayLike) -> ShapeletsArray:         
+        """
+        Implace element-wise floor division
+        """
+
     def __ixor__(self, other: ArrayLike) -> ShapeletsArray: 
         """
         Inplace element-wise ``bitwise xor`` operation
@@ -162,6 +173,8 @@ class ShapeletsArray:
         Element-wise power operation.
         """
 
+    def __invert__(self) -> ShapeletsArray: ...
+
     def __radd__(self, other: ArrayLike) -> ShapeletsArray: ...
     def __rand__(self, other: ArrayLike) -> ShapeletsArray: ... 
     def __rlshift__(self, other: ArrayLike) -> ShapeletsArray: ...
@@ -174,7 +187,8 @@ class ShapeletsArray:
     def __rsub__(self, other: ArrayLike) -> ShapeletsArray:  ... 
     def __rtruediv__(self, other: ArrayLike) -> ShapeletsArray: ...
     def __rxor__(self, other: ArrayLike) -> ShapeletsArray: ...
-    
+    def __rfloordiv__(self, other: ArrayLike) -> ShapeletsArray: ...
+
     def __rshift__(self, other: ArrayLike) -> ShapeletsArray:  
         """
         Element-wise right shift operation

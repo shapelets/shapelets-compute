@@ -112,11 +112,13 @@ def fft(a: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[No
     >>> af = sc.fft.fft(a)
 
     The same transformation as before, but controlling padding and norm:
+
     >>> afp = sc.fft.fft(a, 128, 'ortho')
     >>> afp.shape
     (128, 1)
 
     Two dimensional fft:
+
     >>> a = sc.random.randn((100, 100))
     >>> af = sc.fft.fft(a)
     >>> af.shape
@@ -228,6 +230,7 @@ def irfft(c: ArrayLike, shape: ShapeLike, norm: Optional[Union[NormType,float]] 
 
 def rfftfreq(n: int, d: float = 1.0) -> ShapeletsArray:
     r"""
+    TODO
     """
     return _pygauss.rfftfreq(n, d)
 

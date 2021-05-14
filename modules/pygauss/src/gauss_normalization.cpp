@@ -51,11 +51,13 @@ void pygauss::bindings::gauss_normalization_functions(py::module &m) {
 
     m.def(
         "zscore", 
-        [](const py::object& array_like) {
+        [](const py::object& array_like, const int axis = 0, const int ddof = 0) {
             auto arr = arraylike::as_array_checked(array_like);
-            return gnorm::znorm(arr);
+            return gnorm::znorm(arr, axis, ddof);
         },
-        py::arg("array_like").none(false));        
+        py::arg("array_like").none(false),
+        py::arg("axis") = 0,
+        py::arg("ddof") = 0);        
 
     m.def(
         "unit_length_norm", 

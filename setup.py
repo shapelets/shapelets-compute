@@ -98,8 +98,6 @@ class CMakeBuild(cmdclass["build_ext"]):
             '-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE',
             '-Wno-dev'
         ]
-
-
         
         cfg = 'Debug' if self.debug else 'Release' # 'RelWithDebInfo'
         build_args = ['--config', cfg]  # cfg]
@@ -147,7 +145,14 @@ def create_metadata(full_version, doc_url):
                                     target=["PyGauss"])],
         python_requires='>=3.7',
         package_data={
-            'shapelets': ['data/*.txt', 'compute/.libs/*.*'],
+            'shapelets': [
+                'data/*.txt', 
+                'data/*.mat', 
+                # 'compute/.libs/*.*'
+            ],
+        },
+        exclude_package_data = {
+            'shapelets': [ 'compute/.libs/*.dylib' ]
         },
         include_package_data = True,
     )

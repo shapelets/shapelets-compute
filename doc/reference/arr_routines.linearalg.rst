@@ -1,33 +1,59 @@
 .. _arr_routines_linearalg:
 
-Logic Functions
-***************
+Linear Algebra Functions
+************************
 
 .. currentmodule:: shapelets.compute
 
-Linear algebra
+Eigenvalues
+-----------
+
+.. autosummary::
+   :toctree: generated/
+
+   eig
+   eigh
+   eigvals
+   eigvalsh
+
+Decompositions
 --------------
 
 .. autosummary::
    :toctree: generated/
 
+   lu
+   qr
+   svd
+   cholesky
+
+Convolutions
+------------
+   
+.. autosummary::
+   :toctree: generated/
+   
    convolve
    convolve1
    convolve2
-   convolve3
+   convolve3   
+
+Matrix Operations
+-----------------
+
+.. autosummary::
+   :toctree: generated/
+
    det
    dot
    dot_scalar
    gemm
-   inverse
-   lu
+   inv
+   pinv
    matmul
    matmulNT
    matmulTN
    matmulTT
-   matmul_chain
    norm
-   pinverse
-   qr
    rank
-   svd
+   

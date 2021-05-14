@@ -94,7 +94,7 @@ void pygauss::bindings::math_operations(py::module &m) {
                   return af::round(arr);
 
               auto scale = pow(10, decimals);
-              return af::round((arr * scale) / scale);
+              return af::round(arr * scale) / scale;
           },
           py::arg("array_like").none(false),
           py::arg("decimals") = 0,
@@ -186,7 +186,6 @@ void pygauss::bindings::math_operations(py::module &m) {
 
     UNARY_TEMPLATE_FN(real, af_real, "Extracts the real part of a complex array or matrix")
     UNARY_TEMPLATE_FN(imag, af_imag, "Extracts the imaginary part of a complex array or matrix")
-    UNARY_TEMPLATE_FN(conj, af_conjg, "Gets the complex conjugate")
     UNARY_TEMPLATE_FN(conjugate, af_conjg, "Gets the complex conjugate")
     UNARY_TEMPLATE_FN(complex, af_cplx, "Builds a complex tensor from a real one.")
     UNARY_TEMPLATE_FN(angle, af_arg, "Returns the angle in radians")
@@ -235,7 +234,7 @@ void pygauss::bindings::math_operations(py::module &m) {
                            pygauss::arraylike::as_array_checked(up);
 
                   af_array out = nullptr;
-                  throw_on_error(af_maxof(&out, a.get(), u.get(), GForStatus::get()));
+                  throw_on_error(af_minof(&out, a.get(), u.get(), GForStatus::get()));
                   return af::array(out);
               }
 
@@ -244,7 +243,7 @@ void pygauss::bindings::math_operations(py::module &m) {
                        pygauss::arraylike::as_array_checked(lo);
 
               af_array out = nullptr;
-              throw_on_error(af_minof(&out, a.get(), l.get(), GForStatus::get()));
+              throw_on_error(af_maxof(&out, a.get(), l.get(), GForStatus::get()));
               return af::array(out);
           },
           py::arg("array_like").none(false),

@@ -318,6 +318,8 @@ namespace pygauss {
         void gauss_normalization_functions(py::module &m);
 
         void gauss_dimensionality_functions(py::module &m);
+
+        void clustering_functions(py::module &m);
     }
 
 

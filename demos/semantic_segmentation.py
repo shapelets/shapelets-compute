@@ -33,28 +33,42 @@ def createData(noiseScale = 0.001, freqBase = 5.0, nextFreq = 6.0):
     return data
 
 # %%
+
+# Simulate frequency oscillations in a
+# high voltage distribution network, 
+# oscillating at a base frequency of 
+# 50Hz, with a change 0.1% change in 
+# the middle of the data.
+# Simulation data has 20% of noise
+
 wLen = 800
-noiseScale = 0.10
-freqBase = 5.0
-nextFreq = 5.1
+noiseScale = 0.20
+freqBase = 50.0
+nextFreq = freqBase * 1.01
 
 data = createData(noiseScale, freqBase, nextFreq)
-# %%
 plt.plot(data)
+plt.title("Simulation Data")
 plt.show()
-# %%
 
+
+# %%
+# Run matrix profile on the data, using a window
+# of 800 points 
+import shapelets.compute as sc
 profile, index, _ = sc.matrixprofile.matrix_profile(data, wLen)
 
-# %%
+# Use segmentation algorithm to identify 
+# hidden changes in behaviour
 minPoint = sc.matrixprofile.segment(profile, index, wLen, 1)[0]
-print(minPoint)
-# %%
 
+# Plot results and the location of the 
+# frequency shift
 fig, ax = plt.subplots(2,1, figsize=(18, 8))
 ax[0].plot(profile)
 ax[1].plot(data)
-ax[1].axvspan(minPoint, minPoint+wLen, facecolor="yellow", edgecolor='none', alpha=0.5)
+ax[1].axvspan(minPoint, minPoint+wLen, facecolor="yellow", 
+    edgecolor='none', alpha=0.5)
 plt.show()
 
 # %%

@@ -52,6 +52,14 @@ af::array binary_function(af::array &self, const py::object &other, bool reverse
 
 int array_priority = 30;
 
+af_err floor_divide(af_array* out, const af_array left, const af_array right, bool broadcast) {
+    af_array tmp;
+    auto err = af_div(&tmp, left, right, broadcast);
+    if (err != AF_SUCCESS)
+        return err;
+    return af_floor(out, tmp);
+}
+
 void pygauss::bindings::array_obj(py::module &m) {
 
     py::class_<af::array> ka(m, "ShapeletsArray", py::buffer_protocol());
@@ -502,6 +510,10 @@ void pygauss::bindings::array_obj(py::module &m) {
     BINARY_OPR(af_div, __rtruediv__)
     BINARY_IOP(af_div, __itruediv__)
 
+    BINARY_OP(floor_divide, __floordiv__)
+    BINARY_OPR(floor_divide, __rfloordiv__)
+    BINARY_IOP(floor_divide, __ifloordiv__)
+
     BINARY_OP(af_mod, __mod__)
     BINARY_OPR(af_mod, __rmod__)
     BINARY_IOP(af_mod, __imod__)
@@ -536,6 +548,12 @@ void pygauss::bindings::array_obj(py::module &m) {
     BINARY_OP(af_bitshiftr, __rshift__)
     BINARY_OPR(af_bitshiftr, __rrshift__)
     BINARY_IOP(af_bitshiftr, __irshift__)
+
+    ka.def("__invert__",
+        [](const af::array &self) {
+            auto as_bool = self.isbool() ? self : self.as(af::dtype::b8);
+            return !as_bool;
+        });
 
     ka.def("__neg__",
            [](af::array &self) {

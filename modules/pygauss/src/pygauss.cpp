@@ -58,4 +58,5 @@ PYBIND11_MODULE(_pygauss, m) {
     gauss_distance_functions(m);
     gauss_normalization_functions(m);
     gauss_dimensionality_functions(m);
+    clustering_functions(m);
 }

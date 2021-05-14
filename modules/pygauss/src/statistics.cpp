@@ -265,12 +265,12 @@ void pygauss::bindings::statistic_functions(py::module &m)
 
     m.def(
         "topk_max",
-        [](const py::object &data, const int k) {
+        [](const py::object &data, const int k, const int dim) {
             auto arr = arraylike::as_array_checked(data);
             arraylike::ensure_floating(arr);
             af::array values;
             af::array indices;
-            af::topk(values, indices, arr, k, 0, af_topk_function::AF_TOPK_MAX);
+            af::topk(values, indices, arr, k, dim, af_topk_function::AF_TOPK_MAX);
             
             py::tuple result(2);
             result[0] = values;
@@ -278,16 +278,17 @@ void pygauss::bindings::statistic_functions(py::module &m)
             return result;
         },
         py::arg("a").none(false),
-        py::arg("k").none(false));
+        py::arg("k").none(false),
+        py::arg("dim") = -1);
 
     m.def(
         "topk_min",
-        [](const py::object &data, const int k) {
+        [](const py::object &data, const int k, const int dim) {
             auto arr = arraylike::as_array_checked(data);
             arraylike::ensure_floating(arr);
             af::array values;
             af::array indices;
-            af::topk(values, indices, arr, k, 0, af_topk_function::AF_TOPK_MIN);
+            af::topk(values, indices, arr, k, dim, af_topk_function::AF_TOPK_MIN);
 
             py::tuple result(2);
             result[0] = values;
@@ -295,5 +296,6 @@ void pygauss::bindings::statistic_functions(py::module &m)
             return result;
         },
         py::arg("a").none(false),
-        py::arg("k").none(false));
+        py::arg("k").none(false),
+        py::arg("dim") = -1);
 }

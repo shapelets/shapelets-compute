@@ -141,7 +141,7 @@ namespace gauss::matrix
 
     af::array mass_compute(const mass_t &state, const af::array &queries, bool normalize) {
         auto qReordered = af::reorder(queries, 0, 3, 2, 1);
-        auto checked_q = (normalize) ? gauss::normalization::znorm(qReordered, 1e-8) : qReordered;
+        auto checked_q = (normalize) ? gauss::normalization::znorm(qReordered) : qReordered;
 
         af::array qt = mass_fft(state, checked_q);
         af::array sum_q = af::sum(checked_q, 0);

@@ -28,11 +28,7 @@ def test_stats_skewness_kurtosis_moments():
     assert m4.same_as(24.0, eps=0.03)
 
 def test_stats_correlation():
-    data = [[1., 2, 3, 4],
-            [2., 3, 4, 5],
-            [3., 4, 5, 6],
-            [7., 8, 9, 0]]
-
+    data = [[1., 2, 3, 4], [2., 3, 4, 5], [3., 4, 5, 6], [7., 8, 9, 0]]
     npr = np.corrcoef(data, rowvar=False)
     sr = sc.statistics.corrcoef(data)
     assert sr.same_as(npr)
@@ -190,6 +186,11 @@ def test_stats_topk():
     (vals, indices) = sc.statistics.topk_min(test_data, 5)
     assert vals.same_as([0,1,2,3,4])
     assert indices.same_as([2,4,9,1,6])
-
+    (vals, indices) = sc.statistics.topk_min(sc.reshape(test_data, (5,2)), 1, 0)
+    assert vals.same_as([[0],[2]])
+    assert indices.same_as([[2],[4]])
+    
+    test_data[0] = -np.nan
+    print(sc.statistics.topk_min(test_data, 2, 0))
 
 

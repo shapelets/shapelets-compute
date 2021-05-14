@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Union, Optional
 
 from .__basic_typing import ArrayLike, Shape, DataTypeLike, ShapeLike, _ScalarLike
-from ._array_obj import ShapeletsArray
+from ._array_obj import array as asarray, ShapeletsArray
 
 from . import _pygauss
 
@@ -94,8 +94,6 @@ def linspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = T
 
     """
     return _pygauss.linspace(start, end, num, endpoint, axis, dtype)
-
-
 
 def logspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0, base: float = 10.0, dtype: DataTypeLike = "float32") -> ShapeletsArray: 
     """
@@ -271,7 +269,6 @@ def eye(N: int, M: Optional[int] = None, k: int = 0, dtype: DataTypeLike = 'floa
     """
     return _pygauss.eye(N, M, k, dtype)
 
-
 def full(shape: ShapeLike, fill_value: AnyScalar, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Return a new array of given shape and type, filled with `fill_value`.
@@ -290,6 +287,46 @@ def full(shape: ShapeLike, fill_value: AnyScalar, dtype: DataTypeLike = 'float32
     """   
     return _pygauss.full(shape, fill_value, dtype)
 
+def full_like(a: ArrayLike, fill_value: AnyScalar, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
+    """
+    Return a full array with the same shape and type as a given array.
+
+    Parameters
+    ----------
+    a: ArrayLike
+        Template array to extract shape and type.
+    
+    fill_value: AnyScalar
+        Constant to fill the array
+    
+    shape: ShapeLike, optional (default: None)
+        Overrides the shape implied by the template array
+    
+    dtype: DataTypeLike, optional (default: None)
+        Overrides the type implied by the template array
+
+    Returns
+    -------
+    ShapeletsArray
+        A new array instance fill with a constant value
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> a = sc.array([[1,2], [3,4]])
+    >>> sc.full_like(a, 3)
+    [2 2 1 1]
+            3          3 
+            3          3 
+    >>> sc.full_like(a, 3, dtype="float64")
+    [2 2 1 1]
+        3.0000     3.0000 
+        3.0000     3.0000 
+    """
+    template = asarray(a)
+    t_shape = shape if shape is not None else template.shape
+    t_dtype = dtype if dtype is not None else template.dtype
+    return _pygauss.full(t_shape, fill_value, t_dtype)
 
 def identity(shape: Shape, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
@@ -311,20 +348,96 @@ def identity(shape: Shape, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """        
     return _pygauss.identity(shape, dtype)
 
-
 def zeros(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Creates an array with all its elements set to zero.
     """
     return _pygauss.zeros(shape, dtype)
 
+def zeros_like(a: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
+    """
+    Return an array of zeros with the same shape and type as a given array.
+
+    Parameters
+    ----------
+    a: ArrayLike
+        Template array to extract shape and type.
+    
+    shape: ShapeLike, optional (default: None)
+        Overrides the shape implied by the template array
+    
+    dtype: DataTypeLike, optional (default: None)
+        Overrides the type implied by the template array
+
+    Returns
+    -------
+    ShapeletsArray
+        A new array instance fill with zeros
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> a = sc.array([[1,2], [3,4]])
+    >>> sc.zeros_like(a)
+    [2 2 1 1]
+            0          0 
+            0          0 
+    >>> sc.zeros_like(a, dtype="float64")
+    [2 2 1 1]
+        0.0000     0.0000 
+        0.0000     0.0000 
+
+    """
+    template = asarray(a) 
+    t_shape = shape if shape is not None else template.shape
+    t_dtype = dtype if dtype is not None else template.dtype
+    return _pygauss.zeros(t_shape, t_dtype)    
 
 def ones(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Creates an array with all its elements set to one.
+
     """
     return _pygauss.ones(shape, dtype)
 
+def ones_like(a: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
+    """
+    Return an array of ones with the same shape and type as a given array.
+
+    Parameters
+    ----------
+    a: ArrayLike
+        Template array to extract shape and type.
+    
+    shape: ShapeLike, optional (default: None)
+        Overrides the shape implied by the template array
+    
+    dtype: DataTypeLike, optional (default: None)
+        Overrides the type implied by the template array
+
+    Returns
+    -------
+    ShapeletsArray
+        A new array instance fill with ones
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> a = sc.array([[1,2], [3,4]])
+    >>> sc.ones_like(a)
+    [2 2 1 1]
+            1          1 
+            1          1 
+    >>> sc.zeros_like(a, dtype="float64")
+    [2 2 1 1]
+        1.0000     1.0000 
+        1.0000     1.0000  
+
+    """
+    template = asarray(a) 
+    t_shape = shape if shape is not None else template.shape
+    t_dtype = dtype if dtype is not None else template.dtype
+    return _pygauss.ones(t_shape, t_dtype) 
 
 def diag(a: ArrayLike, index: int = 0, extract: bool = False) -> ShapeletsArray:
     """
@@ -380,7 +493,6 @@ def diag(a: ArrayLike, index: int = 0, extract: bool = False) -> ShapeletsArray:
 
     """
     return _pygauss.diag(a, index, extract)
-    
 
 def iota(shape: ShapeLike, tile: Shape = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
@@ -419,7 +531,6 @@ def iota(shape: ShapeLike, tile: Shape = (1, 1), dtype: DataTypeLike = 'float32'
         4   9   14   4   9   14 
     """
     return _pygauss.iota(shape, tile, dtype)
-
 
 def range(shape: ShapeLike, seq_dim: int = 0, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
@@ -460,5 +571,6 @@ def range(shape: ShapeLike, seq_dim: int = 0, dtype: DataTypeLike = 'float32') -
 
 __all__ = [
     "geomspace", "logspace", "linspace", "arange", "arange", "empty", "eye", 
-    "identity", "full", "zeros", "ones", "diag", "iota", "range"
+    "identity", "full", "zeros", "ones", "diag", "iota", "range",
+    "zeros_like", "ones_like", "full_like"
 ]

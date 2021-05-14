@@ -28,188 +28,689 @@ def __map_scan_op(scanop: ScanOp):
     else:
         raise ValueError("Unknown scan operation")
 
-def argmin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, float], Tuple[int, complex], Tuple[ShapeletsArray, ShapeletsArray]]:
-    """
+def argmin(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, float], Tuple[int, complex], Tuple[ShapeletsArray, ShapeletsArray]]:
+    r"""
+    Locates the minimum values in an array
 
-    """
-    return _pygauss.argmin(array_like, dim)
+    Parameters
+    ----------
+    a: ArrayLike
+        Input array expression
 
-def nanargmin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]:
-    """
+    dim: Optional int (default: None)
+        Axis of the operation. 
+    
+    Returns
+    -------
+    Tuple[int, scalar]
+        When no dimension is given, it returns a tuple with the index and value
+    Tuple[ShapeletsArray, ShapeletsArray]
+        When the operation occurs over a concrete axis, it returns two arrays, one for the index and one for the values.    
 
-    """
-    return _pygauss.nanargmin(array_like, dim)
+    Notes
+    -----
+    When the operation does not indicate an axis, the index refers to the position of 
+    the element in column major order.  When an axis is given, the index refers to the 
+    position of the element within the axis.
 
-def argmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
-    """
-    """
-    return _pygauss.argmax(array_like, dim) 
+    See also
+    --------
+    nanargmin
 
-def nanargmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
-    """
-    """
-    return _pygauss.nanargmax(array_like, dim) 
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> a = sc.array([[1,2,3],[4,5,6]])
+    >>> sc.argmin(a)
+    (0, 1.0)
+    >>> indices, values = sc.argmin(a, 0)
+    >>> indices
+    [1 3 1 1]
+        0          0          0 
+    >>> values
+    [1 3 1 1]
+        1          2          3              
+    """  
+    return _pygauss.argmin(a, dim)
 
-def amax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
-    """
+def nanargmin(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]:
+    r"""
+    Locates the minimum values in an array, discarding nan values
 
-    """
-    return _pygauss.amax(array_like, dim)  
+    Parameters
+    ----------
+    a: ArrayLike
+        Input array expression
 
-def nanmax(array_like: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    dim: Optional int (default: None)
+        Axis of the operation. 
+    
+    Returns
+    -------
+    Tuple[int, scalar]
+        When no dimension is given, it returns a tuple with the index and value
+    Tuple[ShapeletsArray, ShapeletsArray]
+        When the operation occurs over a concrete axis, it returns two arrays, one for the index and one for the values.    
+
+    Notes
+    -----
+    When the operation does not indicate an axis, the index refers to the position of 
+    the element in column major order.  When an axis is given, the index refers to the 
+    position of the element within the axis.
+
+    See also
+    --------
+    argmin
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> import numpy as np
+    >>> a = sc.array([[np.nan, 2, 3],[4, 5, np.nan]])
+    >>> sc.nanargmin(a)
+    (2, 2.0)
+    >>> indices, values = sc.nanargmin(a, 0)
+    >>> indices
+    [1 3 1 1]
+        1          0          0 
+    >>> values
+    [1 3 1 1]
+        4.0000     2.0000     3.0000               
     """
+    return _pygauss.nanargmin(a, dim)
+
+def argmax(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
+    r"""
+    Locates the maximum values in an array
+
+    Parameters
+    ----------
+    a: ArrayLike
+        Input array expression
+
+    dim: Optional int (default: None)
+        Axis of the operation. 
+    
+    Returns
+    -------
+    Tuple[int, scalar]
+        When no dimension is given, it returns a tuple with the index and value
+    Tuple[ShapeletsArray, ShapeletsArray]
+        When the operation occurs over a concrete axis, it returns two arrays, one for the index and one for the values.    
+
+    Notes
+    -----
+    When the operation does not indicate an axis, the index refers to the position of 
+    the element in column major order.  When an axis is given, the index refers to the 
+    position of the element within the axis.
+
+    See also
+    --------
+    nanargmax
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> a = sc.array([[1,2,3],[4,5,6]])
+    >>> sc.argmax(a)
+    (5, 6.0)
+    >>> indices, values = sc.argmax(a, 0)
+    >>> indices
+    [1 3 1 1]
+        1          1          1 
+    >>> values
+    [1 3 1 1]
+        4          5          6    
     """
-    return _pygauss.nanmax(array_like, dim)  
+    return _pygauss.argmax(a, dim) 
+
+def nanargmax(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
+    r"""
+    Locates the maximum values in an array, discarding nan values
+
+    Parameters
+    ----------
+    a: ArrayLike
+        Input array expression
+
+    dim: Optional int (default: None)
+        Axis of the operation. 
+    
+    Returns
+    -------
+    Tuple[int, scalar]
+        When no dimension is given, it returns a tuple with the index and value
+    Tuple[ShapeletsArray, ShapeletsArray]
+        When the operation occurs over a concrete axis, it returns two arrays, one for the index and one for the values.    
+
+    Notes
+    -----
+    When the operation does not indicate an axis, the index refers to the position of 
+    the element in column major order.  When an axis is given, the index refers to the 
+    position of the element within the axis.
+
+    See also
+    --------
+    argmax
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> import numpy as np
+    >>> a = sc.array([[np.nan, 2, 3],[4, 5, np.nan]])
+    >>> sc.nanargmax(a)
+    (3, 5.0)
+    >>> indices, values = sc.nanargmax(a, 0)
+    >>> indices
+    [1 3 1 1]
+        1          1          0 
+    >>> values
+    [1 3 1 1]
+        4.0000     5.0000     3.0000 
+    """
+    return _pygauss.nanargmax(a, dim) 
+
+def amax(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
+    r"""
+    Return the maximum of an array or maximum along an axis
+
+    Parameters
+    ----------
+    a: ArrayLike
+        Input array expression
+
+    dim: Optional int (default: None)
+        Axis of the operation. 
+    
+    Returns
+    -------
+    Scalar
+        When no dimension is given, it returns a value
+    ShapeletsArray
+        When the operation occurs over a concrete axis, it returns an array with the minimum across 
+        the dimensionality of the selected axis. 
+
+    See also
+    --------
+    nanmax
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> a = sc.array([[1,2,3],[4,5,6]])
+    >>> sc.amax(a)
+    6.0
+    >>> sc.amax(a, 0)
+    [1 3 1 1]
+        4          5          6 
+    """
+    return _pygauss.amax(a, dim)  
+
+def nanmax(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    r"""
+    Return the maximum of an array or maximum along an axis, ignoring any NaNs.
+
+    Parameters
+    ----------
+    a: ArrayLike
+        Input array expression
+
+    dim: Optional int (default: None)
+        Axis of the operation. 
+    
+    Returns
+    -------
+    Scalar
+        When no dimension is given, it returns a value
+    ShapeletsArray
+        When the operation occurs over a concrete axis, it returns an array with the minimum across 
+        the dimensionality of the selected axis. 
+
+    See also
+    --------
+    amax
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> import numpy as np
+    >>> a = sc.array([[np.nan, 2, 3],[4, 5, np.nan]])
+    >>> sc.nanmax(a)
+    5.0
+    >>> sc.nanmax(a, 0)
+    [1 3 1 1]
+        4.0000     5.0000     3.0000  
+    """
+    return _pygauss.nanmax(a, dim)  
 
 def maximum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
-    """
+    r"""
+    Element-wise maximum of array elements, propagating NaNs.
+
+    Parameters
+    ----------
+    left: ArrayLike
+        Input array expression
+    right: ArrayLike
+        Input array expression
+
+    Returns
+    -------
+    ShapeletsArray
+        A new array instance with the maximum of left and right, element-wise.
+
+    Notes
+    -----
+    At least one of the entries must be an array expression.  Arrays must be of 
+    the same shape as no broadcasting rules are applied to this function; use 
+    :obj:`~shapelets.compute.tile` method for an efficient mechanism to tile 
+    the arrays.
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc  
+    >>> import numpy as np  
+    >>> sc.maximum([1,2,3], [-1, np.nan, 10])
+    [3 1 1 1]
+         1.0000 
+         2.0000 
+        10.0000
     """
     return _pygauss.maximum(left, right) 
 
 def fmax(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.fmax(left, right) 
 
+def count_nonzero(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    r"""
+    Parameters
+    ----------
 
+    Returns
+    -------
 
-def count_nonzero(array_like: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
-    """
-    return _pygauss.count_nonzero(array_like, dim) 
+    return _pygauss.count_nonzero(a, dim) 
 
-def sum(array_like: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
-    """
-    """
-    return _pygauss.sum(array_like, dim, nan_value) 
+def sum(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    r"""
+    Parameters
+    ----------
 
-def product(array_like: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[FloatOrComplex, ShapeletsArray]:
-    """
-    """
-    return _pygauss.product(array_like, dim, nan_value) 
+    Returns
+    -------
 
-def cumsum(array_like: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
-    """
-    return _pygauss.cumsum(array_like, dim) 
+    return _pygauss.sum(a, dim, nan_value) 
 
-def nancumsum(array_like: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
-    """
-    """
-    return _pygauss.nancumsum(array_like, dim) 
+def product(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[FloatOrComplex, ShapeletsArray]:
+    r"""
+    Parameters
+    ----------
 
-def cumprod(array_like: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
-    """
-    """
-    return _pygauss.cumprod(array_like, dim) 
+    Returns
+    -------
 
-def nancumprod(array_like: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]:
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
-    """
-    return _pygauss.nancumprod(array_like, dim)
+    return _pygauss.product(a, dim, nan_value) 
 
-def scan(array_like: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
-    """
-    """
-    return _pygauss.scan(array_like, dim, __map_scan_op(op), inclusive_scan)
+def cumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
+    r"""
+    Parameters
+    ----------
 
-def nanscan(array_like: ArrayLike, dim: int = 0, nan: float = 0.0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
-    """
-    """
-    return _pygauss.nanscan(array_like, dim, __map_scan_op(op), inclusive_scan)
+    Returns
+    -------
 
-def diff1(array_like: ArrayLike, dim: int) -> ShapeletsArray:
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
-    """
-    return _pygauss.diff1(array_like, dim)
+    return _pygauss.cumsum(a, dim) 
 
-def diff2(array_like: ArrayLike, dim: int) -> ShapeletsArray: 
-    """
-    """
-    return _pygauss.diff2(array_like, dim)
+def nancumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
+    r"""
+    Parameters
+    ----------
 
-def sort(array_like: ArrayLike, dim: int = 0, asc: bool = True) -> ShapeletsArray: 
-    """
-    """
-    return _pygauss.sort(array_like, dim, asc)
+    Returns
+    -------
 
-def sort_index(array_like: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
+    return _pygauss.nancumsum(a, dim) 
+
+def cumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
-    return _pygauss.sort_index(array_like, dim, asc)
+    return _pygauss.cumprod(a, dim) 
+
+def nancumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]:
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
+    """
+    return _pygauss.nancumprod(a, dim)
+
+def scan(a: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
+    """
+    return _pygauss.scan(a, dim, __map_scan_op(op), inclusive_scan)
+
+def nanscan(a: ArrayLike, dim: int = 0, nan: float = 0.0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+
+    """
+    return _pygauss.nanscan(a, dim, __map_scan_op(op), inclusive_scan)
+
+def diff1(a: ArrayLike, dim: int) -> ShapeletsArray:
+    r"""
+    First order numerical difference along specified dimension
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+
+    """
+    return _pygauss.diff1(a, dim)
+
+def diff2(a: ArrayLike, dim: int) -> ShapeletsArray: 
+    r"""
+    Second order numerical difference along specified dimension
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+
+    """
+    return _pygauss.diff2(a, dim)
+
+def sort(a: ArrayLike, dim: int = 0, asc: bool = True) -> ShapeletsArray: 
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
+    """
+    return _pygauss.sort(a, dim, asc)
+
+def sort_index(a: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
+    """
+    return _pygauss.sort_index(a, dim, asc)
 
 def sort_by_key(keys: ArrayLike, data: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+
     """
     return _pygauss.sort_by_key(keys, data, dim, asc)
 
-def flatnonzero(array_like: ArrayLike) -> ShapeletsArray: 
+def flatnonzero(a: ArrayLike) -> ShapeletsArray: 
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
-    """
-    return _pygauss.flatnonzero(array_like)
+    return _pygauss.flatnonzero(a)
 
 def union(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> ShapeletsArray: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.union(x1, x2, is_unique)
 
-def unique(array_like: ArrayLike, is_sorted: bool = False) -> ShapeletsArray: 
+def unique(a: ArrayLike, is_sorted: bool = False) -> ShapeletsArray: 
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
-    """
-    return _pygauss.unique(array_like, is_sorted)
+    return _pygauss.unique(a, is_sorted)
 
 def intersect(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> ShapeletsArray: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.intersect(x1, x2, is_unique)
 
 def count_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.count_by_key(keys, vals, dim)
 
 def max_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.max_by_key(keys, vals, dim)
 
 def min_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.min_by_key(keys, vals, dim)
 
 def product_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.product_by_key(keys, vals, dim)
 
 def nanproduct_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 1.0,  dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.nanproduct_by_key(keys, vals, nan_value, dim)
 
 def sum_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.sum_by_key(keys, vals, dim)
 
 def nansum_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 0.0,  dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.nansum_by_key(keys, vals, nan_value, dim)
 
 def scan_by_key(keys: ArrayLike, vals: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.scan_by_key(keys, vals, dim, __map_scan_op(op), inclusive_scan)
 
-def nan_to_num(array_like: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> ShapeletsArray:
-    """
+def nan_to_num(a: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> ShapeletsArray:
+    r"""
     Returns a new array where the NaN and Inf values have been replaced.
 
     Params
     ------
-    array_like: ArrayLike
+    a: ArrayLike
         A valid array expression
 
     nan: float. Defaults to 0.0
@@ -230,20 +731,39 @@ def nan_to_num(array_like: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> Sha
         0.0000     1.0000 
         2.0000     3.0000     
     """
-    return _pygauss.nan_to_num(array_like, nan, inf)
+    return _pygauss.nan_to_num(a, nan, inf)
 
 def minimum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc    
     """
     return _pygauss.minimum(left, right)
 
 def fmin(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
-    """
+    r"""
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+
     """
     return _pygauss.fmin(left, right) 
 
-def amin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
-    """
+def amin(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
+    r"""
     Returns the minimum of an array or the minimum along an axis, propagating NaNs.
 
     Parameters
@@ -264,15 +784,15 @@ def amin(array_like: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, S
     argmin: Return the indices of the minimum values.
     nanargmin:  Return the indices of the minimum values, ignoring any NaNs.
     """
-    return _pygauss.amin(array_like, dim)
+    return _pygauss.amin(a, dim)
 
-def nanmin(x: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
-    """
+def nanmin(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+    r"""
     The minimum value of an array along a given axis, ignoring any NaNs.
 
     Parameters
     ----------
-    x: ArrayLike
+    a: ArrayLike
         Input array
 
     dim: Optioal int.  Defaults to None.
@@ -298,7 +818,7 @@ def nanmin(x: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, Sha
         Return the indices of the minimum values, ignoring any NaNs.
 
     """
-    return _pygauss.nanmin(x, dim)
+    return _pygauss.nanmin(a, dim)
 
 
     # // amin -> Return the minimum of an array or minimum along an axis, propagating NaNs
@@ -308,8 +828,8 @@ def nanmin(x: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, Sha
     # // argmin -> Return the indices of the minimum values.
 
 
-def all(array_like: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
-    """
+def all(a: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
+    r"""
     Tests if all array elements along a particular axis are `True`
 
     When dim is not specified, this method will return a boolean flag as it will use all 
@@ -317,7 +837,7 @@ def all(array_like: ArrayLike, dim: Optional[int] = None) -> Union[bool, Shapele
 
     Parameters
     ----------
-    array_like: ArrayLike
+    a: ArrayLike
         A valid array expression.
 
     dim: Optional int, defaults to None
@@ -350,17 +870,17 @@ def all(array_like: ArrayLike, dim: Optional[int] = None) -> Union[bool, Shapele
          0 
          0       
     """
-    return _pygauss.all(array_like, dim)
+    return _pygauss.all(a, dim)
 
-def any(array_like: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
-    """
+def any(a: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
+    r"""
     Tests if any array element along a particular axis is `True`
 
     When dim is not specified, this method will return a boolean flag.
 
     Parameters
     ----------
-    array_like: ArrayLike
+    a: ArrayLike
         A valid array expression.
 
     dim: Optional int, defaults to None
@@ -402,10 +922,10 @@ def any(array_like: ArrayLike, dim: Optional[int] = None) -> Union[bool, Shapele
          0 
          1    
     """
-    return _pygauss.any(array_like, dim)
+    return _pygauss.any(a, dim)
 
 def any_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
     Reduces the values in `vals` by testing if any of the elements is set to `True`, grouping the results 
     by keys.
 
@@ -460,7 +980,7 @@ def any_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     return _pygauss.any_by_key(keys, vals, dim)
 
 def all_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
-    """
+    r"""
     Reduces the values in `vals` by testing if all of the elements are set to `True`, by grouping the results 
     using the values in `keys`.
 

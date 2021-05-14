@@ -76,9 +76,9 @@ from . import matrixprofile
 from . import normalization
 from . import statistics
 from . import dimensionality
+from . import clustering
 
-__all__ = ["random", "fft", "distances", "matrixprofile", "normalization", "statistics", "dimensionality"]
-
+__all__ = ["random", "fft", "distances", "matrixprofile", "normalization", "statistics", "dimensionality", "clustering"]
 
 # direct imports
 from . import _device 

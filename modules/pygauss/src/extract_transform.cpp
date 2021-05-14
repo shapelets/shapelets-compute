@@ -163,8 +163,7 @@ void pygauss::bindings::extract_and_transform_operations(py::module &m) {
               return af::transpose(a, conjugate);
           },
           py::arg("array_like").none(false),
-          py::arg("dims") = false,
-          "Performs a standard matrix transpose");
+          py::arg("conjugate") = false);
 
     m.def("cast",
           [](const py::object& array_like, const af::dtype &dtype) {

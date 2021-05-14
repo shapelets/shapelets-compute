@@ -159,18 +159,15 @@ namespace gauss::statistics
         // to ensure we match with octave results
         // result = af::flip(result, 0);
 
-        if (sc == gauss::statistics::XCorrScale::BIASED)
-        {
+        if (sc == gauss::statistics::XCorrScale::BIASED) {
             result = result / n;
         }
-        else if (sc == gauss::statistics::XCorrScale::UNBIASED)
-        {
+        else if (sc == gauss::statistics::XCorrScale::UNBIASED) {
             auto adj = af::join(0, arange(1.0, n + 1.0, 1.0, x.type()), arange(n - 1.0, 0.0, -1.0, x.type()));
             auto adj_mat = af::tile(adj, 1, result.dims(1), result.dims(2));
             result = result / adj_mat;
         }
-        else if (sc == gauss::statistics::XCorrScale::COEFF)
-        {
+        else if (sc == gauss::statistics::XCorrScale::COEFF) {
             auto rms_x = af::sum(af::pow(x, 2.0), 0);
             auto rms_y = af::sum(af::pow(y, 2.0), 0);
             auto rms_mat = af::matmulTN(rms_x, rms_y);

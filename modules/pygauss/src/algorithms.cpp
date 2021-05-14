@@ -255,11 +255,11 @@ void pygauss::bindings::parallel_algorithms(py::module &m)
             auto a = pygauss::arraylike::as_array_checked(array_like);
 
             // choose a sensible max value to replace the nans
-            double min = -std::numeric_limits<float>::max();
+            double min = std::numeric_limits<float>::max();
             if (a.isdouble())
-                min = -std::numeric_limits<double>::max();
+                min = std::numeric_limits<double>::max();
             else if (a.ishalf())
-                min = -65504.0f;
+                min = 65504.0f;
 
             // array containing 1's where input is NaN, and 0 otherwise.
             auto nanLocations = af::isNaN(a);

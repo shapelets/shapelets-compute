@@ -1886,6 +1886,5 @@ def sbd(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     
     It computes the normalized cross-correlation and it returns 1.0 minus the value 
     that maximizes the correlation value between each pair of time series.
-
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.SBD)

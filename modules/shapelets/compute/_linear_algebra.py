@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, Union
+from typing import NamedTuple, Optional, Union
 try:
     from typing import Literal
 except ImportError:
@@ -13,20 +13,18 @@ AnyScalar = _ScalarLike
 FloatOrComplex = Union[complex, float]
 ConvDomain = Literal['auto', 'frequency', 'spatial']
 ConvMode = Literal['default', 'expand']
-NormType = Literal['euclid','lpq','matrix','matrixinf','singular','vector1','vector2','vectorinf','vectorp']
+NormType = Literal['euclid','lpq','matrix','matrixinf','vector1','vector2','vectorinf','vectorp']
 MatMulOptions = Literal['none', 'transpose', 'conjtrans']
 
 def __pygauss_norm_type(tpe: NormType):
     if tpe == 'euclid':
-        return _pygauss.NormType.euclid
+        return _pygauss.NormType.Euclid
     elif tpe == 'lpq':
         return _pygauss.NormType.LPQ
     elif tpe == 'matrix':
         return _pygauss.NormType.Matrix
     elif tpe == 'matrixinf':
         return _pygauss.NormType.MatrixInf
-    elif tpe == 'singular':
-        return _pygauss.NormType.Singular
     elif tpe == 'vector1':
         return _pygauss.NormType.Vector1
     elif tpe == 'vector2':
@@ -65,6 +63,131 @@ def __pygauss_conv_mode(mode: ConvMode):
         return _pygauss.ConvMode.Expand 
     else:
         raise ValueError("Unknown convolve mode")
+
+
+class EigenResult(NamedTuple):
+    values: ShapeletsArray
+    """Access to the eigenvalues"""
+    vectors: ShapeletsArray
+    """Access to the eigenvectors"""
+
+def eigvalsh(data: ArrayLike) -> ShapeletsArray:
+    """
+    Computes eigenvalues for selfadjoint matrices.
+    
+    This method operates over floating and complex matrices of 32 and 64 bits.  If 
+    presented with an (signed or unsigned) integer or ``float16`` matrix, a
+    conversion will occur internally.
+
+    Parameters
+    ----------
+    data: ArrayLike 
+        Squared matrix (nxn)
+    
+    Returns
+    -------
+    ShapeletsArray
+        Floating (not complex) array with eigenvalues in increasing order.
+    """    
+    return _pygauss.eigvalsh(data)
+
+def eigvals(data: ArrayLike) -> ShapeletsArray:
+    """
+    Computes the eigenvalues of general matrices.
+
+    This method operates over floating and complex matrices of 32 and 64 bits.  If 
+    presented with an (signed or unsigned) integer or ``float16`` matrix, a
+    conversion will occur internally.
+
+    Parameters
+    ----------
+    data: ArrayLike 
+        Squared matrix (nxn)
+
+    Returns
+    -------
+    ShapeletsArray
+        Complex array with the eigenvalues.
+
+    """
+    return _pygauss.eigvals(data)
+
+def eigh(data: ArrayLike) -> EigenResult:
+    """
+    Computes eigenvalues and eigenvectors for selfadjoint matrices.
+    
+    This method operates over floating and complex matrices of 32 and 64 bits.  If 
+    presented with an (signed or unsigned) integer or ``float16`` matrix, a
+    conversion will occur internally.
+
+    Parameters
+    ----------
+    data: ArrayLike 
+        Squared matrix (nxn)
+    
+    Returns
+    -------
+    EigenResult
+        Named tuple with eigen values and vectors.  
+
+    Notes
+    -----
+    Eigenvalues will be always real and the result will present them in increasing order.  
+
+    """
+    return EigenResult(*_pygauss.eigh(data))
+
+def eig(data: ArrayLike) -> EigenResult: 
+    """
+    Computes eigenvalues and eigenvectors of general matrices.
+
+    This method operates over floating and complex matrices of 32 and 64 bits.  If 
+    presented with an (signed or unsigned) integer or ``float16`` matrix, a
+    conversion will occur internally.
+
+    Parameters
+    ----------
+    data: ArrayLike 
+        Squared matrix (nxn)
+
+    Returns
+    -------
+    EigenResult
+        Named tuple with eigen values and vectors.  Both values and vectors 
+        are returned as complex arrays, matching the bit size of the input 
+        array.
+
+    Examples
+    --------
+    Compute the eigen vectors and values of a 3x3 matrix:
+
+    >>> import shapelets.compute as sc
+    >>> m = sc.random.randn((3,3))
+    >>> eval, evec = sc.eigen(m)
+    >>> eval
+    [3 1 1 1]
+            (-1.1138, 1.3809) 
+            (-1.1138,-1.3809) 
+            (-0.2371, 0.0000)     
+    >>> evec
+    [3 3 1 1]
+            (-0.4381,-0.2015)          (-0.4381, 0.2015)          (-0.0597,0.0000) 
+            ( 0.1361, 0.0528)          ( 0.1361,-0.0528)          (-0.9269,0.0000) 
+            (-0.4076, 0.7616)          (-0.4076,-0.7616)          (-0.3706,0.0000)     
+    
+
+    Internal data conversion:
+
+    >>> import shapelets.compute as sc
+    >>> m = sc.ones((3,3), "int32")
+    >>> eval, _ = sc.eigen(m)
+    >>> eval
+    [3 1 1 1]
+            (-0.0000,0.0000) 
+            ( 3.0000,0.0000) 
+            ( 0.0000,0.0000) 
+    """
+    return EigenResult(*_pygauss.eig(data))
 
 def convolve(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', domain: ConvDomain = 'auto') -> ShapeletsArray: 
     """
@@ -386,6 +509,31 @@ def dot(lhs: ArrayLike, rhs: ArrayLike, conj_lhs: bool = False, conj_rhs: bool =
 
 def dot_scalar(lhs: ArrayLike, rhs: ArrayLike, conj_lhs: bool = False, conj_rhs: bool = False) -> FloatOrComplex: 
     """
+    Computes the dot product, also known as inner product, of vectors.
+
+    Parameters
+    ----------
+    lhs: 1D vector
+        Input vector, it must be a columnar vector.
+
+    rhs: 1D vector
+        Input vector, it must be a columnar vector.
+
+    conj_lhs: bool, defaults to False
+        When true, the inner product will be computed with the conjugate of the ``lhs`` parameter.
+    
+    conj_rhs: bool, defaults to False
+        When true, the inner product will be computed with the conjugate of the ``rhs`` parameter.
+
+    Returns
+    -------
+    Float or complex value
+        
+    See Also
+    --------
+    dot
+        For a version of the same functionality but leaving the result in device's memory.
+
     """    
     return _pygauss.dot_scalar(lhs,rhs,conj_lhs,conj_rhs)
 
@@ -460,8 +608,36 @@ def gemm(a: ArrayLike, b: ArrayLike, c: Optional[ArrayLike] = None, alpha: float
     """    
     return _pygauss.gemm(a, b , c, alpha, beta, trans_a, trans_b)
 
-def inverse(array_like: ArrayLike) -> ShapeletsArray:
+def inv(array_like: ArrayLike) -> ShapeletsArray:
     """
+    Computes the multiplicative inverse of non singular matrices.
+
+    The inverse of a matrix :math:`A`, denoted as :math:`A^{-1}, is a matrix that satisfies :math:`AA^{-1}=I`
+
+    Parameters
+    ----------
+    array_like: ArrayLike
+        Input matrix
+
+    Returns
+    -------
+    ShapeletsArray
+
+    See Also
+    --------
+    pinv
+        Pseudo-inverse 
+
+    Example
+    -------
+    >>> import shapelets.compute as sc 
+    >>> a = sc.array([[1.,2],[3,4]])
+    >>> inv_a = sc.inv(a)
+    >>> a @ inv_a
+    [2 2 1 1]
+        1.0000     0.0000 
+        0.0000     1.0000 
+
     """        
     return _pygauss.inverse(array_like, _pygauss.MatrixProperties.Default)
 
@@ -597,7 +773,7 @@ def matmul_chain(*args) -> ShapeletsArray:
     """        
     return _pygauss.matmul_chain(*args)
 
-def norm(x: ArrayLike, type: NormType = 'vector2', p: float = 1.0, q: float = 1.0) -> float:
+def norm(x: ArrayLike, type: NormType = 'euclid', p: float = 1.0, q: float = 1.0) -> float:
     r"""
     Computes the norm of a vector.
 
@@ -606,12 +782,71 @@ def norm(x: ArrayLike, type: NormType = 'vector2', p: float = 1.0, q: float = 1.
 
     Parameters
     ----------
-    
+    x: ArrayLike
+        n-dimensional vector
 
-    """        
+    type: NormType (default: 'euclid')
+        See notes for norm types.
+
+    p: float (default: 1.0)
+        See norm type table in notes
+
+    q: float (default: 1.0)
+        See norm type table in notes
+
+    Returns
+    -------
+    Float value
+        Computed norm
+
+    Notes
+    -----
+    The following norm types and parameters can be specified:
+
+    +-----------+---------------------------------------------------------------------+
+    | Norm Type | Description                                                         |
+    +===========+=====================================================================+
+    | euclid    | Euclidian norm.  Same as vector 2                                   |
+    +-----------+---------------------------------------------------------------------+
+    | lpq       | General norm computation with arbitrary p and q parameters          |
+    +-----------+---------------------------------------------------------------------+
+    | matrix    | return the max of column sums                                       |
+    +-----------+---------------------------------------------------------------------+
+    | matrixinf | return the max of row sums                                          |
+    +-----------+---------------------------------------------------------------------+
+    | vector1   | treats the input as a vector and returns the sum of absolute values |
+    +-----------+---------------------------------------------------------------------+
+    | vector2   | treats the input as a vector and returns euclidean norm             |
+    +-----------+---------------------------------------------------------------------+
+    | vectorinf | treats the input as a vector and returns the max of absolute values |
+    +-----------+---------------------------------------------------------------------+
+    | vectorp   | treats the input as a vector and returns the p-norm                 |
+    +-----------+---------------------------------------------------------------------+
+
+    Examples
+    --------
+    >>> import shapelets.compute as sc
+    >>> a = sc.array([[1.,2], [3, 5]])
+    >>> sc.norm(a)
+    6.244997998398398
+    >>> sc.norm(a, 'matrix')
+    7.0
+    >>> sc.norm(a, 'matrixinf')  
+    8.0
+    >>> sc.norm(a, 'vector1') 
+    11.0
+    >>> sc.norm(a, 'vector2') 
+    6.244997998398398
+    >>> sc.norm(a, 'vectorinf') 
+    5.0
+    >>> sc.norm(a, 'vectorp', p=3.5) 
+    5.28157131911548
+    >>> sc.norm(a, 'lpq', p=2.0, q=3.0)
+    7.214996469470583
+    """      
     return _pygauss.norm(x,__pygauss_norm_type(type) ,p, q)
 
-def pinverse(x: ArrayLike, tol: float = 1e-06) -> ShapeletsArray: 
+def pinv(x: ArrayLike, tol: float = 1e-06) -> ShapeletsArray: 
     """
     Computes Moore-Penrose pseudoinverse of a matrix.
 
@@ -621,6 +856,7 @@ def pinverse(x: ArrayLike, tol: float = 1e-06) -> ShapeletsArray:
     ----------
     x: 2D Array.  MxN
         Input array.  See notes regarding batching.
+
     tol: float. Defaults to 1e-06
         Lower threshold for finding singular values using :obj:`~shapelets.compute.svd`
 
@@ -638,8 +874,8 @@ def pinverse(x: ArrayLike, tol: float = 1e-06) -> ShapeletsArray:
     --------
     >>> import shapelets.compute as sc
     >>> a = sc.array([[0,3],[1,4],[2,5]], dtype="float32")
-    >>> pinv = sc.pinverse(a)
-    >>> a @ pinv @ a
+    >>> inv = sc.pinv(a)
+    >>> a @ inv @ a
     [3 2 1 1]
         0.0000     3.0000 
         1.0000     4.0000 
@@ -773,9 +1009,9 @@ def svd(x: ArrayLike) -> tuple:
 
 
 __all__ = [
-    "cholesky", "det", "dot", "dot_scalar", "gemm", "inverse", "lu", "matmul", "matmulNT", "matmulTN", 
-    "matmulTT", "matmul_chain", "norm", "pinverse", "qr", "rank", "svd", "convolve", 
-    "convolve1", "convolve2", "convolve3",
+    "cholesky", "det", "dot", "dot_scalar", "gemm", "inv", "lu", "matmul", "matmulNT", "matmulTN", 
+    "matmulTT", "matmul_chain", "norm", "pinv", "qr", "rank", "svd", "convolve", 
+    "convolve1", "convolve2", "convolve3", "eig","eigh", "eigvals", "eigvalsh",
     "NormType", "ConvMode", "ConvDomain"
 ]
 
