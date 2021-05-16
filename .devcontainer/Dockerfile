@@ -12,7 +12,7 @@ RUN apt-get update  \
     && apt-get -y install --no-install-recommends autoconf automake bison cmake curl flex g++ gdb git make pkg-config zip unzip tar wget alien\ 
     && apt-get -y install --no-install-recommends libboost-all-dev libevent-dev libssl-dev libtool libffi-dev zlib1g-dev libssl-dev \
     && apt-get -y install --no-install-recommends libpython3.8 libpython3.8-dev \
-    && apt-get install -y --no-install-recommends ${PYTHON_PACKAGES} \
+    && apt-get -y install --no-install-recommends ${PYTHON_PACKAGES} \
     && pip3 install --no-cache-dir --upgrade pip setuptools wheel
 
 
