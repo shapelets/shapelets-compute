@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+"""
+Shapelets run-time tools
+
+"""
+
+from abc import abstractmethod
+import argparse
+import math
+import shapelets.compute as sc
+from timeit import default_timer as timer
+
+class Benchmark:
+    @abstractmethod
+    def __init__(self, n: int, dt: str) -> None: ... 
+
+    @abstractmethod
+    def run(self) -> sc.ShapeletsArray: ... 
+    
+    @abstractmethod
+    def to_report_units(self, time_in_seconds: float) -> float: ...
+
+    def run_benchmark(self, warm: int = 10, runs: int = 10, min_time: float = 1.0) -> float: 
+        sample_times = []
+        for _ in range(warm):
+            sc.sync()
+            start = timer()
+            self.run()
+            sc.sync()
+            end = timer()
+            sample_times.append(end)
+        
+        median_time = sc.median(sample_times)
+        batches = int(math.ceil(min_time / (runs*median_time)))
+        # print(self.n, median_time, batches)
+        run_time = 0.0
+        for _ in range(int(batches)):
+            start = timer() 
+            for _ in range(runs):
+                self.run()
+            sc.sync()
+            run_time += (timer() - start) / runs
+        run_time /= batches
+        return self.to_report_units(run_time)    
+
+class BenchmarkFFT(Benchmark):
+    def __init__(self, n:int, dt: str) -> None:
+        self.n = n
+        self.a = sc.random.randn(n, dt)
+    
+    def run(self) -> sc.ShapeletsArray:
+        return sc.fft.fft(self.a)
+
+    def to_report_units(self, time_in_seconds: float) -> float:
+        return 5 * self.n * math.log2(self.n) / (time_in_seconds * 1e9) 
+
+class BenchmarkBlas(Benchmark):
+    def __init__(self, n: int, dt: str) -> None:
+        self.n = n 
+        self.a = sc.ones((n,n), dt)
+
+    def run(self) -> sc.ShapeletsArray:
+        return self.a @ self.a 
+    
+    def to_report_units(self, time_in_seconds: float) -> float:
+        return 2.0 * math.pow(self.n, 3) / (time_in_seconds * 1e9)
+
+def run_benchmarks(fn, r):
+    data = [(str(n), fn(n).run_benchmark()) for n in r]
+    max_value = max(count for _, count in data)
+    increment = max_value / 25
+    longest_label_length = max(len(label) for label, _ in data)
+    for label, count in data:
+        bar_chunks, remainder = divmod(int(count * 8 / increment), 8)
+        bar = '█' * bar_chunks
+        if remainder > 0:
+            bar += chr(ord('█') + (8 - remainder))
+        bar = bar or  '▏'
+        print(f'{label.rjust(longest_label_length)} ▏ {count:#4f} {bar}')  
+
+def set_backend_and_device(backend: sc.Backend, device: int):
+    try:
+        sc.set_backend(backend)
+    except:
+        print("Backend " + backend + " is not available in your plaform")
+        print("Available backends are: " + repr(sc.get_available_backends()))
+        exit(-1)
+    try:
+        sc.set_device(device)
+    except:
+        print("Invalid device number.  Available devices are:")
+        for d in sc.get_devices():
+            print(repr(d))
+        exit(-2)
+
+def show_info():
+    import shapelets as s
+    print()
+    print(f'Shapelets version : {s.__version__}')
+    print(f'Platform Libraries: {sc.library_dir}')
+    default_backend = sc.get_backend()
+    default_device = sc.get_device()
+    print(f'Default backend   : {default_backend}')
+    print(f'Default device    : {default_device.id}')
+    print()
+    print('Available backend and devices')
+    for b in sc.get_available_backends():
+        sc.set_backend(b)
+        for d in sc.get_devices():
+            print(f'{b}\t{d}')
+    print()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Shapelets run-time tools")
+    subparsers = parser.add_subparsers(dest='command')
+    info_parser = subparsers.add_parser("info", help='Shows installation information')
+
+    benchmark_parser = subparsers.add_parser('bench', help='Runs benchmarks')
+    benchmark_parser.add_argument('backend', choices=['cpu', 'opencl', 'cuda'])
+    benchmark_parser.add_argument('-d', '--device', type=int, default=0)
+    benchmark_parser.add_argument('-t', '--datatype', default="float32")
+
+    benchmark_subparser = benchmark_parser.add_subparsers(dest='test')
+    blass_benchmark_parser = benchmark_subparser.add_parser('blas', help='Runs matrix multiplication benchmark')
+    blass_benchmark_parser.add_argument('-s', '--start', default=512, type=int)
+    blass_benchmark_parser.add_argument('-e', '--end', default=4096, type=int)
+    blass_benchmark_parser.add_argument('-i', '--increment', default=512, type=int)
+
+    fft_benchmark_parser = benchmark_subparser.add_parser('fft', help='Runs 1D FFT benchmark')
+    fft_benchmark_parser.add_argument('-s', '--start', default=10, type=int)
+    fft_benchmark_parser.add_argument('-e', '--end', default=20, type=int)
+    fft_benchmark_parser.add_argument('-i', '--increment', default=1, type=int)
+
+    install_parser = subparsers.add_parser('install', help='Install backend support')
+    install_parser.add_argument('backend', choices=['cpu', 'opencl', 'cuda'])
+
+    args = parser.parse_args()
+
+    if args.command is None:
+        parser.print_help()
+    elif args.command == 'info':
+        show_info()
+    elif args.command == 'bench':
+        set_backend_and_device(args.backend, args.device)
+        datatype = args.datatype
+        if args.test is None:
+            benchmark_parser.print_help()
+        else:
+            if args.test == 'blas':
+                fn = lambda n: BenchmarkBlas(n, datatype)
+                r = range(args.start, args.end + args.increment, args.increment)
+            elif args.test == 'fft':
+                fn = lambda n: BenchmarkFFT(n, datatype)
+                r = [1 << M for M in range(args.start, args.end + args.increment, args.increment)]
+
+            print(f'Running benchmark {args.test} for {args.backend}[{args.device}] using {datatype}' ) 
+            print(sc.get_device())
+            print()   
+            run_benchmarks(fn, r)
+    elif args.command == 'install':
+        backend = args.backend 
+        if (backend in sc.get_available_backends()):
+            print(f'Backend {backend} is already installed')
+        else:
+            print("Do install")
+
+
+if __name__ == '__main__':
+    main()

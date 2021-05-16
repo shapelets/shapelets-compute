@@ -465,6 +465,11 @@ class ShapeletsArray:
         Returns the total number of elements held by this array.
         """
 
+    def eval() -> None:
+        """
+        Forces evaluation of this array
+        """
+
     __array_priority__ = 30
     __hash__ = None
 

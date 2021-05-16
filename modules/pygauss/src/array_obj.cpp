@@ -486,6 +486,11 @@ void pygauss::bindings::array_obj(py::module &m) {
                return af::abs(self);
            });
 
+    ka.def("eval",
+           [](const af::array &self) {
+               return self.eval();
+           });
+
     BINARY_OP(af_add, __add__)
     BINARY_OPR(af_add, __radd__)
     BINARY_IOP(af_add, __iadd__)

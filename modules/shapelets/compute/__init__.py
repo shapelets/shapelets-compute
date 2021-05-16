@@ -66,7 +66,6 @@ if os.name == 'nt':
         if len(filenames) > 1:
             warnings.warn("Loaded more than one pyd library in compute folder: %s" % repr(filenames), stacklevel=2)
 
-del library_dir
 del compute_dir
 
 from . import random
@@ -116,3 +115,4 @@ __all__ += _construction.__all__
 __all__ += _extract_transform.__all__
 __all__ += _linear_algebra.__all__
 __all__ += _statistics.__all__
+__all__ += ["library_dir"]
