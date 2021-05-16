@@ -30,6 +30,11 @@ PYBIND11_MODULE(_pygauss, m) {
           },
           py::arg("new_value").none(false));
 
+    m.def("af_version",
+        []() {
+            return AF_API_VERSION_CURRENT;
+        });
+
     shared_enum_types(m);
     device_operations(m);
 

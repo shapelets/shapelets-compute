@@ -1,20 +1,24 @@
 from __future__ import annotations
 import os
 import platform
+from . import _pygauss
 
 # os.environ["AF_JIT_KERNEL_TRACE"] = "stderr"
 # os.environ["AF_TRACE"]="all"
 # os.environ["AF_SHOW_LOAD_PATH"]="1"
 # os.environ["AF_PRINT_ERRORS"]="1"
 
+# af version
+__af_version__ = _pygauss.af_version()
+
 # current location
 compute_dir = os.path.abspath(os.path.dirname(__file__)) 
 
 # look if the production directory exists...
-library_dir = os.path.join(compute_dir, '.libs')
+__library_dir__ = os.path.join(compute_dir, '.libs')
 
-if not os.path.exists(library_dir):
-    raise RuntimeError("No valid location can be stablished for native libraries. " + library_dir)
+if not os.path.exists(__library_dir__):
+    raise RuntimeError("No valid location can be stablished for native libraries. " + __library_dir__)
 
 # if platform.system() == 'Linux':
 #     if 'LD_PRELOAD' in os.environ:
@@ -25,17 +29,17 @@ if not os.path.exists(library_dir):
 #     found = ldpreload.find('libmkl_def.so') != -1
 #     if not found:
 #         newpaths = ':'.join([
-#             os.path.join(library_dir, 'libmkl_def.so'), 
-#             os.path.join(library_dir, 'libmkl_avx2.so'), 
-#             os.path.join(library_dir, 'libmkl_core.so'), 
-#             os.path.join(library_dir, 'libmkl_intel_lp64.so'),
-#             os.path.join(library_dir, 'libmkl_intel_thread.so'), 
-#             os.path.join(library_dir, 'libiomp5.so')])
+#             os.path.join(__library_dir__, 'libmkl_def.so'), 
+#             os.path.join(__library_dir__, 'libmkl_avx2.so'), 
+#             os.path.join(__library_dir__, 'libmkl_core.so'), 
+#             os.path.join(__library_dir__, 'libmkl_intel_lp64.so'),
+#             os.path.join(__library_dir__, 'libmkl_intel_thread.so'), 
+#             os.path.join(__library_dir__, 'libiomp5.so')])
 #         os.environ['LD_PRELOAD'] = newpaths + ldpreload
 
 # Let AF know where the RT libraries are
-os.environ["AF_PATH"] = library_dir
-os.environ["AF_BUILD_LIB_CUSTOM_PATH"] = library_dir
+os.environ["AF_PATH"] = __library_dir__
+os.environ["AF_BUILD_LIB_CUSTOM_PATH"] = __library_dir__
 
 if os.name == 'nt':
     import warnings 
@@ -44,7 +48,7 @@ if os.name == 'nt':
     try:
         from ctypes import PyDLL
         # Ensure present folder is present in the path
-        os.environ['PATH'] = library_dir + ';' + compute_dir + ';' + os.environ['PATH']
+        os.environ['PATH'] = __library_dir__ + ';' + compute_dir + ';' + os.environ['PATH']
     except:
         warnings.warn('Unable to perform initialization', stacklevel=2)    
     else:
@@ -115,4 +119,4 @@ __all__ += _construction.__all__
 __all__ += _extract_transform.__all__
 __all__ += _linear_algebra.__all__
 __all__ += _statistics.__all__
-__all__ += ["library_dir"]
+__all__ += ["__library_dir__", "__af_version__"]
