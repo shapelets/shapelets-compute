@@ -23,3 +23,7 @@ RUN mkdir /opt/cmake
 RUN sh /cmake-3.20.1-linux-x86_64.sh --prefix=/opt/cmake --skip-license
 RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
 RUN cmake --version
+
+#ensure pyenv is installed
+RUN curl https://pyenv.run | bash
+
