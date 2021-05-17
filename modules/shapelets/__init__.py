@@ -22,15 +22,20 @@ else:
     __all__ = ["compute", "generators", "data"]
 
     backends = compute.get_available_backends()
-    if len(backends) == 1:
-        msg = "Only one compute device found: " + repr(backends)
-        if backends[0] == 'cpu':
+    if len(backends) <= 1:
+        import warnings
+        if len(backends) == 0:
+            msg = """
+                No backends available.  Please use shapelets command line tool to 
+                install a new backend.  For example: shapelets install cpu
+                """
+        elif backends[0] == 'cpu':
+            msg = "Only one compute device found: " + repr(backends)
             msg += """
                 Most of the operations won't be accelerated since the only device found is CPU.  Consider 
                 adding OpenCL or CUDA support to your environment to benefit from the accelerated versions of the 
                 algorithms this library provides.
                 """
-        import warnings
         warnings.warn(msg, RuntimeWarning)
     del backends
 
