@@ -83,12 +83,12 @@ void pygauss::bindings::random_numbers(py::module &m) {
                  "Draw samples from a Wald, or inverse Gaussian, distribution.")
 
             .def("normal",
-                 [](af::randomEngine &self, const double loc, const double scale, const af::dim4 &shape,
+                 [](af::randomEngine &self, const double mean, const double sigma, const af::dim4 &shape,
                     const af::dtype &dtype) {
-                     return gauss::random::normal(loc, scale, shape, dtype, self);
+                     return gauss::random::normal(mean, sigma, shape, dtype, self);
                  },
-                 py::arg("loc") = 0.0,
-                 py::arg("scale") = 1.0,
+                 py::arg("mean") = 0.0,
+                 py::arg("sigma") = 1.0,
                  py::arg("shape") = af::dim4(1, 1, 1, 1),
                  py::arg("dtype") = af::dtype::f32,
                  "Draw random samples from a normal (Gaussian) distribution.")
@@ -148,16 +148,14 @@ void pygauss::bindings::random_numbers(py::module &m) {
                      return gauss::random::permute(original, checked_axis, self);
                  },
                  py::arg("x").none(false),
-                 py::arg("axis") = 0,
-                 "Randomly permute a sequence, or return a permuted range");
+                 py::arg("axis") = 0);
 
     m.def("default_rng",
           [](const af::randomEngineType type, const unsigned long long seed) {
               return af::randomEngine(type, seed);
           },
           py::arg("type") = af::randomEngineType::AF_RANDOM_ENGINE_DEFAULT,
-          py::arg("seed") = 0ULL,
-          "Creates a new random engine");
+          py::arg("seed") = 0ULL);
 
     m.def("permutation",
           [](const py::object &x, const int32_t axis, std::optional<af::randomEngine> &engine) -> af::array {
@@ -171,8 +169,7 @@ void pygauss::bindings::random_numbers(py::module &m) {
           },
           py::arg("x").none(false),
           py::arg("axis") = 0,
-          py::arg("engine") = py::none(),
-          "Randomly permute a sequence, or return a permuted range");
+          py::arg("engine") = py::none());
 
     m.def("random",
           [](const af::dim4 &shape, const af::dtype &dtype, std::optional<af::randomEngine> &engine) {
@@ -180,16 +177,14 @@ void pygauss::bindings::random_numbers(py::module &m) {
           },
           py::arg("shape").none(false),
           py::arg("dtype") = af::dtype::f32,
-          py::arg("engine") = py::none(),
-          "Creates a new array using random values drawn from a uniform distribution");
+          py::arg("engine") = py::none());
 
     m.def("randn", [](const af::dim4 &shape, const af::dtype &dtype, std::optional<af::randomEngine> &engine) {
               return gauss::random::normal(0.0, 1.0, shape, dtype, engine);
           },
           py::arg("shape").none(false),
           py::arg("dtype") = af::dtype::f32,
-          py::arg("engine") = py::none(),
-          "Creates a new array using random numbers drawn from a normal distribution");
+          py::arg("engine") = py::none());
 
     m.def("randint",
           [](const int64_t low, const std::optional<int64_t> high, const af::dim4 &shape, const af::dtype &dtype,
@@ -200,9 +195,5 @@ void pygauss::bindings::random_numbers(py::module &m) {
           py::arg("high") = py::none(),
           py::arg("shape") = af::dim4(1, 1),
           py::arg("dtype") = af::dtype::s32,
-          py::arg("engine") = py::none(),
-          "Return random integers from low (inclusive) to high (exclusive).\n"
-          "\n"
-          "Return random integers from the “discrete uniform” distribution of the specified dtype in the “half-open” "
-          "interval [low, high). If high is None (the default), then results are from [0, low).");
+          py::arg("engine") = py::none());
 }

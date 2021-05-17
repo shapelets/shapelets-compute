@@ -120,7 +120,7 @@ def test_pad_creation():
     a = sh.iota((3, 2), dtype="float32") + 10.
     # add one extra row at the beginning (1, 0, ...) and one at the
     # end (1, 0, 0, 0).  Values are zero.
-    pz = sh.pad(a, (1, 0, 0, 0), (1, 0, 0, 0), sh.BorderType.Zero)
+    pz = sh.pad(a, (1, 0, 0, 0), (1, 0, 0, 0), 'zero')
     assert pz.same_as([
         [0., 0],
         [10, 13],
@@ -131,7 +131,7 @@ def test_pad_creation():
 
     # add one extra column at the beginning, one extra row at the end
     # and out of bound values are clamped to the edge
-    zce = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), sh.BorderType.ClampEdge)
+    zce = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), 'clampedge')
     assert zce.same_as([
         [10., 10, 13],
         [11, 11, 14],
@@ -141,7 +141,7 @@ def test_pad_creation():
 
     # same as before but cycle out of bound values are mapped to range
     # of the dimension in cyclic fashion
-    zcc = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), sh.BorderType.Periodic)
+    zcc = sh.pad(a, (0, 1, 0, 0), (1, 0, 0, 0), 'periodic')
     assert zcc.same_as([
         [13., 10, 13],
         [14, 11, 14],
@@ -150,7 +150,7 @@ def test_pad_creation():
     ])
 
     # Out of bound values are symmetric over the edge
-    zcs = sh.pad(a, (1, 1, 0, 0), (1, 1, 0, 0), sh.BorderType.Symmetric)
+    zcs = sh.pad(a, (1, 1, 0, 0), (1, 1, 0, 0), 'symmetric')
     assert zcs.same_as([
         [10, 10, 13, 13],
         [10, 10, 13, 13],
@@ -240,7 +240,7 @@ def test_tile():
     c = sh.tile(b, 1, 2)
     assert c.same_as([[0, 0], [1, 1], [2, 2], [3, 3], [0, 0], [1, 1], [2, 2], [3, 3]])
     # same in one operation
-    d = sh.tile(a, (2, 2))
+    d = sh.tile(a, 2, 2)
     assert d.same_as(c)
 
 
@@ -287,7 +287,9 @@ def test_memory_view():
     assert not b.c_contiguous
 
     # data is shared for CPU backend.
-    sh.set_backend(sh.Backend.CPU)
+    sh.set_backend('cpu')
+    assert sh.get_backend() == 'cpu'
+    
     # memoryview doesn't have indexing
     # implemented
     a = sh.iota(10)
@@ -309,3 +311,14 @@ def test_join():
     assert sh.join([a, b, c], 0).same_as([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     # join on columns
     assert sh.join([a, b, c], 1).same_as([[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]])
+
+def test_linspace():
+    sh.linspace(1, 100, num=10).same_as(np.linspace(1, 100, num=10))
+    sh.linspace(1, 100, num=10, endpoint=False).same_as(np.linspace(1, 100, num=10, endpoint=False))
+    sh.linspace(1, 100, num=10, endpoint=True).same_as(np.linspace(1, 100, num=10, endpoint=True))
+    sh.geomspace(1, 100, num=10).same_as(np.geomspace(1, 100, num=10))
+    sh.geomspace(1, 100, num=10, endpoint=False).same_as(np.geomspace(1, 100, num=10, endpoint=False))
+    sh.geomspace(1, 100, num=10, endpoint=True).same_as(np.geomspace(1, 100, num=10, endpoint=True))
+    sh.logspace(1, 100, num=10).same_as(np.logspace(1, 100, num=10))
+    sh.logspace(1, 100, num=10, endpoint=False).same_as(np.logspace(1, 100, num=10, endpoint=False))
+    sh.logspace(1, 100, num=10, endpoint=True).same_as(np.logspace(1, 100, num=10, endpoint=True))

@@ -133,7 +133,8 @@ void runScamp(SCAMP::SCAMPArgs &args) {
     // When using GPUs do not use CPU workers as they are much slower currently
     // and can cause unnecessary latency
     int numWorkersCPU = 0;
-    if (algos::library::getBackend() == algos::library::Backend::KHIVA_BACKEND_CPU) {
+    if (af::getActiveBackend() == af::Backend::AF_BACKEND_CPU) {
+    // if (algos::library::getBackend() == algos::library::Backend::KHIVA_BACKEND_CPU) {
         devices.clear();
         numWorkersCPU = std::thread::hardware_concurrency();
     }
@@ -528,10 +529,8 @@ void getChains(af::array tss, long m, af::array &chains) {
         auto currArrChains = extractAllChains(res.first.second, res.second.second);
         sortChains(currArrChains);
         auto flattenedIndexesPair = buildFlattenedWithIndexes(currArrChains);
-        chains(af::seq(flattenedIndexesPair.first.size()), 0, tssIdx) =
-            gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.first);
-        chains(af::seq(flattenedIndexesPair.second.size()), 1, tssIdx) =
-            gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.second);
+        chains(af::seq(flattenedIndexesPair.first.size()), 0, tssIdx) = gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.first);
+        chains(af::seq(flattenedIndexesPair.second.size()), 1, tssIdx) = gauss::vectorutil::createArray<unsigned int>(flattenedIndexesPair.second);
     }
 }
 

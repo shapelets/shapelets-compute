@@ -6,8 +6,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
-#include <fmt/format.h>
+
 #include <spdlog/spdlog.h>
+
 #include <gauss.h>
 
 #include "formatters.h"
@@ -283,6 +284,7 @@ namespace pygauss {
     }
 
     namespace bindings {
+        
         void device_operations(py::module &m);
 
         void shared_enum_types(py::module &m);
@@ -301,7 +303,7 @@ namespace pygauss {
 
         void logic_operations(py::module &m);
 
-        void math_operations(py::module_ &m);
+        void math_operations(py::module &m);
 
         void random_numbers(py::module &m);
 
@@ -313,7 +315,11 @@ namespace pygauss {
 
         void gauss_distance_functions(py::module &m);
 
-        void gauss_statistic_bindings(py::module &m);
+        void gauss_normalization_functions(py::module &m);
+
+        void gauss_dimensionality_functions(py::module &m);
+
+        void clustering_functions(py::module &m);
     }
 
 

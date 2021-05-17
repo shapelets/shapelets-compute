@@ -6,9 +6,6 @@
 
 namespace gauss::features {
 
-using AggregationFuncDimT = af::array (*)(const af::array &, const dim_t);
-using AggregationFuncBoolDimT = af::array (*)(const af::array &, bool, const dim_t);
-using AggregationFuncInt = af::array (*)(const af::array &, const int);
 
 /**
  * @brief Calculates the absolute energy of the time series which is the sum over the squared values.
@@ -38,95 +35,43 @@ GAUSSAPI af::array absEnergy(const af::array &base);
  */
 GAUSSAPI af::array absoluteSumOfChanges(const af::array &tss);
 
-/**
- * @brief Calculates the value of an aggregation function f_agg (e.g. var or mean) of the autocorrelation
- * (Compare to http://en.wikipedia.org/wiki/Autocorrelation#Estimation), taken over different all possible
- * lags (1 to length of x).
- * \f[
- * \frac{1}{n-1} \sum_{l=1,\ldots, n} \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
- * \f]
- *  where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean.
- *
- * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
- * dimension one indicates the number of time series.
- * @param aggregationFunction The function to summarise all autocorrelation with different lags.
- *
- * @return af::array An array with the same dimensions as tss, whose values (time series in dimension 0)
- * contains the aggregated correlation for each time series.
- */
-GAUSSAPI af::array aggregatedAutocorrelation(const af::array &tss, AggregationFuncBoolDimT aggregationFunction);
 
-/**
- * @brief Calculates the value of an aggregation function f_agg (e.g. var or mean) of the autocorrelation
- * (Compare to http://en.wikipedia.org/wiki/Autocorrelation#Estimation), taken over different all possible
- * lags (1 to length of x).
- * \f[
- * \frac{1}{n-1} \sum_{l=1,\ldots, n} \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
- * \f]
- *  where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean.
- *
- * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
- * dimension one indicates the number of time series.
- * @param aggregationFunction The function to summarise all autocorrelation with different lags.
- *
- * @return af::array An array with the same dimensions as tss, whose values (time series in dimension 0)
- * contains the aggregated correlation for each time series.
- */
-GAUSSAPI af::array aggregatedAutocorrelation(const af::array &tss, AggregationFuncDimT aggregationFunction);
 
-/**
- * @brief Calculates the value of an aggregation function f_agg (e.g. var or mean) of the autocorrelation
- * (Compare to http://en.wikipedia.org/wiki/Autocorrelation#Estimation), taken over different all possible
- * lags (1 to length of x).
- * \f[
- * \frac{1}{n-1} \sum_{l=1,\ldots, n} \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
- * \f]
- *  where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean.
- *
- * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
- * dimension one indicates the number of time series.
- * @param aggregationFunction The function to summarise all autocorrelation with different lags.
- *
- * @return af::array An array with the same dimensions as tss, whose values (time series in dimension 0)
- * contains the aggregated correlation for each time series.
- */
-GAUSSAPI af::array aggregatedAutocorrelation(const af::array &tss, AggregationFuncInt aggregationFunction);
+// /**
+//  * @brief Calculates a linear least-squares regression for values of the time series that were aggregated over chunks
+//  * versus the sequence from 0 up to the number of chunks minus one.
+//  *
+//  * @param t The time series to calculate the features of.
+//  * @param chunkSize The chunkSize used to aggregate the data.
+//  * @param aggregationFunction Function to be used in the aggregation.
+//  * @param slope Slope of the regression line.
+//  * @param intercept Intercept of the regression line.
+//  * @param rvalue Correlation coefficient.
+//  * @param pvalue Two-sided p-value for a hypothesis test whose null hypothesis is that the slope is zero, using
+//  * Wald Test with t-distribution of the test statistic.
+//  * @param stderrest Standard error of the estimated gradient.
+//  */
+// GAUSSAPI void aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncDimT aggregationFunction,
+//                                     af::array &slope, af::array &intercept, af::array &rvalue, af::array &pvalue,
+//                                     af::array &stderrest);
 
-/**
- * @brief Calculates a linear least-squares regression for values of the time series that were aggregated over chunks
- * versus the sequence from 0 up to the number of chunks minus one.
- *
- * @param t The time series to calculate the features of.
- * @param chunkSize The chunkSize used to aggregate the data.
- * @param aggregationFunction Function to be used in the aggregation.
- * @param slope Slope of the regression line.
- * @param intercept Intercept of the regression line.
- * @param rvalue Correlation coefficient.
- * @param pvalue Two-sided p-value for a hypothesis test whose null hypothesis is that the slope is zero, using
- * Wald Test with t-distribution of the test statistic.
- * @param stderrest Standard error of the estimated gradient.
- */
-GAUSSAPI void aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncDimT aggregationFunction,
-                                    af::array &slope, af::array &intercept, af::array &rvalue, af::array &pvalue,
-                                    af::array &stderrest);
-
-/**
- * @brief Calculates a linear least-squares regression for values of the time series that were aggregated over chunks
- * versus the sequence from 0 up to the number of chunks minus one.
- *
- * @param t The time series to calculate the features of.
- * @param chunkSize The chunkSize used to aggregate the data.
- * @param aggregationFunction Function to be used in the aggregation.
- * @param slope Slope of the regression line.
- * @param intercept Intercept of the regression line.
- * @param rvalue Correlation coefficient.
- * @param pvalue Two-sided p-value for a hypothesis test whose null hypothesis is that the slope is zero, using
- * Wald Test with t-distribution of the test statistic.
- * @param stderrest Standard error of the estimated gradient.
- */
-GAUSSAPI void aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncInt aggregationFunction,
-                                    af::array &slope, af::array &intercept, af::array &rvalue, af::array &pvalue,
-                                    af::array &stderrest);
+// /**
+//  * @brief Calculates a linear least-squares regression for values of the time series that were aggregated over chunks
+//  * versus the sequence from 0 up to the number of chunks minus one.
+//  *
+//  * @param t The time series to calculate the features of.
+//  * @param chunkSize The chunkSize used to aggregate the data.
+//  * @param aggregationFunction Function to be used in the aggregation.
+//  * @param slope Slope of the regression line.
+//  * @param intercept Intercept of the regression line.
+//  * @param rvalue Correlation coefficient.
+//  * @param pvalue Two-sided p-value for a hypothesis test whose null hypothesis is that the slope is zero, using
+//  * Wald Test with t-distribution of the test statistic.
+//  * @param stderrest Standard error of the estimated gradient.
+//  */
+// GAUSSAPI void aggregatedLinearTrend(const af::array &t, long chunkSize, AggregationFuncInt aggregationFunction,
+//                                     af::array &slope, af::array &intercept, af::array &rvalue, af::array &pvalue,
+//                                     af::array &stderrest);
 
 /**
  * @brief Calculates a vectorized Approximate entropy algorithm (https://en.wikipedia.org/wiki/Approximate_entropy).
@@ -146,36 +91,6 @@ GAUSSAPI void aggregatedLinearTrend(const af::array &t, long chunkSize, Aggregat
  * the vectorized Approximate entropy for all the input time series in tss.
  */
 GAUSSAPI af::array approximateEntropy(const af::array &tss, int m, float r);
-
-/**
- * @brief Calculates the autocorrelation of the specified lag for the given time series, according to the formula [1].
- * \f[
- * \frac{1}{(n-l)\sigma^{2}} \sum_{t=1}^{n-l}(X_{t}-\mu )(X_{t+l}-\mu),
- * \f]
- * where \f$n\f$ is the length of the time series \f$X_i\f$, \f$\sigma^2\f$ its variance and \f$\mu\f$ its mean, \f$l\f$
- * denotes the lag.
- *
- * [1] https://en.wikipedia.org/wiki/Autocorrelation#Estimation
- *
- * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- * @param maxLag The maximum lag to compute.
- * @param unbiased Determines whether it divides by (n - lag) (if true), or n (if false).
- *
- * @return af::array The autocorrelation value for the given time series.
- */
-GAUSSAPI af::array autoCorrelation(const af::array &tss, long maxLag, bool unbiased = false);
-
-/**
- * @brief Calculates the auto-covariance the given time series.
- *
- * @param xss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- * @param unbiased Determines whether it divides by n - lag (if true) or n (if false).
- *
- * @return af::array The auto-covariance value for the given time series.
- */
-GAUSSAPI af::array autoCovariance(const af::array &xss, bool unbiased = false);
 
 /**
  * @brief Calculates the binned entropy for the given time series and number of bins. It calculates the value of:
@@ -253,31 +168,8 @@ GAUSSAPI af::array countAboveMean(const af::array &tss);
  */
 GAUSSAPI af::array countBelowMean(const af::array &tss);
 
-/**
- * @brief Calculates the cross-covariance of the given time series.
- *
- * @param xss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- * @param yss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- * @param unbiased Determines whether it divides by n - lag (if true) or n (if false).
- *
- * @return af::array The cross-covariance value for the given time series.
- */
-GAUSSAPI af::array crossCovariance(const af::array &xss, const af::array &yss, bool unbiased = true);
 
-/**
- * @brief Calculates the cross-correlation of the given time series.
- *
- * @param xss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- * @param yss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- * @param unbiased Determines whether it divides by n - lag (if true) or n (if false).
- *
- * @return af::array The cross-correlation value for the given time series.
- */
-GAUSSAPI af::array crossCorrelation(const af::array &xss, const af::array &yss, bool unbiased = true);
+
 
 /** @brief Calculates a Continuous wavelet transform for the Ricker wavelet, also known as the "Mexican hat wavelet"
  * which is defined by:
@@ -382,7 +274,7 @@ GAUSSAPI af::array firstLocationOfMinimum(const af::array &tss);
  *
  * @return af::array The coefficients for each time series.
  */
-GAUSSAPI af::array friedrichCoefficients(const af::array &tss, int m, float r);
+//GAUSSAPI af::array friedrichCoefficients(const af::array &tss, int m, float r);
 
 /**
  * @brief Computes if the input time series contain duplicated elements.
@@ -545,7 +437,7 @@ GAUSSAPI af::array longestStrikeBelowMean(const af::array &tss);
  *
  * @return af::array Largest fixed point of deterministic dynamics.
  */
-GAUSSAPI af::array maxLangevinFixedPoint(const af::array &tss, int m, float r);
+// GAUSSAPI af::array maxLangevinFixedPoint(const af::array &tss, int m, float r);
 
 /**
  * @brief Calculates the maximum value for each time series within tss.
@@ -668,33 +560,7 @@ GAUSSAPI af::array numberCrossingM(const af::array &tss, int m);
  */
 GAUSSAPI af::array numberPeaks(af::array tss, int n);
 
-/**
- * @brief Calculates the value of the partial autocorrelation function at the given lag. The lag \f$k\f$ partial
- * autocorrelation of a time series \f$\lbrace x_t, t = 1 \ldots T \rbrace\f$ equals the partial correlation of
- * \f$x_t\f$ and \f$x_{t-k}\f$, adjusted for the intermediate variables \f$\lbrace x_{t-1}, \ldots, x_{t-k+1}
- * \rbrace\f$ ([1]). Following [2], it can be defined as:
- * \f[
- *      \alpha_k = \frac{ Cov(x_t, x_{t-k} | x_{t-1}, \ldots, x_{t-k+1})}
- *      {\sqrt{ Var(x_t | x_{t-1}, \ldots, x_{t-k+1}) Var(x_{t-k} | x_{t-1}, \ldots, x_{t-k+1} )}}
- * \f]
- * with (a) \f$x_t = f(x_{t-1}, \ldots, x_{t-k+1})\f$ and (b) \f$ x_{t-k} = f(x_{t-1}, \ldots, x_{t-k+1})\f$
- * being AR(k-1) models that can be fitted by OLS. Be aware that in (a), the regression is done on past values to
- * predict \f$ x_t \f$ whereas in (b), future values are used to calculate the past value \f$x_{t-k}\f$.
- * It is said in [1] that, for an AR(p), the partial autocorrelations \f$ \alpha_k \f$ will be nonzero for
- * \f$ k<=p \f$ and zero for \f$ k>p \f$. With this property, it is used to determine the lag of an AR-Process.
- *
- * [1] Box, G. E., Jenkins, G. M., Reinsel, G. C., & Ljung, G. M. (2015). Time series analysis: forecasting and control.
- * John Wiley & Sons.
- *
- * [2] https://onlinecourses.science.psu.edu/stat510/node/62
- *
- * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
- * one indicates the number of time series.
- * @param lags Indicates the lags to be calculated.
- *
- * @return af::array The partial autocorrelation for each time series for the given lag.
- */
-GAUSSAPI af::array partialAutocorrelation(const af::array &tss, const af::array &lags);
+
 
 /**
  * @brief Calculates the percentage of unique values, that are present in the time series more than once.
@@ -738,7 +604,7 @@ GAUSSAPI af::array percentageOfReoccurringValuesToAllValues(const af::array &tss
  *
  * @return af::array Values at the given quantile.
  */
-GAUSSAPI af::array quantile(const af::array &tss, const af::array &q, float precision = 100000000);
+// GAUSSAPI af::array quantile(const af::array &tss, const af::array &q, float precision = 100000000);
 
 /**
  * @brief Counts observed values within the interval [min, max).

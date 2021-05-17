@@ -1,76 +1,107 @@
 #%%
 import os
-import scipy.io
 import numpy as np
 import pathlib
 import matplotlib.pyplot as plt 
 import shapelets.compute as sc 
+from shapelets.data import load_dataset
 import cProfile
 
 current_path = pathlib.Path(__file__).parent.absolute()
-file = os.path.join(current_path, "regime.txt")
-data = np.loadtxt(file)
-# plt.plot(data)
-# plt.show()
+file = os.path.join(current_path, "vanilla_ice.csv")
 
-# %%
-profile, index = sc.matrixprofile.matrix_profile(data, 100)
-# plt.plot(profile)
-# plt.show()
+data = np.loadtxt('/Users/justo.ruiz/Development/shapelets/solo_comprobacion/modules/shapelets/data/Patient1.Mix 02.amc.txt')
+#data = load_dataset("daily-min-temperatures.txt")
+data = data[:, 1] # 1
+plt.plot(data)
+plt.show()
 
-# %%
-cac = sc.matrixprofile.cac(profile, index, 100)
-# print(sc.argmin(cac))
+w = 150
+
+from matrixprofile.algorithms.regimes import extract_regimes
+from matrixprofile.algorithms.mpx import mpx
+profile = mpx(np.array(data), w)
+profile = extract_regimes(profile)
+print(profile['regimes'])
+plt.plot(profile['cac'])
+plt.show()
+
+
+oprofile, oindex = sc.matrixprofile.matrix_profile(data, w)
+print(sc.matrixprofile.regimes(oprofile, oindex, w, -1, 5))
+
+
+
+
+# # %%
+# profile, index = sc.matrixprofile.matrix_profile(data, w)
+# # plt.plot(profile)
+# # plt.show()
+
+# # %%
+# cac, argmin = sc.matrixprofile.cac(profile, index, w)
+# cac2 = sc.matrixprofile.cac_int(profile, index, w)
+# argmin2 = sc.argmin(cac2)
+
+# print(argmin, argmin2)
+
+
 # plt.plot(cac)
 # plt.show()
+# plt.plot(cac2)
+# plt.show()
 
-cProfile.run('sc.matrixprofile.matrix_profile(data, 100)')
-cProfile.run('sc.matrixprofile.cac(profile, index, 100)')
+# cac = sc.array(cac)
+
+# print(cac.shape)
+# print(cac2.shape)
+
+# plt.plot(cac- cac2)
+# plt.show()
+
+# # %%
+
+# # pos = sc.iota(index.shape, dtype = index.dtype)
+
+# # smll = sc.minimum(pos, index)
+# # large = sc.maximum(pos, index)
+
+# # # sc.join([smll[1050:1150], pos[1050:1150], index[1050:1150]], 1)
+
+# # smll = sc.sort(smll)
+# # large = sc.sort(large)
+
+# # si, sv = sc.sum_by_key(smll, sc.full(smll.shape, 1.0))
+# # li, lv = sc.sum_by_key(large, sc.full(large.shape, -1.0))
+
+# # mark1 = sc.zeros(index.shape)
+# # mark1.assign(si, sv)
+# # mark2 = sc.zeros(index.shape)
+# # mark2.assign(li, lv)
+
+# # mark = mark1 + mark2
+
+# # cross_count = sc.cumsum(mark)
 
 
+# # i = sc.iota(cross_count.shape)
+# # l = cross_count.shape[0]
+# # adj = 2.0 * i * (l-i) / l 
+# # plt.plot(cross_count)
+# # plt.plot(adj)
+# # #plt.plot(adj / cross_count)
+# # plt.show()
 
 
+# # cross_count =cross_count /adj
 
+# # cross_count = sc.minimum(cross_count, 1.)
+# # fig, ax1 = plt.subplots() 
+# # ax1.plot(data[5*w:-5*w], color="tab:green")
+# # ax2=ax1.twinx()
+# # ax2.plot(cross_count[5*w:-5*w], color="tab:red")
+# # plt.show()
+
+# # # %%
 
 # %%
-
-# pos = sc.range(len(index), dtype=index.dtype)
-# small = sc.minimum(pos, index)
-# small_mark = sc.zeros(len(index), dtype=index.dtype)
-# large = sc.maximum(pos, index)
-# large_mark = sc.zeros(len(index), dtype=index.dtype)
-
-# # %%
-# xx = sc.sort(small)
-# si, sv = sc.sum_by_key(xx, sc.ones(xx.shape, dtype=index.dtype))
-# small_mark.assign(si, sv)
-# print(small_mark.shape[0] == index.shape[0])
-
-# xx = sc.sort(large)
-# li, lv = sc.sum_by_key(xx, sc.ones(xx.shape, dtype=index.dtype))
-# large_mark.assign(li, lv)
-# print(large_mark.shape[0] == index.shape[0])
-# mark = small_mark - large_mark
-
-
-# # %%
-# crosscount = sc.cumsum(mark)
-
-# # %%
-# plt.plot(crosscount)
-# plt.show()
-# # %%
-# l = crosscount.shape[0]
-# i = sc.iota(l)
-# adj = 2*i*(l-i)/l
-
-# # %%
-# plt.plot(adj)
-# plt.show()
-# # %%
-# normalized_crosscount = sc.minimum(crosscount / adj, 1)
-
-# # %%
-# plt.plot(normalized_crosscount)
-# plt.show()
-# # %%

@@ -9,16 +9,9 @@ namespace spd = spdlog;
 
 typedef af_err (*binaryFn)(af_array *out, const af_array lhs, const af_array rhs, const bool batch);
 
-
 af::array binary_function(af::array &self, const py::object &other, bool reverse, binaryFn fn) {
     af::array rhs = pygauss::arraylike::as_itself_or_promote(other, self.dims(), self.type());
-
-    auto batch = pygauss::GForStatus::get();
-    if (!batch) {
-        // check if we can broadcast by either tiling or setting the batch flag.
-        // TODO
-    }
-
+    auto batch = pygauss::GForStatus::get() || self.dims() != rhs.dims();
     af_array out = nullptr;
     if (!reverse)
         pygauss::throw_on_error((*fn)(&out, self.get(), rhs.get(), batch));
@@ -28,20 +21,19 @@ af::array binary_function(af::array &self, const py::object &other, bool reverse
     return af::array(out);
 }
 
-
 #define BINARY_OP(OP, PYTHON_FN)                                                                        \
     ka.def(#PYTHON_FN,                                                                                  \
                    [](af::array &self, const py::object &other){                                        \
-                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
+                       spd::trace("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, false, OP);                                  \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
 
 
-#define BINARY_OPR(OP, PYTHON_FN)                                                                        \
-    ka.def(#PYTHON_FN,                                                                                   \
+#define BINARY_OPR(OP, PYTHON_FN)                                                                       \
+    ka.def(#PYTHON_FN,                                                                                  \
                    [](af::array &self, const py::object &other){                                        \
-                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
+                       spd::trace("Binary operation {} {}", #OP, GForStatus::get());                    \
                        return binary_function(self, other, true, OP);                                   \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
@@ -50,9 +42,8 @@ af::array binary_function(af::array &self, const py::object &other, bool reverse
 #define BINARY_IOP(OP, PYTHON_FN)                                                                       \
     ka.def(#PYTHON_FN,                                                                                  \
                    [](af::array &self, const py::object &other){                                        \
-                       spd::debug("Binary inplace operation {}", #OP);                                  \
-                       spd::debug("Binary operation {} {}", #OP, GForStatus::get());                    \
-                       binary_function(self, other, false, OP);                                         \
+                       spd::trace("Binary operation {} {}", #OP, GForStatus::get());                    \
+                       self = binary_function(self, other, false, OP);                                  \
                        return self;                                                                     \
                    },                                                                                   \
                    py::arg("other").none(false));                                                       \
@@ -60,6 +51,14 @@ af::array binary_function(af::array &self, const py::object &other, bool reverse
 
 
 int array_priority = 30;
+
+af_err floor_divide(af_array* out, const af_array left, const af_array right, bool broadcast) {
+    af_array tmp;
+    auto err = af_div(&tmp, left, right, broadcast);
+    if (err != AF_SUCCESS)
+        return err;
+    return af_floor(out, tmp);
+}
 
 void pygauss::bindings::array_obj(py::module &m) {
 
@@ -77,12 +76,9 @@ void pygauss::bindings::array_obj(py::module &m) {
                return af::allTrue<bool>(af::abs(non_nan_self - non_nan_other) < (double) eps);
            },
            py::arg("arr_like").none(false),
-           py::arg("eps") = 1e-4,
-           "Performs a element wise comparison between the arrays and returns "
-           "True if the two arrays are the same (same dimensions, same values).");
+           py::arg("eps") = 1e-4);
 
-    ka.def_readonly_static("__array_priority__", &array_priority,
-                           "Ensure priority in resolved in favour of our built-in methods");
+    ka.def_readonly_static("__array_priority__", &array_priority);
 
     ka.def("__getitem__",
            [](const af::array &self, const py::object &selector) {
@@ -92,8 +88,7 @@ void pygauss::bindings::array_obj(py::module &m) {
                throw_on_error(af_release_indexers(index));
                return af::array(out);
            },
-           py::arg("selector").none(false),
-           "");
+           py::arg("selector").none(false));
 
     ka.def("__setitem__",
            [](af::array &self, const py::object &selector, const py::object &value) {
@@ -117,12 +112,12 @@ void pygauss::bindings::array_obj(py::module &m) {
     ka.def("__copy__",
            [](const af::array &self) {
                return af::array(self);
-           }, "Shallow copy");
+           });
 
     ka.def("__deepcopy__",
            [](const af::array &self, const py::object& memo) {
                return self.copy();
-           }, py::arg("memo"), "Deep copy");
+           }, py::arg("memo"));
 
     ka.def("__len__",
            [](const af::array &self) {
@@ -152,9 +147,39 @@ void pygauss::bindings::array_obj(py::module &m) {
                                  return self.isvector();
                              });
 
+    ka.def_property_readonly("is_empty",
+                             [](const af::array &self) { 
+                                 return self.isempty();
+                             });                         
+
     ka.def_property_readonly("is_single",
                              [](const af::array &self) {
                                  return self.issingle();
+                             });
+
+    ka.def_property_readonly("is_integer",
+                             [](const af::array &self) {
+                                 return self.isinteger();
+                             });
+
+    ka.def_property_readonly("is_complex",
+                             [](const af::array &self) {
+                                 return self.iscomplex();
+                             });
+
+    ka.def_property_readonly("is_bool",
+                             [](const af::array &self) {
+                                 return self.isbool();
+                             });
+
+    ka.def_property_readonly("is_floating",
+                             [](const af::array &self) {
+                                 return self.isfloating();
+                             });
+
+    ka.def_property_readonly("is_half",
+                             [](const af::array &self) {
+                                 return self.ishalf();
                              });
 
     ka.def_property_readonly("shape",
@@ -165,43 +190,42 @@ void pygauss::bindings::array_obj(py::module &m) {
     ka.def_property_readonly("size",
                              [](const af::array &self) {
                                  return self.elements();
-                             }, "Returns the total number of elements of this array.");
-
+                             });
 
     ka.def_property_readonly("ndim",
                              [](const af::array &self) {
                                  return self.numdims();
-                             }, "Returns the number of dimensions.");
+                             });
 
     ka.def_property_readonly("itemsize",
                              [](const af::array &self) {
                                  return arraylike::scalar_size(self.type());
-                             }, "Returns the size in bytes of each individual item held by this array");
+                             });
 
     ka.def_property_readonly("dtype",
                              [](const af::array &self) {
                                  return self.type();
-                             }, "Returns the numpy dtype describing the type of elements held by this array");
+                             });
 
     ka.def_property_readonly("T",
                              [](const af::array &self) {
                                  return self.T();
-                             }, "Get the transposed the array");
+                             });
 
     ka.def_property_readonly("H",
                              [](const af::array &self) {
                                  return self.H();
-                             }, "Get the conjugate-transpose of the current array");
+                             });
 
     ka.def_property_readonly("real",
                              [](const af::array &self) {
                                 return af::real(self);
-                             }, "Returns the real part of this tensor");
+                             });
 
     ka.def_property_readonly("imag",
                              [](const af::array &self) {
                                  return af::imag(self);
-                             }, "Returns the imaginary part of this tensor");
+                             });
 
     ka.def("eval",
            [](const af::array &self){
@@ -212,9 +236,213 @@ void pygauss::bindings::array_obj(py::module &m) {
            [](const af::array &self, const af::dtype &type) {
                return self.as(type);
            },
-           py::arg("type").none(false),
-           "converts the array into a new array with the specified type");
+           py::arg("type").none(false));
 
+    ka.def("__int__", 
+        [](const af::array &self){
+            
+            if (self.elements() != 1)
+                throw std::runtime_error("Only arrays of one element can be converted to Python scalars");
+
+            switch (self.type())
+            {
+            case af::dtype::b8: {
+                auto d = self.scalar<char>();
+                return py::int_(d);
+            }
+            case af::dtype::c32: {
+                auto d = self.scalar<af::af_cfloat>();
+                return py::int_(static_cast<long long>(d.real));
+            }
+            case af::dtype::c64: {
+                auto d = self.scalar<af::af_cdouble>();
+                return py::int_(static_cast<long long>(d.real));
+            }
+            case af::dtype::s16: {
+                auto d = self.scalar<short>();
+                return py::int_(d);
+            }
+            case af::dtype::s32: {
+                auto d = self.scalar<int>();
+                return py::int_(d);
+            }
+            case af::dtype::s64: {
+                auto d = self.scalar<long long>();
+                return py::int_(d);
+            }
+            case af::dtype::f16: {
+                auto d = self.scalar<af::half>();
+                auto f = static_cast<float>(half::from_bits(d.data_));
+                return py::int_(static_cast<int>(f));
+            }
+            case af::dtype::f32: {
+                auto d = self.scalar<float>();
+                return py::int_(static_cast<long long>(d));
+            }
+            case af::dtype::f64: {
+                auto d = self.scalar<double>();
+                return py::int_(static_cast<long long>(d));
+            }
+            case af::dtype::u16: {
+                auto d = self.scalar<unsigned short>();
+                return py::int_(d);
+            }
+            case af::dtype::u32: {
+                auto d = self.scalar<unsigned int>();
+                return py::int_(d);
+            }
+            case af::dtype::u64: {
+                auto d = self.scalar<unsigned long long>();
+                return py::int_(d);
+            }
+            case af::dtype::u8: {
+                auto d = self.scalar<unsigned char>();
+                return py::int_(d);
+            }
+            default:
+                throw std::runtime_error("Unexpected type");
+                break;
+            }                  
+        });
+
+    ka.def("__float__", 
+        [](const af::array &self){
+            if (self.elements() != 1)
+                throw std::runtime_error("Only arrays of one element can be converted to Python scalars");
+
+            switch (self.type())
+            {
+            case af::dtype::b8: {
+                auto d = self.scalar<char>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::c32: {
+                auto d = self.scalar<af::af_cfloat>();
+                return py::float_(d.real);
+            }
+            case af::dtype::c64: {
+                auto d = self.scalar<af::af_cdouble>();
+                return py::float_(d.real);
+            }
+            case af::dtype::s16: {
+                auto d = self.scalar<short>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::s32: {
+                auto d = self.scalar<int>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::s64: {
+                auto d = self.scalar<long long>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::f16: {
+                auto d = self.scalar<af::half>();
+                auto f = static_cast<float>(half::from_bits(d.data_));
+                return py::float_(f);
+            }
+            case af::dtype::f32: {
+                auto d = self.scalar<float>();
+                return py::float_(d);
+            }
+            case af::dtype::f64: {
+                auto d = self.scalar<double>();
+                return py::float_(d);
+            }
+            case af::dtype::u16: {
+                auto d = self.scalar<unsigned short>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::u32: {
+                auto d = self.scalar<unsigned int>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::u64: {
+                auto d = self.scalar<unsigned long long>();
+                return py::float_(static_cast<double>(d));
+            }
+            case af::dtype::u8: {
+                auto d = self.scalar<unsigned char>();
+                return py::float_(static_cast<double>(d));
+            }
+            default:
+                throw std::runtime_error("Unexpected type");
+                break;
+            }                
+        });
+
+    ka.def("__complex__", 
+        [](const af::array &self){
+            if (self.elements() != 1)
+                throw std::runtime_error("Only arrays of one element can be converted to Python scalars");
+
+            switch (self.type())
+            {
+            case af::dtype::b8: {
+                auto d = self.scalar<char>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::c32: {
+                auto d = self.scalar<af::af_cfloat>();
+                return std::complex<double>(static_cast<double>(d.real), static_cast<double>(d.imag));
+            }
+            case af::dtype::c64: {
+                auto d = self.scalar<af::af_cdouble>();
+                return std::complex<double>(d.real, d.imag);
+            }
+            case af::dtype::s16: {
+                auto d = self.scalar<short>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::s32: {
+                auto d = self.scalar<int>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::s64: {
+                auto d = self.scalar<long long>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::f16: {
+                auto d = self.scalar<af::half>();
+                auto f = static_cast<float>(half::from_bits(d.data_));
+                return std::complex<double>(static_cast<double>(f), 0.0);
+            }
+            case af::dtype::f32: {
+                auto d = self.scalar<float>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::f64: {
+                auto d = self.scalar<double>();
+                return std::complex<double>(d, 0.0);
+            }
+            case af::dtype::u16: {
+                auto d = self.scalar<unsigned short>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::u32: {
+                auto d = self.scalar<unsigned int>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::u64: {
+                auto d = self.scalar<unsigned long long>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            case af::dtype::u8: {
+                auto d = self.scalar<unsigned char>();
+                return std::complex<double>(static_cast<double>(d), 0.0);
+            }
+            default:
+                throw std::runtime_error("Unexpected type");
+                break;
+            }
+        });
+
+    // ka.def("__iter__",
+    //     [](const af::array &self){
+    //         // Need to do this method for full compat with ndarray
+    //         // and pandas.
+    //         throw std::runtime_error("TODO");
+    //     });
 
     ka.def("__repr__",
            [](const af::array &self) {
@@ -241,8 +469,7 @@ void pygauss::bindings::array_obj(py::module &m) {
                throw_on_error(af_matmul(&out, self.get(), rhs.get(), AF_MAT_NONE, AF_MAT_NONE));
                return af::array(out);
            },
-           py::arg("other").none(false),
-           "Matrix multiplication");
+           py::arg("other").none(false));
 
     ka.def("__rmatmul__",
            [](const af::array &self, const py::object &other) {
@@ -252,8 +479,17 @@ void pygauss::bindings::array_obj(py::module &m) {
                throw_on_error(af_matmul(&out, rhs.get(), self.get(), AF_MAT_NONE, AF_MAT_NONE));
                return af::array(out);
            },
-           py::arg("other").none(false),
-           "Matrix multiplication");
+           py::arg("other").none(false));
+
+    ka.def("__abs__",
+           [](const af::array &self) {
+               return af::abs(self);
+           });
+
+    ka.def("eval",
+           [](const af::array &self) {
+               return self.eval();
+           });
 
     BINARY_OP(af_add, __add__)
     BINARY_OPR(af_add, __radd__)
@@ -270,6 +506,10 @@ void pygauss::bindings::array_obj(py::module &m) {
     BINARY_OP(af_div, __truediv__)
     BINARY_OPR(af_div, __rtruediv__)
     BINARY_IOP(af_div, __itruediv__)
+
+    BINARY_OP(floor_divide, __floordiv__)
+    BINARY_OPR(floor_divide, __rfloordiv__)
+    BINARY_IOP(floor_divide, __ifloordiv__)
 
     BINARY_OP(af_mod, __mod__)
     BINARY_OPR(af_mod, __rmod__)
@@ -306,6 +546,12 @@ void pygauss::bindings::array_obj(py::module &m) {
     BINARY_OPR(af_bitshiftr, __rrshift__)
     BINARY_IOP(af_bitshiftr, __irshift__)
 
+    ka.def("__invert__",
+        [](const af::array &self) {
+            auto as_bool = self.isbool() ? self : self.as(af::dtype::b8);
+            return !as_bool;
+        });
+
     ka.def("__neg__",
            [](af::array &self) {
                auto zero = py::float_(0.0f);
@@ -327,15 +573,5 @@ void pygauss::bindings::array_obj(py::module &m) {
               if (!lst.empty()) {
                   throw_on_error(af_eval_multiple(lst.size(), lst.data()));
               }
-          },
-          "Forces the evaluation of all the arrays");
-
-    ka.def(
-        "assign",
-        [](af::array &self, const af::array &indices, const af::array &rhs){
-            self(indices)=rhs;
-            return self;
-        },
-        py::arg("indices").none(false),
-        py::arg("rhs").none(false));
+          });
 }

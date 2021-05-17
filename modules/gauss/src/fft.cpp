@@ -1,5 +1,7 @@
 #include <gauss/fft.h>
 #include <variant>
+#include <optional>
+#include <iostream>
 
 namespace gauss::fft {
 
@@ -179,12 +181,82 @@ af::array rfftfreq(const int32_t n, const double d) {
     return r * v;
 }
 
-af::array fftfreq(const int32_t n, const double d) {
+af::array fftfreq(const unsigned int n, const double d) {
     double v = 1.0 / (n * d);
-    auto N = ((n - 1) >> 1) + 1;
+    auto N = static_cast<long long>(((n - 1) >> 1) + 1);
     auto r1 = af::range(af::dim4(N));
-    af::array r2 = af::seq(-(n >> 1), -1);
+    af::array r2 = af::seq(-static_cast<signed int>(n >> 1) , -1);
     return af::join(0, r1, r2.as(r1.type())) * v;
+}
+
+af::array fftshift(const af::array& x, const std::optional<std::variant<int, std::vector<int>>>& axes) {
+    // just in case
+    if (x.isempty())
+        return x;
+
+    // the shifts we end up doing
+    int shifts[4] = {0, 0, 0, 0};
+    
+    if (!axes) {
+        // no data provided
+        // iterate through all dimensions and shift by 1/2
+        for (auto i = 0u; i<x.numdims(); i++) {
+            shifts[i] = x.dims(i) >> 1;
+        }
+    }
+    else {
+        
+        auto var = axes.value();
+        if (var.index() == 0) {
+            // just one axis provided
+            auto dim = std::get<int>(var);
+            if (dim >= 4)
+                throw std::invalid_argument("No more than four dimensions are applicable.");
+            shifts[dim] = x.dims(dim) >> 1; 
+        }
+        else {
+            // concrete axes provided
+            auto dims = std::get<std::vector<int>>(var);
+            for (auto dim: dims) {
+                if (dim >= 4)
+                    throw std::invalid_argument("No more than four dimensions are applicable.");
+                shifts[dim] = x.dims(dim) >> 1; 
+            }
+        }
+    }
+
+    return af::shift(x, shifts[0], shifts[1], shifts[2], shifts[3]);
+}
+
+
+af::array spectral_derivative(const af::array& signal, const std::variant<double, af::array> kappa_spec, const bool shift) {
+    // number of points
+    auto n = signal.dims(0);
+    // peform the fft 
+    auto fhat = af::fft(signal);
+    
+    af::array kappa;
+    if (kappa_spec.index()==0) {
+        // compute kappa (spatial frequencies, aka wave numbers)
+        auto domain_length = std::get<double>(kappa_spec);
+        auto unshifted_kappa = (2.0 * af::Pi / domain_length) * (af::range(n) - (n>>1));
+        // shift the spatial frequencies so the match the Fourier transform terms.
+        kappa = fftshift(unshifted_kappa);
+    }
+    else {
+        auto given_kappa = std::get<af::array>(kappa_spec);
+        if (given_kappa.dims(0) != n)
+            throw std::invalid_argument("Kappa specification must have the same lenght as the signal");
+        // shift if requested
+        kappa = (shift) ? fftshift(given_kappa) : given_kappa;
+    }
+
+    // compute i*k*f --> which gives the fourier of the derivative
+    auto dfhat = kappa * fhat * af::cfloat(0.0, 1.0);
+    // put it back
+    auto df = af::ifft(dfhat);
+    // remove the imaginary part of the result.
+    return af::real(df);
 }
 
 }

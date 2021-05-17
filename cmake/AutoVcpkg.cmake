@@ -15,105 +15,90 @@
 # ~~~
 
 set(AUTO_VCPKG_GIT_REPOSITORY "https://github.com/Microsoft/vcpkg.git")
+set(DOWNLOADS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/.downloads)
+set(DEFAULT_AUTO_VCPKG_ROOT "${CMAKE_SOURCE_DIR}/external/vcpkg")
 
 function (vcpkg_download)
-    if (DEFINED AUTO_VCPKG_ROOT)
-        return()
-    endif ()
-    set(AUTO_VCPKG_ROOT "${CMAKE_SOURCE_DIR}/external/vcpkg")
     set(vcpkg_download_contents [===[
-cmake_minimum_required(VERSION 3.5)
-project(vcpkg-download)
+        cmake_minimum_required(VERSION 3.5)
+        project(vcpkg-download)
 
-include(ExternalProject)
-ExternalProject_Add(vcpkg
-            GIT_REPOSITORY @AUTO_VCPKG_GIT_REPOSITORY@
-            GIT_SHALLOW ON
-            SOURCE_DIR @AUTO_VCPKG_ROOT@
-            PATCH_COMMAND ""
-            CONFIGURE_COMMAND  ""
-            BUILD_COMMAND ""
-            INSTALL_COMMAND ""
-            LOG_DOWNLOAD ON
-            LOG_CONFIGURE ON
-            LOG_INSTALL ON)
+        include(ExternalProject)
+        ExternalProject_Add(vcpkg
+                    GIT_REPOSITORY @AUTO_VCPKG_GIT_REPOSITORY@
+                    GIT_SHALLOW ON
+                    SOURCE_DIR @AUTO_VCPKG_ROOT@
+                    PATCH_COMMAND ""
+                    CONFIGURE_COMMAND  ""
+                    BUILD_COMMAND ""
+                    INSTALL_COMMAND ""
+                    LOG_DOWNLOAD ON
+                    LOG_CONFIGURE ON
+                    LOG_INSTALL ON)
     ]===])
+
     string(REPLACE "@AUTO_VCPKG_GIT_REPOSITORY@" "${AUTO_VCPKG_GIT_REPOSITORY}" vcpkg_download_contents "${vcpkg_download_contents}")
     string(REPLACE "@AUTO_VCPKG_ROOT@" "${AUTO_VCPKG_ROOT}" vcpkg_download_contents "${vcpkg_download_contents}")
-    file(WRITE "${CMAKE_BINARY_DIR}/vcpkg-download/CMakeLists.txt" "${vcpkg_download_contents}")
+
+    file(WRITE "${DOWNLOADS_DIRECTORY}/vcpkg-download/CMakeLists.txt" "${vcpkg_download_contents}")
+
     execute_process(COMMAND "${CMAKE_COMMAND}"
-            "-H${CMAKE_BINARY_DIR}/vcpkg-download"
-            "-B${CMAKE_BINARY_DIR}/vcpkg-download")
+        "-H${DOWNLOADS_DIRECTORY}/vcpkg-download"
+        "-B${DOWNLOADS_DIRECTORY}/vcpkg-download")
+
     execute_process(COMMAND "${CMAKE_COMMAND}"
-            "--build" "${CMAKE_BINARY_DIR}/vcpkg-download")
+        "--build" "${DOWNLOADS_DIRECTORY}/vcpkg-download")
+
+    if (WIN32)
+        execute_process(
+            COMMAND "${AUTO_VCPKG_ROOT}/bootstrap-vcpkg.bat" 
+            WORKING_DIRECTORY "${AUTO_VCPKG_ROOT}"
+        )
+    else()
+        execute_process(
+            COMMAND  "${AUTO_VCPKG_ROOT}/bootstrap-vcpkg.sh" 
+            WORKING_DIRECTORY "${AUTO_VCPKG_ROOT}"
+        )
+    endif()            
+
 endfunction ()
 
-function (vcpkg_bootstrap)
-    find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT})
+
+function (vcpkg_install)
+
+    # if it is not set and there is an enviornment variable point to it
+    if(NOT DEFINED AUTO_VCPKG_ROOT)
+        if (DEFINED ENV{VCPKG_ROOT}) 
+            set(AUTO_VCPKG_ROOT "$ENV{VCPKG_ROOT}" CACHE STRING "")    
+        elseif(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+            set(AUTO_VCPKG_ROOT "$ENV{VCPKG_INSTALLATION_ROOT}" CACHE STRING "")    
+        else()
+            set(AUTO_VCPKG_ROOT ${DEFAULT_AUTO_VCPKG_ROOT} CACHE STRING "")    
+        endif()
+    endif()
+    
+    # if we have the variable set, try to find the executable
+    find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT} 
+        NO_DEFAULT_PATH 
+        NO_CMAKE_ENVIRONMENT_PATH
+        NO_SYSTEM_ENVIRONMENT_PATH)
+
+    # if not found, download and/or bootstrap
     if (NOT AUTO_VCPKG_EXECUTABLE)
-        execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/cmake/vcpkg-bootstrap.cmake" "${AUTO_VCPKG_ROOT}")
-        execute_process(COMMAND ${CMAKE_COMMAND} -P "${AUTO_VCPKG_ROOT}/vcpkg-bootstrap.cmake" WORKING_DIRECTORY ${AUTO_VCPKG_ROOT})
-    endif ()
-endfunction ()
+        message(STATUS "Couldn't find vcpkg in ${AUTO_VCPKG_ROOT}; downloading and building...")
+        vcpkg_download()
+        find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT}
+            NO_DEFAULT_PATH 
+            NO_CMAKE_ENVIRONMENT_PATH 
+            NO_SYSTEM_ENVIRONMENT_PATH)
 
-function (vcpkg_download_and_bootstrap)
-    if (NOT DEFINED AUTO_VCPKG_ROOT)
-        if (NOT DEFINED ENV{AUTO_VCPKG_ROOT})
-            vcpkg_download()
-            set(AUTO_VCPKG_ROOT "${CMAKE_SOURCE_DIR}/external/vcpkg" CACHE STRING "")
-        else ()
-            set(AUTO_VCPKG_ROOT "$ENV{AUTO_VCPKG_ROOT}" CACHE STRING "")
+        if (NOT AUTO_VCPKG_EXECUTABLE)
+            message(FATAL_ERROR "Cannot find vcpkg executable")
         endif ()
-        message(STATUS "Setting AUTO_VCPKG_ROOT to ${AUTO_VCPKG_ROOT}")
-        mark_as_advanced(AUTO_VCPKG_ROOT)
-    endif ()
-    vcpkg_bootstrap()
-endfunction ()
-
-function (vcpkg_configure)
-    if (AUTO_VCPKG_EXECUTABLE AND DEFINED AUTO_VCPKG_ROOT)
-        set(CMAKE_TOOLCHAIN_FILE
-                "${AUTO_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-        return()
-    endif ()
-
-    vcpkg_download_and_bootstrap()
-
-    message("Searching for vcpkg in ${AUTO_VCPKG_ROOT}")
-    find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT})
-    if (NOT AUTO_VCPKG_EXECUTABLE)
-        message(FATAL_ERROR "Cannot find vcpkg executable")
-    endif ()
+    endif()
 
     mark_as_advanced(AUTO_VCPKG_EXECUTABLE)
     set(CMAKE_TOOLCHAIN_FILE "${AUTO_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endfunction ()
 
-function (vcpkg_install)
-    # Before running a full download and installation of
-    # vcpkg, check if there is an environment variable
-    # pointing to an existing installation
-    if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED AUTO_VCPKG_ROOT)
-        set(AUTO_VCPKG_ROOT "$ENV{VCPKG_ROOT}" CACHE STRING "")
-        find_program(AUTO_VCPKG_EXECUTABLE vcpkg PATHS ${AUTO_VCPKG_ROOT})
-    endif()
-
-    # Ensure the vcpkg system is configured.
-    vcpkg_configure()
-
-    cmake_parse_arguments(_vcpkg_install "" "TRIPLET" "" ${ARGN})
-    if (NOT ARGN)
-        message(STATUS "vcpkg_install() called with no packages to install")
-        return()
-    endif ()
-
-    if (NOT _vcpkg_install_TRIPLET)
-        set(packages ${ARGN})
-    else ()
-        string(APPEND ":${_vcpkg_install_TRIPLET}" packages ${ARGN})
-    endif ()
-    string(JOIN ", " join ${packages})
-    message(STATUS "vcpkg_install() called to install: ${join}")
-
-    execute_process (COMMAND "${AUTO_VCPKG_EXECUTABLE}" "install" ${packages})
+    execute_process (COMMAND "${AUTO_VCPKG_EXECUTABLE} install --feature-flags:versions,manifest")
 endfunction ()

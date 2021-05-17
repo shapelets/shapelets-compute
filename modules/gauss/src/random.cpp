@@ -1,5 +1,6 @@
 #include <gauss/internal/scopedHostPtr.h>
 #include <gauss/random.h>
+#include <iostream>
 
 #define FLOAT32_EPS 1.1920929e-07
 
@@ -126,32 +127,24 @@ af::array gauss::random::gamma(double alpha,
 //      end
 //
 
-
     auto d = alpha - 1. / 3.;
     auto c = 1.0 / sqrt(9.0 * d);
     auto ii = 0L;
 
     while (ii < n) {
         auto left = n - ii;
-
         auto z = af::randn(af::dim4(left), af::dtype::f32, re);
         auto y = (1.0 + c * z);
         auto v = y * y * y;
-
         auto if_test = ((z >= -1.0 / c) && (v > 0.0));
-        auto Z = z(if_test);
+        auto Z = z(if_test).copy();
         auto V = v(if_test).copy();
-
         auto U = af::randu(af::dim4(V.elements()), af::dtype::f32, re);
-
         auto flag = U < af::exp((0.5 * Z * Z + d - d * V + d * af::log(V)));
         auto x = d * V(flag) / lambda;
-
         auto accepted = x.elements();
-
-        auto left_index = af::seq(ii, std::min(n, ii + accepted));
-        auto right_index = af::seq(0, std::min(left, accepted));
-
+        auto left_index = af::seq(ii, std::min(n, ii + accepted)-1);
+        auto right_index = af::seq(0, std::min(left, accepted)-1);
         result(left_index) = x(right_index);
         ii += accepted;
     }
@@ -263,6 +256,10 @@ af::array gauss::random::multivariate_normal(int64_t samples,
     // draw normal samples into a matrix of `samples` rows by `d` columns
     auto re = engine.value_or(af::getDefaultRandomEngine());
     auto u = af::randn(af::dim4(samples, d), dtype, re);
+    
+    af::gforSet(true);
+    auto result = check_mean + af::matmulNT(u, cho);
+    af::gforSet(false);
 
-    return check_mean + af::matmulNT(u, cho);
+    return result;
 }

@@ -16,25 +16,20 @@ include(CheckLanguage)
 check_language(CUDA)
 
 if(CMAKE_CUDA_COMPILER)
-	message(STATUS "CUDA compiler found: ${CMAKE_CUDA_COMPILER}")
-	enable_language(CUDA)
-    add_definitions("-D_HAS_CUDA_")
-    include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+    message(STATUS "CUDA compiler found: ${CMAKE_CUDA_COMPILER}")
     set(CMAKE_CUDA_STANDARD 14)
-    find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
     include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-    
+
     set(CUDA_SEPARABLE_COMPILATION ON)
     set(CUDA_RESOLVE_DEVICE_SYMBOLS ON)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr -lineinfo")
     set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE}")
-    set(CUDA_GENCODE_FLAGS "${CUDA_GENCODE_FLAGS} -gencode arch=compute_60,code=sm_70")
-    set(CUDA_GENCODE_FLAGS "${CUDA_GENCODE_FLAGS} -gencode arch=compute_61,code=sm_61")
-    set(CUDA_GENCODE_FLAGS "${CUDA_GENCODE_FLAGS} -gencode arch=compute_60,code=sm_60")
-    set(CUDA_GENCODE_FLAGS "${CUDA_GENCODE_FLAGS} -gencode arch=compute_50,code=sm_50")
-    set(CUDA_GENCODE_FLAGS "${CUDA_GENCODE_FLAGS} -gencode arch=compute_37,code=sm_37")
-    set(CUDA_GENCODE_FLAGS "${CUDA_GENCODE_FLAGS} -gencode arch=compute_35,code=sm_35")
-    set(CUDA_GENCODE_FLAGS "${CUDA_GENCODE_FLAGS} -gencode arch=compute_30,code=sm_30")    
+    
+	enable_language(CUDA)
+    find_package(CUDA ${CMAKE_CUDA_VERSION} REQUIRED)
+    find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
+
+    add_definitions("-D_HAS_CUDA_")
 endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -59,80 +54,110 @@ endif()
 #   - tile <- gpu_kernels cpu_kernels qt_helper
 #   - scamp <- cpu_stats tile
 ###
-add_library(gauss_scamp_common external/scamp/src/common.cpp)
-set_target_properties(gauss_scamp_common
-    PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-        CXX_VISIBILITY_PRESET "hidden"
-        POSITION_INDEPENDENT_CODE ON)
 
-if (CMAKE_CUDA_COMPILER)
-    add_library(gauss_scamp_qt_kernels external/scamp/src/qt_kernels.cu)
-    set_target_properties(gauss_scamp_qt_kernels
-        PROPERTIES
-            INTERPROCEDURAL_OPTIMIZATION TRUE
-            CXX_VISIBILITY_PRESET "hidden"
-            POSITION_INDEPENDENT_CODE ON
-            COMPILE_FLAGS "${COMPILE_FLAGS} ${CUDA_GENCODE_FLAGS}") 
-
-    add_library(gauss_scamp_gpu_kernels external/scamp/src/kernels.cu)
-    target_link_libraries(gauss_scamp_gpu_kernels gauss_scamp_common)
-    set_target_properties(gauss_scamp_gpu_kernels
-        PROPERTIES
-            INTERPROCEDURAL_OPTIMIZATION TRUE
-            CXX_VISIBILITY_PRESET "hidden"
-            POSITION_INDEPENDENT_CODE ON
-            COMPILE_FLAGS "${COMPILE_FLAGS} ${CUDA_GENCODE_FLAGS}") 
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+  set(CMAKE_CUDA_ARCHITECTURES 75 72 70 61 60) # 50 37 35)
 endif()
 
+add_library(gauss_scamp_common external/scamp/src/common.cpp)
+if (CMAKE_CUDA_COMPILER) 
+    target_link_libraries(gauss_scamp_common 
+        ${CUDA_cudart_LIBRARY}
+    )
+endif()
+set_property(TARGET gauss_scamp_common 
+PROPERTY
+    INTERPROCEDURAL_OPTIMIZATION TRUE 
+    CXX_VISIBILITY_PRESET "hidden"
+    POSITION_INDEPENDENT_CODE ON
+)
+
 add_library(gauss_scamp_qt_helper external/scamp/src/qt_helper.cpp)
-set_target_properties(gauss_scamp_qt_helper
-    PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-        CXX_VISIBILITY_PRESET "hidden"
-        POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(gauss_scamp_qt_helper
-    gauss_scamp_common
-    $<$<BOOL:${CMAKE_CUDA_COMPILER}>:cufft>
-    $<$<BOOL:${CMAKE_CUDA_COMPILER}>:gauss_scamp_qt_kernels>)
+if (CMAKE_CUDA_COMPILER)
+    add_library(gauss_scamp_qt_kernels 
+        external/scamp/src/qt_kernels.cu
+    )
+    set_property(TARGET gauss_scamp_qt_kernels 
+        PROPERTY
+            INTERPROCEDURAL_OPTIMIZATION TRUE 
+            CXX_VISIBILITY_PRESET "hidden"
+            POSITION_INDEPENDENT_CODE ON
+    )
+
+    target_link_libraries(gauss_scamp_qt_helper 
+        ${CUDA_CUFFT_LIBRARIES} 
+        gauss_scamp_qt_kernels 
+        gauss_scamp_common)
+else()
+    target_link_libraries(gauss_scamp_qt_helper gauss_scamp_common)
+endif()
+
+set_property(TARGET gauss_scamp_qt_helper 
+PROPERTY
+    INTERPROCEDURAL_OPTIMIZATION TRUE 
+    CXX_VISIBILITY_PRESET "hidden"
+    POSITION_INDEPENDENT_CODE ON
+)
+
+add_library(gauss_scamp_kernel_common external/scamp/src/kernel_common.cpp)
+if (CMAKE_CUDA_COMPILER)
+    add_library(gauss_scamp_gpu_utils external/scamp/src/kernel_gpu_utils.cu)
+    set_property(TARGET gauss_scamp_gpu_utils 
+        PROPERTY
+            INTERPROCEDURAL_OPTIMIZATION TRUE 
+            CXX_VISIBILITY_PRESET "hidden"
+            POSITION_INDEPENDENT_CODE ON
+    )
+
+    target_link_libraries(gauss_scamp_gpu_utils 
+        gauss_scamp_kernel_common 
+        ${CUDA_cudart_LIBRARY}
+    )
+    
+    add_library(gauss_scamp_gpu_kernels external/scamp/src/kernels.cu)
+    set_property(TARGET gauss_scamp_gpu_kernels 
+        PROPERTY
+            INTERPROCEDURAL_OPTIMIZATION TRUE 
+            CXX_VISIBILITY_PRESET "hidden"
+            POSITION_INDEPENDENT_CODE ON
+    )
+
+    target_link_libraries(gauss_scamp_gpu_kernels 
+        gauss_scamp_gpu_utils 
+        gauss_scamp_kernel_common 
+        gauss_scamp_common
+    )
+endif()
 
 add_library(gauss_scamp_cpu_stats external/scamp/src/cpu_stats.cpp)
-set_target_properties(gauss_scamp_cpu_stats
-    PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-        CXX_VISIBILITY_PRESET "hidden"
-        POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(gauss_scamp_cpu_stats gauss_scamp_common)
 
 add_library(gauss_scamp_cpu_kernels external/scamp/src/cpu_kernels.cpp)
-set_target_properties(gauss_scamp_cpu_kernels
-    PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-        CXX_VISIBILITY_PRESET "hidden"
-        POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(gauss_scamp_cpu_kernels gauss_scamp_common)
+target_link_libraries(gauss_scamp_cpu_kernels 
+        gauss_scamp_kernel_common 
+        gauss_scamp_common)
 
 add_library(gauss_scamp_tile external/scamp/src/tile.cpp)
-set_target_properties(gauss_scamp_tile
-    PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-        CXX_VISIBILITY_PRESET "hidden"
-        POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(gauss_scamp_tile
-    $<$<BOOL:${CMAKE_CUDA_COMPILER}>:gauss_scamp_gpu_kernels>
-    gauss_scamp_cpu_kernels
+if (CMAKE_CUDA_COMPILER)
+  target_link_libraries(gauss_scamp_tile 
+    gauss_scamp_common 
+    gauss_scamp_gpu_kernels 
+    gauss_scamp_cpu_kernels 
     gauss_scamp_qt_helper)
+else()
+  target_link_libraries(gauss_scamp_tile 
+    gauss_scamp_common 
+    gauss_scamp_cpu_kernels 
+    gauss_scamp_qt_helper)
+endif()
 
+add_library(gauss_scamp_utils external/scamp/src/scamp_utils.cpp)
 add_library(gauss_scamp external/scamp/src/SCAMP.cpp)
-set_target_properties(gauss_scamp
-    PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-        CXX_VISIBILITY_PRESET "hidden"
-        POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(gauss_scamp
-    PRIVATE
-        gauss_scamp_tile
-        gauss_scamp_cpu_stats)
+    gauss_scamp_tile 
+    gauss_scamp_cpu_stats 
+    gauss_scamp_common 
+    gauss_scamp_qt_helper)
 
 ####
 # Main algos
@@ -163,8 +188,7 @@ set(GAUSSLIB_SOURCES ${GAUSSLIB_SRC}/clustering.cpp
                      ${GAUSSLIB_SRC}/random.cpp
                      ${GAUSSLIB_SRC}/regression.cpp
                      ${GAUSSLIB_SRC}/regularization.cpp
-                     ${GAUSSLIB_SRC}/statistics.cpp
-                     ${GAUSSLIB_SRC}/util.cpp)
+                     ${GAUSSLIB_SRC}/statistics.cpp)
 
 # Headers to add to compilation
 set(GAUSSLIB_HEADERS ${GAUSSLIB_INC}/gauss/clustering.h
@@ -181,11 +205,9 @@ set(GAUSSLIB_HEADERS ${GAUSSLIB_INC}/gauss/clustering.h
                      ${GAUSSLIB_INC}/gauss/regression.h
                      ${GAUSSLIB_INC}/gauss/regularization.h
                      ${GAUSSLIB_INC}/gauss/statistics.h
-                     ${GAUSSLIB_INC}/gauss/utils.h
                      ${GAUSSLIB_INC}/gauss/internal/libraryInternal.h
                      ${GAUSSLIB_INC}/gauss/internal/matrixInternal.h
                      ${GAUSSLIB_INC}/gauss/internal/scopedHostPtr.h
-                     ${GAUSSLIB_INC}/gauss/internal/util.h
                      ${GAUSSLIB_INC}/gauss/internal/vectorUtil.h)
 
 # The output is a static library
@@ -209,8 +231,8 @@ target_link_libraries(gauss
 
 # Add compile definitions
 target_compile_definitions(gauss
-    PRIVATE GAUSS_EXPORTS
-    PUBLIC AF_UNIFIED)    
+    PUBLIC GAUSS_EXPORTS
+           AF_UNIFIED)    
 
 set_target_properties(gauss
     PROPERTIES

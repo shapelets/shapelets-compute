@@ -41,19 +41,22 @@ namespace pygauss::arraylike {
         for (size_t i = 1; i < dimCount; ++i)
             strides[i] = strides[i - 1] * shape[i - 1];
 
-        auto isDirect = af::getActiveBackend() != af::Backend::AF_BACKEND_OPENCL;
+        af_backend arr_backend = AF_BACKEND_DEFAULT;
+        af_get_backend_id(&arr_backend, self.get());
+        auto isDirect = arr_backend == AF_BACKEND_CPU;
+
         void *data = nullptr;
 
         switch (self.type()) {
             case af::dtype::b8:
             case af::dtype::u8:
-                data = isDirect ? self.device<uint8_t>() : self.host<uint8_t>();
+                data = isDirect ? self.device<unsigned char>() : self.host<unsigned char>();
                 break;
             case af::dtype::s16:
-                data = isDirect ? self.device<int16_t>() : self.host<int16_t>();
+                data = isDirect ? self.device<short>() : self.host<short>();
                 break;
             case af::dtype::u16:
-                data = isDirect ? self.device<uint16_t>() : self.host<uint16_t>();
+                data = isDirect ? self.device<unsigned short>() : self.host<unsigned short>();
                 break;
             case af::dtype::f16:
                 data = isDirect ? self.device<af::half>() : self.host<af::half>();
@@ -62,16 +65,16 @@ namespace pygauss::arraylike {
                 data = isDirect ? self.device<float>() : self.host<float>();
                 break;
             case af::dtype::s32:
-                data = isDirect ? self.device<int32_t>() : self.host<int32_t>();
+                data = isDirect ? self.device<int>() : self.host<int>();
                 break;
             case af::dtype::u32:
-                data = isDirect ? self.device<uint32_t>() : self.host<uint32_t>();
+                data = isDirect ? self.device<unsigned int>() : self.host<unsigned int>();
                 break;
             case af::dtype::u64:
-                data = isDirect ? self.device<uint64_t>() : self.host<uint64_t>();
+                data = isDirect ? self.device<unsigned long long>() : self.host<unsigned long long>();
                 break;
             case af::dtype::s64:
-                data = isDirect ? self.device<int64_t>() : self.host<int64_t>();
+                data = isDirect ? self.device<long long>() : self.host<long long>();
                 break;
             case af::dtype::f64:
                 data = isDirect ? self.device<double>() : self.host<double>();
@@ -310,42 +313,42 @@ namespace pygauss::arraylike {
                     auto arr = py::array_t<uint8_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
                     // missing symbols if bool is used as type param
-                    return af::array(dims, static_cast<uint8_t *>(req.ptr)).as(af::dtype::b8);
+                    return af::array(dims, static_cast<unsigned char *>(req.ptr)).as(af::dtype::b8);
                 }
                 case af::dtype::s32: {
                     auto arr = py::array_t<int32_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    return af::array(dims, static_cast<int32_t *>(req.ptr));
+                    return af::array(dims, static_cast<int *>(req.ptr));
                 }
                 case af::dtype::u32: {
                     auto arr = py::array_t<uint32_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    return af::array(dims, static_cast<uint32_t *>(req.ptr));
+                    return af::array(dims, static_cast<unsigned int *>(req.ptr));
                 }
                 case af::dtype::u8: {
                     auto arr = py::array_t<uint8_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    return af::array(dims, static_cast<uint8_t *>(req.ptr));
+                    return af::array(dims, static_cast<unsigned char *>(req.ptr));
                 }
                 case af::dtype::s64: {
                     auto arr = py::array_t<int64_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    return af::array(dims, static_cast<int64_t *>(req.ptr));
+                    return af::array(dims, static_cast<long long *>(req.ptr));
                 }
                 case af::dtype::u64: {
                     auto arr = py::array_t<uint64_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    return af::array(dims, static_cast<uint64_t *>(req.ptr));
+                    return af::array(dims, static_cast<unsigned long long *>(req.ptr));
                 }
                 case af::dtype::s16: {
                     auto arr = py::array_t<int16_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    return af::array(dims, static_cast<int16_t *>(req.ptr));
+                    return af::array(dims, static_cast<short *>(req.ptr));
                 }
                 case af::dtype::u16: {
                     auto arr = py::array_t<uint16_t, py::array::f_style | py::array::forcecast>::ensure(np_arr);
                     auto req = arr.request();
-                    return af::array(dims, static_cast<uint16_t *>(req.ptr));
+                    return af::array(dims, static_cast<unsigned short *>(req.ptr));
                 }
                 case af::dtype::f16: {
                     auto arr = py::array_t<half, py::array::f_style | py::array::forcecast>::ensure(np_arr);

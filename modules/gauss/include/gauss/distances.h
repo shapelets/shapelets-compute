@@ -4,17 +4,49 @@
 #include <arrayfire.h>
 #include <gauss/defines.h>
 #include <optional>
+#include <functional>
 
 namespace gauss::distances {
 
+/**
+ * Structure that describes a distance / similitude algorithm
+ */ 
 typedef struct distance_algorithm {
+    // Requires all column vectors to be of the same length
     bool same_length;
+
+    // Informs of possible optimisations when d_ij=d_ji
     bool is_symmetric;
+    
+    // Optionally describes the preferred result type of 
+    // the computation.  This is used to allocate the 
+    // result matrix in compute (see below) public 
+    // methods
     std::optional<af::dtype> resultType;
+    
+    // Computes the distance of the column vector in the 
+    // first parameters against all column vectors in the 
+    // second argument.
     std::function<af::array(const af::array&, const af::array&)> compute;
+
 } distance_algorithm_t;
 
-distance_algorithm_t abs_euclidean();
+/**
+ * @brief Runs the algo for every column in xa to all the others.
+ * if the algorithm is symmetric, it will only do half of the work
+ */ 
+af::array compute(const distance_algorithm_t& algo, const af::array& xa);
+
+/**
+ * @brief Runs algo for every column in xa against all columns in xb
+ */ 
+af::array compute(const distance_algorithm_t& algo, const af::array& xa, const af::array &xb);
+
+
+/////////////////
+// Built-in Algos
+/////////////////
+
 distance_algorithm_t additive_symm_chi();
 distance_algorithm_t avg_l1_linf();
 distance_algorithm_t bhattacharyya();
@@ -49,7 +81,7 @@ distance_algorithm_t manhattan();
 distance_algorithm_t matusita();
 distance_algorithm_t max_symmetric_chi();
 distance_algorithm_t min_symmetric_chi();
-distance_algorithm_t minkowshi(double p);
+distance_algorithm_t minkowski(double p);
 distance_algorithm_t mpdist(int32_t w, double threshold = 0.05);
 distance_algorithm_t neyman();
 distance_algorithm_t pearson();
@@ -64,9 +96,9 @@ distance_algorithm_t taneja();
 distance_algorithm_t topsoe();
 distance_algorithm_t vicis_wave_hedges();
 distance_algorithm_t wavehedges();
-
-af::array compute(const distance_algorithm_t& algo, const af::array& xa);
-af::array compute(const distance_algorithm_t& algo, const af::array& xa, const af::array &xb);
+distance_algorithm_t tanimoto();
+distance_algorithm_t ruzicka();
+distance_algorithm_t motyka();
 
 }  // namespace gauss
 

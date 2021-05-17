@@ -35,32 +35,19 @@ void pygauss::bindings::device_operations(py::module &m) {
     m.def("get_backend",
           []() {
               return af::getActiveBackend();
-          },
-          R"__d__(
-        Returns the current backend.
-
-        Please note that all the arrays will be implicitly created in the active backend and
-        mixing arrays created with different backends would yield a runtime exception.
-    )__d__");
+          });
 
     m.def("set_backend",
           [](af::Backend newBackend) {
               af::setBackend(newBackend);
-          },
-          R"__d__(
-        Changes the active or current backend.
-
-        Please note that all the arrays will be implicitly created in the active backend and
-        mixing arrays created with different backends would yield a runtime exception.
-    )__d__");
+          });
 
     m.def("has_backend",
           [](af::Backend test_backend) {
               auto code = af::getAvailableBackends();
               return code & test_backend;
           },
-          py::arg("test_backend").none(false),
-          "Checks if a particular backend is supported in this platform.");
+          py::arg("test_backend").none(false));
 
     m.def("get_available_backends",
           []() {
@@ -70,23 +57,15 @@ void pygauss::bindings::device_operations(py::module &m) {
               if (code & af::Backend::AF_BACKEND_CPU) result.push_back(af::Backend::AF_BACKEND_CPU);
               if (code & af::Backend::AF_BACKEND_OPENCL) result.push_back(af::Backend::AF_BACKEND_OPENCL);
               return result;
-          },
-          "Returns a list with all available backends in this computer");
+          });
 
-    py::class_<DeviceInfo>(m, "DeviceInfo", R"__d__(
-        Data class describing a device where computations are run within the active backend.
-
-        A computational backend may expose more than one device.  Use ::func::`~shapelets.get_devices` to
-        get a complete list of devices found on the active backend.
-        )__d__")
-            .def_readonly("id", &DeviceInfo::id, "Id for this device, which is unique within the backend.")
-            .def_readonly("name", &DeviceInfo::name,
-                          "Descriptive device name as provided by the drivers in this system.")
-            .def_readonly("platform", &DeviceInfo::platform,
-                          "Platform information associated to the backend and device.")
-            .def_readonly("compute", &DeviceInfo::compute, "Compute capabilities of the device within the platform")
-            .def_readonly("isHalfAvailable", &DeviceInfo::isHalfAvailable, "Returns true if Float16 is supported.")
-            .def_readonly("isDoubleAvailable", &DeviceInfo::isDoubleAvailable, "Returns true if Float64 is supported.")
+    py::class_<DeviceInfo>(m, "DeviceInfo")
+            .def_readonly("id", &DeviceInfo::id)
+            .def_readonly("name", &DeviceInfo::name)
+            .def_readonly("platform", &DeviceInfo::platform)
+            .def_readonly("compute", &DeviceInfo::compute)
+            .def_readonly("isHalfAvailable", &DeviceInfo::isHalfAvailable)
+            .def_readonly("isDoubleAvailable", &DeviceInfo::isDoubleAvailable)
             .def("__repr__", [](const DeviceInfo &dev) {
                 std::stringstream result;
                 result << "[" << dev.id << "] ";
@@ -99,16 +78,11 @@ void pygauss::bindings::device_operations(py::module &m) {
                 return result.str();
             });
 
-    py::class_<DeviceMem>(m, "DeviceMemory", R"__d__(
-        Describes how much memory is currently in used on a particular device.
-
-        Use ::func::`~shapelets.get_device_memory` to report and populate memory usage. The function
-        ::func::`~shapelets.device_gc` will force a synchronization and removal of temporal arrays.
-        )__d__")
-            .def_readonly("bytes", &DeviceMem::bytes, "Number of bytes used.")
-            .def_readonly("buffers", &DeviceMem::buffers, "Number of distinct buffers in use.")
-            .def_readonly("locked_bytes", &DeviceMem::lock_bytes, "Number of bytes currently locked.")
-            .def_readonly("locked_buffers", &DeviceMem::lock_buffers, "Number of distinct buffers currently locked.")
+    py::class_<DeviceMem>(m, "DeviceMemory")
+            .def_readonly("bytes", &DeviceMem::bytes)
+            .def_readonly("buffers", &DeviceMem::buffers)
+            .def_readonly("locked_bytes", &DeviceMem::lock_bytes)
+            .def_readonly("locked_buffers", &DeviceMem::lock_buffers)
             .def("__repr__", [](const DeviceMem &dm) {
                 std::stringstream result;
                 result << "bytes: " << dm.bytes << ", ";
@@ -138,8 +112,7 @@ void pygauss::bindings::device_operations(py::module &m) {
               }
               af::setDevice(current);
               return result;
-          },
-          "Returns a list of devices found within the active backend.");
+          });
 
     m.def("get_device",
           []() {
@@ -156,8 +129,7 @@ void pygauss::bindings::device_operations(py::module &m) {
                       std::string(b_compute), af::isHalfAvailable(currentDevice),
                       af::isDoubleAvailable(currentDevice)
               };
-          },
-          "Returns the current or active device");
+          });
 
     m.def("set_device",
           [](const std::variant<int, DeviceInfo> &dev) {
@@ -175,19 +147,12 @@ void pygauss::bindings::device_operations(py::module &m) {
                   return true;
               }
               return false;
-          }, R"__d__(
-        Changes the current or active device
-
-        To select the new device, one could either use a ::class::`shapelets.DeviceInfo` or the `id`
-        property of the device.  If there is being an effective change, this method will return
-        true; false otherwise.
-    )__d__");
+          });
 
     m.def("device_gc",
           []() {
               af::deviceGC();
-          },
-          "Forces a garbage collection on the memory device");
+          });
 
     m.def("sync",
           [](const std::optional<std::variant<int, DeviceInfo>> &dev) {
@@ -205,8 +170,7 @@ void pygauss::bindings::device_operations(py::module &m) {
 
               af::sync(deviceId);
           },
-          py::arg("dev") = py::none(),
-          "Blocks until the device has finished processing.");
+          py::arg("dev") = py::none());
 
     m.def("get_device_memory",
           [](const std::optional<std::variant<int, DeviceInfo>> &dev) {
@@ -238,14 +202,5 @@ void pygauss::bindings::device_operations(py::module &m) {
 
               return DeviceMem{bytes, buffers, lock_bytes, lock_buffers};
           },
-          py::arg("dev") = py::none(),
-          R"__d__(
-        Reports the current memory utilization on a particular device.
-
-        When no parameter is provided it will return the memory utilization associated with the
-        current device; however, one could either use a ::class::`shapelets.DeviceInfo` or the `id`
-        property of the device to report over a different device; when used explicitly, the
-        default device will be changed for the duration of the call but, on method termination,
-        the default device will be restored.
-    )__d__");
+          py::arg("dev") = py::none());
 }

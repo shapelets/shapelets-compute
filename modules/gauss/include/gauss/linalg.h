@@ -20,6 +20,28 @@ namespace gauss::linalg {
  */
 GAUSSAPI af::array lls(const af::array &A, const af::array &b);
 
+
+GAUSSAPI af::array levinsonDurbin(af::array acv, int order);
+
+/**
+ * @brief Computes the eigen values and vectors of the input array.  General method.
+ * @return Tuple of arrays, where the first element corresponds to the eigen values and the second 
+ * item are the eigen values.
+ */ 
+std::tuple<af::array, af::array> eig(const af::array &m);
+
+std::tuple<af::array, af::array> eigh(const af::array &m);
+
+/**
+ * @brief Computes the eigen values of the input array.  General method.
+ */ 
+af::array eigvals(const af::array &m); 
+
+/**
+ * @brief Computes the eigen values of the input array.  General method.
+ */ 
+af::array eigvalsh(const af::array &m); 
+
 }  // namespace gauss
 
 #endif

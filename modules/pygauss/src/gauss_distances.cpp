@@ -9,7 +9,6 @@ namespace py = pybind11;
 namespace gdist = gauss::distances;
 
 typedef enum {
-    Abs_Euclidean, 
     Additive_Symm_Chi, 
     Avg_L1_Linf, 
     Bhattacharyya, 
@@ -43,11 +42,13 @@ typedef enum {
     Matusita, 
     Max_Symmetric_Chi, 
     Min_Symmetric_Chi, 
-    Minkowshi, 
+    Minkowski, 
+    Motyka,
     MPDist, 
     Neyman, 
     Pearson, 
     Prob_Symmetric_Chi, 
+    Ruzicka,
     SBD, 
     Soergel, 
     Sorensen, 
@@ -56,6 +57,7 @@ typedef enum {
     Squared_Euclidean, 
     Taneja, 
     Topsoe, 
+    Tanimoto,
     Vicis_Wave_Hedges, 
     Wave_Hedges
 } distance_types;
@@ -64,8 +66,12 @@ typedef enum {
 
 gauss::distances::distance_algorithm_t enumToAlgo(distance_types dst,py::kwargs kwargs) {
   switch(dst) {
-    case distance_types::Abs_Euclidean:
-          return gauss::distances::abs_euclidean();
+    case distance_types::Tanimoto:
+          return gauss::distances::tanimoto();
+    case distance_types::Ruzicka:
+          return gauss::distances::ruzicka();
+    case distance_types::Motyka:
+          return gauss::distances::motyka();
     case distance_types::Additive_Symm_Chi:
           return gauss::distances::additive_symm_chi();
     case distance_types::Avg_L1_Linf:
@@ -132,12 +138,12 @@ gauss::distances::distance_algorithm_t enumToAlgo(distance_types dst,py::kwargs 
           return gauss::distances::max_symmetric_chi();
     case distance_types::Min_Symmetric_Chi:
           return gauss::distances::min_symmetric_chi();
-    case distance_types::Minkowshi:
+    case distance_types::Minkowski:
           {
           auto key = py::str("p");
-          if (!kwargs || !kwargs.contains(key)) throw std::invalid_argument("Minkowshi requires parameter p");
+          if (!kwargs || !kwargs.contains(key)) throw std::invalid_argument("Minkowski requires parameter p");
           auto p = kwargs[key].cast<double>();
-          return gauss::distances::minkowshi(p);
+          return gauss::distances::minkowski(p);
         }
     case distance_types::MPDist: {
             auto key = py::str("w");
@@ -181,10 +187,9 @@ gauss::distances::distance_algorithm_t enumToAlgo(distance_types dst,py::kwargs 
   }
 }
 
-void pygauss::bindings::gauss_distance_functions(py::module_ &m) {
+void pygauss::bindings::gauss_distance_functions(py::module &m) {
 
   py::enum_<distance_types>(m, "DistanceType", "Distance Type")
-        .value("Abs_Euclidean", distance_types::Abs_Euclidean, "")
         .value("Additive_Symm_Chi", distance_types::Additive_Symm_Chi, "")
         .value("Avg_L1_Linf", distance_types::Avg_L1_Linf, "")
         .value("Bhattacharyya", distance_types::Bhattacharyya, "")
@@ -218,11 +223,13 @@ void pygauss::bindings::gauss_distance_functions(py::module_ &m) {
         .value("Matusita", distance_types::Matusita, "")
         .value("Max_Symmetric_Chi", distance_types::Max_Symmetric_Chi, "")
         .value("Min_Symmetric_Chi", distance_types::Min_Symmetric_Chi, "")
-        .value("Minkowshi", distance_types::Minkowshi, "")
+        .value("Minkowski", distance_types::Minkowski, "")
+        .value("Motyka", distance_types::Motyka, "")
         .value("MPDist", distance_types::MPDist, "")
         .value("Neyman", distance_types::Neyman, "")
         .value("Pearson", distance_types::Pearson, "")
         .value("Prob_Symmetric_Chi", distance_types::Prob_Symmetric_Chi, "")
+        .value("Ruzicka", distance_types::Ruzicka, "")
         .value("SBD", distance_types::SBD, "")
         .value("Soergel", distance_types::Soergel, "")
         .value("Sorensen", distance_types::Sorensen, "")
@@ -231,10 +238,10 @@ void pygauss::bindings::gauss_distance_functions(py::module_ &m) {
         .value("Squared_Euclidean", distance_types::Squared_Euclidean, "")
         .value("Taneja", distance_types::Taneja, "")
         .value("Topsoe", distance_types::Topsoe, "")
+        .value("Tanimoto", distance_types::Tanimoto, "")
         .value("Vicis_Wave_Hedges", distance_types::Vicis_Wave_Hedges, "")
         .value("Wave_Hedges", distance_types::Wave_Hedges, "")
         .export_values();
-
 
   m.def("pdist",
     [](const py::object& array_like, const distance_types distType, py::kwargs kwargs) {

@@ -2159,6 +2159,11 @@ namespace half_float
 		half operator--(int) { half out(*this); --*this; return out; }
 		/// \}
 	
+	public:
+		inline static half from_bits(unsigned int bits) HALF_NOEXCEPT {
+			return half(detail::binary, bits);
+		}
+
 	private:
 		/// Rounding mode to use
 		static const std::float_round_style round_style = (std::float_round_style)(HALF_ROUND_STYLE);

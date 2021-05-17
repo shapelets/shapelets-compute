@@ -1,3 +1,11 @@
 [submodule "modules/gauss/external/scamp"]
 	path = modules/gauss/external/scamp
 	url = https://github.com/shapelets/SCAMP
+[submodule "external/pybind11"]
+	path = external/pybind11
+	url = https://github.com/pybind/pybind11.git
+	branch = stable
+[submodule "external/spdlog"]
+	path = external/spdlog
+	url = https://github.com/gabime/spdlog.git
+	branch = v1.x

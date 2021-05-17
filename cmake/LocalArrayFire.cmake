@@ -3,42 +3,18 @@ OPTION(ArrayFire_Local "Chooses local ArrayFire copy over installed copy" ON)
 
 function (download_af)
     
-    if (APPLE)
-        # Download and unpack apple libraries to lib/arrayfire
-        message(STATUS "ArrayFire: Starting download for Mac")
-        execute_process(
-            COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/macos_arrayfire.sh ${CMAKE_SOURCE_DIR}/external/arrayfire
-            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-            # COMMAND_ECHO STDERR
-            RESULT_VARIABLE AF_DOWNLOADED
-        )
-
-    elseif (UNIX)
-        # Download and unpack linux libraries to lib/arrayfire
-        message(STATUS "ArrayFire: Starting download for Unix")
-        
-        execute_process(
-            COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/cmake/linux_arrayfire.sh ${CMAKE_SOURCE_DIR}/external/arrayfire
-            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-            # COMMAND_ECHO STDERR
-            RESULT_VARIABLE AF_DOWNLOADED
-        )
-
-    elseif (WIN32)
-        message(STATUS "ArrayFire: Starting download for Windows")
-        # Download and unpack windows libraries to lib/arrayfire
-        message(FATAL_ERROR "TODO: Missing Win32 download script")
-
-    else()
-        message(FATAL_ERROR "ArrayFire: Unknown platform.")
-
-    endif()
+    execute_process(
+        COMMAND python setup_af.py
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/cmake"
+        RESULT_VARIABLE AF_DOWNLOADED
+    )
 
     if(AF_DOWNLOADED AND NOT AF_DOWNLOADED EQUAL 0)
         message(FATAL_ERROR "ArrayFire: Unsucessful download")
     else()
         message(STATUS "ArrayFire: local copy downloaded")
     endif()
+
 endfunction()
 
 #determine if a system copy exists
@@ -46,6 +22,8 @@ find_package(ArrayFire QUIET)
 
 if (ArrayFire_FOUND)
     message(STATUS "ArrayFire: System Installation at ${ArrayFire_DIR}")
+else()
+    message(STATUS "ArrayFire: No system-wide installation found")
 endif()
 
 # if a local copy is preferred or there is no installation of 
@@ -60,10 +38,16 @@ if (ArrayFire_Local OR NOT EXISTS ${ArrayFire_DIR} OR NOT ArrayFire_FOUND)
     endif()
 
     # ensure ArrayFire_DIR is set
-    set(ArrayFire_DIR "${CMAKE_SOURCE_DIR}/external/arrayfire/share/ArrayFire/cmake")
+    
+    if (WIN32)
+        set(ArrayFire_DIR "${CMAKE_SOURCE_DIR}/external/arrayfire/cmake")
+    else()
+        set(ArrayFire_DIR "${CMAKE_SOURCE_DIR}/external/arrayfire/share/ArrayFire/cmake")
+    endif()    
+    
     # add directory to list of cmake modules
     list(APPEND CMAKE_MODULE_PATH ${ArrayFire_DIR})
 endif()
 
 # report where AF is located
-message(STATUS "ArrayFire: Using installation at ./external/arrayfire")
+message(STATUS "ArrayFire: Using installation at ${ArrayFire_DIR}")

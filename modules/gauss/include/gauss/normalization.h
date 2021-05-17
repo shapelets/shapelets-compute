@@ -7,6 +7,13 @@
 namespace gauss::normalization {
 
 /**
+ * @brief Removes the mean from the input series
+ * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and
+ * dimension one indicates the number of time series.
+ */  
+GAUSSAPI af::array detrend(const af::array &tss) ;
+
+/**
  * @brief Normalizes the given time series according to its maximum value and adjusts each value within the range
  * (-1, 1).
  *
@@ -90,23 +97,28 @@ GAUSSAPI void meanNormInPlace(af::array &tss);
  *
  * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
  * one indicates the number of time series.
- * @param epsilon Minimum standard deviation to consider. It acts as a gatekeeper for those time series that may be
- * constant or near constant.
+ * @param axis Axis of the operation.
+ * @param ddof Degrees of freedom for stdev
  *
  * @return af::array With the same dimensions as tss where the time series have been adjusted for zero mean and one as
  * standard deviation.
  */
-GAUSSAPI af::array znorm(const af::array &tss, double epsilon = 0.00000001);
+GAUSSAPI af::array znorm(const af::array &tss, const int axis = 0, const int ddof = 0);
 
 /**
  * @brief Adjusts the time series in the given input and performs z-norm inplace (without allocating further memory).
  *
  * @param tss Expects an input array whose dimension zero is the length of the time series (all the same) and dimension
  * one indicates the number of time series.
- * @param epsilon Minimum standard deviation to consider. It acts as a gatekeeper for those time series that may be
- * constant or near constant.
+ * @param ddof Degrees of freedom for stdev
  */
-GAUSSAPI void znormInPlace(af::array &tss, double epsilon = 0.00000001);
+GAUSSAPI void znormInPlace(af::array &tss, const int ddof = 0);
+
+
+GAUSSAPI af::array unitLengthNorm(const af::array &tss);
+GAUSSAPI af::array medianNorm(const af::array &tss);
+GAUSSAPI af::array sigmoidNorm(const af::array &tss);
+GAUSSAPI af::array tanhNorm(const af::array &tss);
 
 }  // namespace gauss
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ._version import get_versions
 
 __ALL__ = ['version', 'full_version', 'git_revision', 'release']

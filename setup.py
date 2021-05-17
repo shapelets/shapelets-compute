@@ -6,16 +6,16 @@ import platform
 import subprocess
 import versioneer
 from typing import Union, List
-from setuptools import setup, Extension, find_packages
+from setuptools import Command, setup, Extension, find_packages
+from setuptools.command.develop import develop
 from distutils.version import LooseVersion
 import warnings
 import builtins
 
-cmdclass = versioneer.get_cmdclass()
+
 
 # Technique from numpy
 builtins.__SHAPELETS_SETUP__ = True
-
 
 def process_version_information(full_version):
     """ Builds a textual version string out of the information provided by versioneer"""
@@ -27,10 +27,8 @@ def process_version_information(full_version):
         minor=minor,
         is_dev=is_dev)
 
-
 def get_documentation_url(ver_details, doc_root="https:://shapelets.io/doc/"):
     return doc_root + "dev" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
-
 
 def check_submodules():
     """ Ensure we have source code for gauss external repos """
@@ -51,6 +49,7 @@ def check_submodules():
         if line.startswith('-') or line.startswith('+'):
             raise ValueError('Submodule not clean: {}'.format(line))
 
+cmdclass = versioneer.get_cmdclass()
 
 ##
 # Build native libraries using CMAKE
@@ -96,16 +95,25 @@ class CMakeBuild(cmdclass["build_ext"]):
         extdir = os.path.join(extdir, ext.output_dir)
         cmake_args = [
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-            '-DPYTHON_EXECUTABLE=' + sys.executable
+            '-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE',
+            '-Wno-dev'
         ]
 
-        cfg = 'Debug' if self.debug else 'Release'
-        build_args = ['--config', 'Debug']  # cfg]
+        if 'in_development' in globals():
+            cmake_args += [
+                '-DCOPY_ALL_FILES=ON'
+            ]
+        else:
+            cmake_args += [
+                '-DCOPY_ALL_FILES=OFF'
+            ]
+        
+        cfg = 'Debug' if self.debug else 'Release' # 'RelWithDebInfo'
+        build_args = ['--config', cfg]  # cfg]
 
         if platform.system() == "Windows":
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
-            if sys.maxsize > 2 ** 32:
-                cmake_args += ['-A', 'x64']
+            cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
@@ -124,18 +132,21 @@ class CMakeBuild(cmdclass["build_ext"]):
         if ext.target:
             if isinstance(ext.target, list):
                 for target in ext.target:
-                    subprocess.check_call(['cmake', '--build', '.', '--target', target] + build_args,
-                                          cwd=self.build_temp)
+                    subprocess.check_call(['cmake', '--build', '.', '--target', target] + build_args, cwd=self.build_temp)
             else:
-                subprocess.check_call(['cmake', '--build', '.', '--target', ext.target] + build_args,
-                                      cwd=self.build_temp)
+                subprocess.check_call(['cmake', '--build', '.', '--target', ext.target] + build_args, cwd=self.build_temp)
         else:
             subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-        print()
-
+class DevelopCommand(develop):
+    def run(self):
+        global in_development
+        in_development = True
+        develop.run(self)
+        
 
 def create_metadata(full_version, doc_url):
+    cmdclass['develop'] = DevelopCommand
     return dict(
         project_urls={
             "Documentation": doc_url
@@ -146,15 +157,25 @@ def create_metadata(full_version, doc_url):
         package_dir={'': 'modules'},
         test_suite="pytest",
         ext_modules=[CMakeExtension("pygauss",
-                                    debug=True,
+                                    debug=False,
                                     output_dir='shapelets/compute',
                                     target=["PyGauss"])],
-                                    # target=["PyGauss", "stubcpu", "stubcuda", "stubcl"])],
         python_requires='>=3.7',
         package_data={
-            'shapelets': ['*.pyi', 'py.typed'],
+            'shapelets': [
+                'data/*.txt', 
+                'data/*.mat', 
+                # 'compute/.libs/*.*'
+            ],
         },
+        scripts=['modules/scripts/shapelets'],
+        exclude_package_data = {
+            'shapelets': [ 'compute/.libs/*.dylib' ]
+        },
+        include_package_data = True,
     )
+
+
 
 
 def setup_package():
@@ -171,7 +192,7 @@ def setup_package():
     ver_details = process_version_information(ver_info)
 
     if sys.version_info >= (3, 10):
-        fmt = "Shapelets {} may not yet support Python {}.{}."
+        fmt = "Shapelets Compute {} may not yet support Python {}.{}."
         warnings.warn(fmt.format(ver_details["textual"], *sys.version_info[:2]), RuntimeWarning)
         del fmt
 
@@ -189,29 +210,3 @@ def setup_package():
 if __name__ == '__main__':
     setup_package()
 
-# from pybind11_stubgen import ModuleStubsGenerator
-# module = ModuleStubsGenerator("khiva")
-# module.parse()
-# module.write_setup_py = False
-#
-# with open(cur_file_path + "/khiva.pyi", "w") as fp:
-#     fp.write("#\n# AUTOMATICALLY GENERATED FILE, DO NOT EDIT!\n#\n\n")
-#     fp.write("\n".join(module.to_lines()))
-
-
-# class PostDevelopCommand(develop):
-#     """Post-installation for development mode."""
-#     def run(self):
-#         develop.run(self)
-#         # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
-#
-# class PostInstallCommand(install):
-#     """Post-installation for installation mode."""
-#     def run(self):
-#         install.run(self)
-#         # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
-#
-#     # cmdclass={
-#     #              'develop': PostDevelopCommand,
-#     #              'install': PostInstallCommand,
-#     #          },
