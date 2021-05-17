@@ -6,12 +6,13 @@ import platform
 import subprocess
 import versioneer
 from typing import Union, List
-from setuptools import setup, Extension, find_packages
+from setuptools import Command, setup, Extension, find_packages
+from setuptools.command.develop import develop
 from distutils.version import LooseVersion
 import warnings
 import builtins
 
-cmdclass = versioneer.get_cmdclass()
+
 
 # Technique from numpy
 builtins.__SHAPELETS_SETUP__ = True
@@ -26,10 +27,8 @@ def process_version_information(full_version):
         minor=minor,
         is_dev=is_dev)
 
-
 def get_documentation_url(ver_details, doc_root="https:://shapelets.io/doc/"):
     return doc_root + "dev" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
-
 
 def check_submodules():
     """ Ensure we have source code for gauss external repos """
@@ -50,6 +49,7 @@ def check_submodules():
         if line.startswith('-') or line.startswith('+'):
             raise ValueError('Submodule not clean: {}'.format(line))
 
+cmdclass = versioneer.get_cmdclass()
 
 ##
 # Build native libraries using CMAKE
@@ -98,6 +98,15 @@ class CMakeBuild(cmdclass["build_ext"]):
             '-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE',
             '-Wno-dev'
         ]
+
+        if 'in_development' in globals():
+            cmake_args += [
+                '-DCOPY_ALL_FILES=ON'
+            ]
+        else:
+            cmake_args += [
+                '-DCOPY_ALL_FILES=OFF'
+            ]
         
         cfg = 'Debug' if self.debug else 'Release' # 'RelWithDebInfo'
         build_args = ['--config', cfg]  # cfg]
@@ -129,7 +138,15 @@ class CMakeBuild(cmdclass["build_ext"]):
         else:
             subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+class DevelopCommand(develop):
+    def run(self):
+        global in_development
+        in_development = True
+        develop.run(self)
+        
+
 def create_metadata(full_version, doc_url):
+    cmdclass['develop'] = DevelopCommand
     return dict(
         project_urls={
             "Documentation": doc_url
@@ -157,6 +174,8 @@ def create_metadata(full_version, doc_url):
         },
         include_package_data = True,
     )
+
+
 
 
 def setup_package():

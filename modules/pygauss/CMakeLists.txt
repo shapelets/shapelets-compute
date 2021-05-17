@@ -57,47 +57,62 @@ get_property(AFLIB TARGET ArrayFire::af PROPERTY IMPORTED_LOCATION_${AFLIBIMPCFG
 get_filename_component(AFLIBDIR "${AFLIB}" DIRECTORY)
 
 IF (APPLE)
-        set(RUNTIME_LIBS 
-                ${AFLIBDIR}/libaf.3.dylib 
-                ${AFLIBDIR}/libafcpu.3.dylib
-                ${AFLIBDIR}/libafcuda.3.dylib
-                ${AFLIBDIR}/libafopencl.3.dylib
-                ${AFLIBDIR}/libcudart.10.1.dylib
-                ${AFLIBDIR}/libcudnn.dylib
-                ${AFLIBDIR}/libiomp5.dylib
-                ${AFLIBDIR}/libiompstubs5.dylib
-                ${AFLIBDIR}/libmkl_avx.dylib
-                ${AFLIBDIR}/libmkl_avx2.dylib
-                ${AFLIBDIR}/libmkl_avx512.dylib
-                ${AFLIBDIR}/libmkl_core.dylib
-                ${AFLIBDIR}/libmkl_intel_lp64.dylib
-                ${AFLIBDIR}/libmkl_intel_thread.dylib
-                ${AFLIBDIR}/libmkl_mc.dylib
-                ${AFLIBDIR}/libmkl_mc3.dylib
-                ${AFLIBDIR}/libnvrtc-builtins.dylib
-                ${AFLIBDIR}/libnvrtc.10.1.dylib)
+        if (COPY_ALL_FILES)
+                set(RUNTIME_LIBS 
+                        ${AFLIBDIR}/libaf.3.dylib 
+                        ${AFLIBDIR}/libafcpu.3.dylib
+                        ${AFLIBDIR}/libafcuda.3.dylib
+                        ${AFLIBDIR}/libafopencl.3.dylib
+                        ${AFLIBDIR}/libcudart.10.1.dylib
+                        ${AFLIBDIR}/libcudnn.dylib
+                        ${AFLIBDIR}/libiomp5.dylib
+                        ${AFLIBDIR}/libiompstubs5.dylib
+                        ${AFLIBDIR}/libmkl_avx.dylib
+                        ${AFLIBDIR}/libmkl_avx2.dylib
+                        ${AFLIBDIR}/libmkl_avx512.dylib
+                        ${AFLIBDIR}/libmkl_core.dylib
+                        ${AFLIBDIR}/libmkl_intel_lp64.dylib
+                        ${AFLIBDIR}/libmkl_intel_thread.dylib
+                        ${AFLIBDIR}/libmkl_mc.dylib
+                        ${AFLIBDIR}/libmkl_mc3.dylib
+                        ${AFLIBDIR}/libnvrtc-builtins.dylib
+                        ${AFLIBDIR}/libnvrtc.10.1.dylib)
+        else()
+                set(RUNTIME_LIBS 
+                        ${AFLIBDIR}/libaf.3.dylib)
+        endif()
+
 elseif(UNIX)
-        set(RUNTIME_LIBS 
-                ${AFLIBDIR}/libaf.so.3
-                ${AFLIBDIR}/libafcpu.so.3
-                ${AFLIBDIR}/libafcuda.so.3
-                ${AFLIBDIR}/libafopencl.so.3
-                ${AFLIBDIR}/libcudnn.so.7.6.5
-                ${AFLIBDIR}/libiomp5.so
-                ${AFLIBDIR}/libmkl_avx.so
-                ${AFLIBDIR}/libmkl_avx2.so
-                ${AFLIBDIR}/libmkl_avx512.so
-                ${AFLIBDIR}/libmkl_core.so
-                ${AFLIBDIR}/libmkl_def.so
-                ${AFLIBDIR}/libmkl_intel_lp64.so
-                ${AFLIBDIR}/libmkl_intel_thread.so
-                ${AFLIBDIR}/libmkl_mc.so
-                ${AFLIBDIR}/libmkl_mc3.so
-                ${AFLIBDIR}/libnvrtc-builtins.so
-                ${AFLIBDIR}/libnvrtc.so.11.1
-                ${AFLIBDIR}/libOpenCL.so.1)
+        if (COPY_ALL_FILES)
+                set(RUNTIME_LIBS 
+                        ${AFLIBDIR}/libaf.so.3
+                        ${AFLIBDIR}/libafcpu.so.3
+                        ${AFLIBDIR}/libafcuda.so.3
+                        ${AFLIBDIR}/libafopencl.so.3
+                        ${AFLIBDIR}/libcudnn.so.7.6.5
+                        ${AFLIBDIR}/libiomp5.so
+                        ${AFLIBDIR}/libmkl_avx.so
+                        ${AFLIBDIR}/libmkl_avx2.so
+                        ${AFLIBDIR}/libmkl_avx512.so
+                        ${AFLIBDIR}/libmkl_core.so
+                        ${AFLIBDIR}/libmkl_def.so
+                        ${AFLIBDIR}/libmkl_intel_lp64.so
+                        ${AFLIBDIR}/libmkl_intel_thread.so
+                        ${AFLIBDIR}/libmkl_mc.so
+                        ${AFLIBDIR}/libmkl_mc3.so
+                        ${AFLIBDIR}/libnvrtc-builtins.so
+                        ${AFLIBDIR}/libnvrtc.so.11.1
+                        ${AFLIBDIR}/libOpenCL.so.1)
+        else()
+                set(RUNTIME_LIBS 
+                        ${AFLIBDIR}/libaf.so.3)
+        endif()                        
 else()
-        file(GLOB RUNTIME_LIBS ${AFLIBDIR}/*.dll)
+        if (COPY_ALL_FILES)
+                file(GLOB RUNTIME_LIBS ${AFLIBDIR}/*.dll)
+        else()
+                set(RUNTIME_LIBS ${AFLIBDIR}/af.dll)                
+        endif()                        
 endif()
 
 foreach(file_i ${RUNTIME_LIBS})
