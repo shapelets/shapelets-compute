@@ -105,7 +105,11 @@ elseif(UNIX)
                         ${AFLIBDIR}/libOpenCL.so.1)
         else()
                 set(RUNTIME_LIBS 
-                        ${AFLIBDIR}/libaf.so.3)
+                        ${AFLIBDIR}/libaf.so.3
+                        ${AFLIBDIR}/libmkl_core.so
+                        ${AFLIBDIR}/libiomp5.so
+                        ${AFLIBDIR}/libmkl_intel_lp64.so
+                        ${AFLIBDIR}/libmkl_intel_thread.so)
         endif()                        
 else()
         if (COPY_ALL_FILES)

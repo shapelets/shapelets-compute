@@ -1,21 +1,27 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 
 """
 Shapelets run-time tools
 
 """
 
+import warnings
+warnings.filterwarnings("ignore")
+
 from abc import abstractmethod
-import argparse
-import math
-import shapelets.compute as sc
-from timeit import default_timer as timer
+
 import os
 import platform
-from urllib.request import urlretrieve
-from tqdm import tqdm
+import argparse
+import math
 import pathlib
-from urllib.parse import urljoin
 import zipfile
+
+from tqdm import tqdm
+from timeit import default_timer as timer
+from urllib.request import urlretrieve
+from urllib.parse import urljoin
+
+import shapelets.compute as sc
 
 class DownloadProgressBar(tqdm):
     def update_to(self, b=1, bsize=1, tsize=None):
@@ -100,8 +106,8 @@ def set_backend_and_device(backend: sc.Backend, device: int):
     try:
         sc.set_backend(backend)
     except:
-        print("Backend " + backend + " is not available in your plaform")
-        print("Available backends are: " + repr(sc.get_available_backends()))
+        print(f'Backend {backend} is not available in your plaform')
+        print(f'Available backends are [{sc.get_available_backends()}])')
         exit(-1)
     try:
         sc.set_device(device)
@@ -116,23 +122,27 @@ def show_info():
     print()
     print(f'Shapelets version : {s.__version__} [{sc.__af_version__}]')
     print(f'Platform Libraries: {sc.__library_dir__}')
-    default_backend = sc.get_backend()
-    default_device = sc.get_device()
-    print(f'Default backend   : {default_backend}')
-    print(f'Default device    : {default_device.id}')
-    print()
-    print('Available backend and devices')
-    for b in sc.get_available_backends():
-        sc.set_backend(b)
-        for d in sc.get_devices():
-            print(f'{b}\t{d}')
+    backends = sc.get_available_backends()
+    if len(backends) == 0:
+        print("No backends found.  Use install option to ready a new one.")
+    else:
+        default_backend = sc.get_backend()
+        default_device = sc.get_device()
+        print(f'Default backend   : {default_backend}')
+        print(f'Default device    : {default_device.id}')
+        print()
+        print('Available backend and devices')
+        for b in backends:
+            sc.set_backend(b)
+            for d in sc.get_devices():
+                print(f'{b}\t{d}')
     print()
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Shapelets run-time tools")
     subparsers = parser.add_subparsers(dest='command')
-    info_parser = subparsers.add_parser("info", help='Shows installation information')
+    subparsers.add_parser("info", help='Shows installation information')
 
     benchmark_parser = subparsers.add_parser('bench', help='Runs benchmarks')
     benchmark_parser.add_argument('backend', choices=['cpu', 'opencl', 'cuda'])
@@ -159,8 +169,10 @@ def main() -> None:
 
     if args.command is None:
         parser.print_help()
+
     elif args.command == 'info':
         show_info()
+
     elif args.command == 'bench':
         set_backend_and_device(args.backend, args.device)
         datatype = args.datatype
@@ -178,6 +190,7 @@ def main() -> None:
             print(sc.get_device())
             print()   
             run_benchmarks(fn, r)
+
     elif args.command == 'install':
         backend = args.backend 
         if (backend in sc.get_available_backends() and not args.force):
@@ -201,6 +214,34 @@ def main() -> None:
             with zipfile.ZipFile(download_location, 'r') as zip_ref:
                 for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist())):
                     zip_ref.extract(member=file, path=sc.__library_dir__)
+
+            if (system == 'linux'):
+                if 'LD_PRELOAD' in os.environ:
+                    ldpreload = os.environ['LD_PRELOAD']
+                else:
+                    ldpreload = ''
+
+                found = ldpreload.find('libmkl_def.so') != -1                
+                if not found:
+                    newpaths = ':'.join([
+                        os.path.join(sc.__library_dir__, 'libmkl_def.so'), 
+                        os.path.join(sc.__library_dir__, 'libmkl_avx2.so'), 
+                        os.path.join(sc.__library_dir__, 'libmkl_core.so'), 
+                        os.path.join(sc.__library_dir__, 'libmkl_intel_lp64.so'),
+                        os.path.join(sc.__library_dir__, 'libmkl_intel_thread.so'), 
+                        os.path.join(sc.__library_dir__, 'libiomp5.so')])
+                    
+                    print("")
+                    print("MKL Libraries in Linux")
+                    print("----------------------")
+                    print("")
+                    print("It is possible you may need to use LD_PRELOAD if you run into")
+                    print("runtime errors in Linux.  If that is the case, use the following")
+                    print("environment setting to update your system: ")
+                    print("")
+                    print(f'export LD_PRELOAD={newpaths}')
+                    print("")
+
             print("Done!")
 
 if __name__ == '__main__':

@@ -20,23 +20,6 @@ __library_dir__ = os.path.join(compute_dir, '.libs')
 if not os.path.exists(__library_dir__):
     raise RuntimeError("No valid location can be stablished for native libraries. " + __library_dir__)
 
-# if platform.system() == 'Linux':
-#     if 'LD_PRELOAD' in os.environ:
-#         ldpreload = ':' + os.environ['LD_PRELOAD']
-#     else:
-#         ldpreload = ''
-
-#     found = ldpreload.find('libmkl_def.so') != -1
-#     if not found:
-#         newpaths = ':'.join([
-#             os.path.join(__library_dir__, 'libmkl_def.so'), 
-#             os.path.join(__library_dir__, 'libmkl_avx2.so'), 
-#             os.path.join(__library_dir__, 'libmkl_core.so'), 
-#             os.path.join(__library_dir__, 'libmkl_intel_lp64.so'),
-#             os.path.join(__library_dir__, 'libmkl_intel_thread.so'), 
-#             os.path.join(__library_dir__, 'libiomp5.so')])
-#         os.environ['LD_PRELOAD'] = newpaths + ldpreload
-
 # Let AF know where the RT libraries are
 os.environ["AF_PATH"] = __library_dir__
 os.environ["AF_BUILD_LIB_CUSTOM_PATH"] = __library_dir__
