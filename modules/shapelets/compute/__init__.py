@@ -1,15 +1,11 @@
 from __future__ import annotations
 import os
-import platform
-from . import _pygauss
+
 
 # os.environ["AF_JIT_KERNEL_TRACE"] = "stderr"
 # os.environ["AF_TRACE"]="all"
 # os.environ["AF_SHOW_LOAD_PATH"]="1"
 # os.environ["AF_PRINT_ERRORS"]="1"
-
-# af version
-__af_version__ = _pygauss.af_version()
 
 # current location
 compute_dir = os.path.abspath(os.path.dirname(__file__)) 
@@ -54,6 +50,9 @@ if os.name == 'nt':
             warnings.warn("Loaded more than one pyd library in compute folder: %s" % repr(filenames), stacklevel=2)
 
 del compute_dir
+
+from . import _pygauss
+__af_version__ = _pygauss.af_version()
 
 from . import random
 from . import fft

@@ -21,7 +21,7 @@ from timeit import default_timer as timer
 from urllib.request import urlretrieve
 from urllib.parse import urljoin
 
-import shapelets.compute as sc
+from . import compute as sc
 
 class DownloadProgressBar(tqdm):
     def update_to(self, b=1, bsize=1, tsize=None):
@@ -100,7 +100,7 @@ def run_benchmarks(fn, r):
         if remainder > 0:
             bar += chr(ord('█') + (8 - remainder))
         bar = bar or  '▏'
-        print(f'{label.rjust(longest_label_length)} ▏ {count:#4f} {bar}')  
+        print(f'{label.rjust(longest_label_length)} | {count:#4f} {bar}')  
 
 def set_backend_and_device(backend: sc.Backend, device: int):
     try:
@@ -139,7 +139,7 @@ def show_info():
     print()
 
 
-def main() -> None:
+def cli() -> None:
     parser = argparse.ArgumentParser(description="Shapelets run-time tools")
     subparsers = parser.add_subparsers(dest='command')
     subparsers.add_parser("info", help='Shows installation information')
@@ -244,5 +244,4 @@ def main() -> None:
 
             print("Done!")
 
-if __name__ == '__main__':
-    main()
+__all__ = ['cli']

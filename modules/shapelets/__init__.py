@@ -19,7 +19,12 @@ else:
     from . import compute
     from . import generators
     from . import data
+    
+    from ._cli import *
+    from . import _cli
+    
     __all__ = ["compute", "generators", "data"]
+    __all__ += _cli.__all__
 
     backends = compute.get_available_backends()
     if len(backends) <= 1:

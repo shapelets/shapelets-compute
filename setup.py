@@ -165,12 +165,7 @@ def create_metadata(full_version, doc_url):
             'shapelets': [
                 'data/*.txt', 
                 'data/*.mat', 
-                # 'compute/.libs/*.*'
             ],
-        },
-        scripts=['modules/scripts/shapelets'],
-        exclude_package_data = {
-            'shapelets': [ 'compute/.libs/*.dylib' ]
         },
         include_package_data = True,
     )
