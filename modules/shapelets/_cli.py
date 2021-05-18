@@ -15,6 +15,7 @@ import argparse
 import math
 import pathlib
 import zipfile
+import tempfile
 
 from tqdm import tqdm
 from timeit import default_timer as timer
@@ -199,21 +200,22 @@ def cli() -> None:
             system =  platform.system().lower()
             version = sc.__af_version__
             name = f'{system}-{backend}-{version}.zip'
-            current_path = pathlib.Path(__file__).parent.absolute()
-            download_location = os.path.join(current_path, name)
             checked_url = str(args.url)
             if not checked_url.endswith('/'):
                 checked_url += '/'
-            url = urljoin(checked_url, name)
-            
-            if not os.path.isfile(download_location):
+            url = urljoin(checked_url, name)            
+
+            with tempfile.TemporaryDirectory() as current_path:
+                download_location = os.path.join(current_path, name)
                 print(f'Downloading {url}')
                 download(url, download_location)
-
-            print(f'Extracting {download_location} to {sc.__library_dir__}')
-            with zipfile.ZipFile(download_location, 'r') as zip_ref:
-                for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist())):
-                    zip_ref.extract(member=file, path=sc.__library_dir__)
+                print(f'Extracting {download_location} to {sc.__library_dir__}')
+                with zipfile.ZipFile(download_location, 'r') as zip_ref:
+                    for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist())):
+                        dst = os.path.join(sc.__library_dir__, file)
+                        exists = os.path.exists(dst)
+                        if not exists:
+                            zip_ref.extract(member=file, path=sc.__library_dir__)
 
             if (system == 'linux'):
                 if 'LD_PRELOAD' in os.environ:
