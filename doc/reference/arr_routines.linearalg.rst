@@ -25,6 +25,7 @@ Decompositions
    lu
    qr
    svd
+   SVDResult
    cholesky
 
 Convolutions

@@ -971,7 +971,85 @@ def rank(x: ArrayLike, tol: float = 1e-05) -> int:
     """     
     return _pygauss.rank(x, tol)   
 
-def svd(x: ArrayLike) -> tuple: 
+class SVDResult():
+    """
+    Results of a SVD operation over a matrix of size MxN
+
+    Attributes
+    ----------
+    u: ShapeletsArray
+        MxM matrix
+    s: ShapeletsArray
+        Columnar vector with the diagonal elements of the factorization (Mx1)
+    vt: ShapeletsArray
+        NxN matrix
+    """
+    def __init__(self, u: ShapeletsArray, s: ShapeletsArray, vt: ShapeletsArray) -> None:
+        self.u = u 
+        self.s = s
+        self.vt = vt
+        self._pct = None 
+
+    def low_rank(self, rank: int, srank: int = 0) -> ShapeletsArray:
+        """
+        Returns a low rank reconstruction of the original matrix by selecting
+        a range of factors.
+
+        Parameters
+        ----------
+        rank : int
+            Rank of the reconstruction.
+        srank : int, optional (default: 0)
+            In low rank reconstruction scenarios, it is typical to start with 
+            the factors in s from the first (0) to rank.  If you wish to use 
+            a concrete region of factors (say, 3 to 7), use this parameter to 
+            indicate the begining of the selection.
+
+        Returns
+        -------
+        ShapeletsArray
+            Low rank reconstruction of the original matrix.
+        """
+        return (self.u[:, srank:rank] * self.s.T[:, srank:rank])@self.vt[srank:rank, :]
+
+    def pct_rank(self, rank: int, srank: int = 0) -> float:
+        """
+        Computes how much information is contained in a low rank reconstruction.
+
+        Parameters
+        ----------
+        rank : int
+            Rank of the reconstruction.
+        srank : int, optional (default: 0)
+            In low rank reconstruction scenarios, it is typical to start with 
+            the factors in s from the first (0) to rank.  If you wish to use 
+            a concrete region of factors (say, 3 to 7), use this parameter to 
+            indicate the begining of the selection.
+
+        Returns
+        -------
+        float
+            Percentage of the information.
+        """
+        return _pygauss.sum(self.pct[srank:rank])
+
+    @property
+    def acc_pct(self) -> ShapeletsArray:
+        """
+        Cummulative percentage of information implied by a low rank reconstruction
+        """
+        return _pygauss.cumsum(self.pct)
+
+    @property
+    def pct(self) -> ShapeletsArray:
+        """
+        Percentage of information implied by a low rank reconstruction
+        """
+        if self._pct is None:
+            self._pct = self.s / _pygauss.sum(self.s)        
+        return self._pct
+
+def svd(x: ArrayLike) -> SVDResult: 
     """
     Returns the singular value decomposition of a matrix
 
@@ -986,9 +1064,11 @@ def svd(x: ArrayLike) -> tuple:
     
     Returns
     -------
-    Tuple
-        This method returns a tuple of three arrays: :math:`U` (MxM), :math:`S` and :math:`V^T` (NxN).  Please note
+    SVDResult
+        This method returns a companion object with three arrays: :math:`U` (MxM), :math:`S` and :math:`V^T` (NxN).  Please note
         that :math:`S` will be returned as a columnar vector whose elements are the main diagonal of matrix MxN.
+        
+        This companion object has methods for low rank reconstruction of the original array.
     
     Examples
     --------
@@ -996,16 +1076,16 @@ def svd(x: ArrayLike) -> tuple:
 
     >>> import shapelets.compute as sc
     >>> a = sc.random.randn((5,5), "float32")
-    >>> u, s, vt = sc.svd(a)
-    >>> sdiag = sc.diag(s, False)
-    >>> a.same_as(u @ sdiag @ vt)
+    >>> r = sc.svd(a)
+    >>> sdiag = sc.diag(r.s, False)
+    >>> a.same_as(r.u @ sdiag @ r.vt)
     True
 
     References
     ----------
     [1] `ArrayFire Documentation <https://arrayfire.org/docs/group__lapack__factor__func__svd.htm>`_ 
     """        
-    return _pygauss.svd(x)   
+    return SVDResult(*_pygauss.svd(x))   
 
 
 __all__ = [
