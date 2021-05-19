@@ -40,7 +40,7 @@ opencl  [1] Intel(R)_HD_Graphics_630 (OpenCL - 1.2 - Apple) F64: ✘ - F16: ✘
 
 If you have already a distribution of [ArrayFire](https://arrayfire.com/) in your machine, shapelets should be able to discover it and use it.  
 
-However, if ArrayFire is not installed, you can use `shapelets` command line tool to set up your environment with the necessary run time libraries. To install runtime support for running on CPU, OpenCL and/or CUDA, execute a install command, for example:
+However, if ArrayFire is not installed, use `shapelets` command line tool to set up your environment with the necessary run time libraries. To install runtime support for running on CPU, OpenCL and/or CUDA, execute a install command, for example:
 
 ```
 $ shapelets install cuda 
@@ -58,12 +58,12 @@ $ shapelets bench opencl -t float32 fft
 Running benchmark fft for opencl[0] using float32
 [0] AMD_Radeon_Pro_560_Compute_Engine (OpenCL - 1.2 - Apple) F64: ✓ - F16: ✘
 
-   1024 | 0.240293 ▏
-   2048 | 0.481944 ▎
-   4096 | 0.913051 ▌
-   8192 | 1.569680 █
-  16384 | 3.535214 ██▍
-  32768 | 6.905293 ████▋
+   1024 |  0.240293 ▏
+   2048 |  0.481944 ▎
+   4096 |  0.913051 ▌
+   8192 |  1.569680 █
+  16384 |  3.535214 ██▍
+  32768 |  6.905293 ████▋
   65536 | 12.850520 ████████▋
  131072 | 17.359991 ███████████▊
  262144 | 22.944038 ███████████████▌
