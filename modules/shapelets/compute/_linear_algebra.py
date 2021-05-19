@@ -663,7 +663,7 @@ def lu(x: ArrayLike) -> tuple:
     the permutation matrix is used to index the results of the decomposition, as the following example shows:
 
     >>> import shapelets.compute as sc
-    >>> a = sc.array([[0, 3, 6], [1, 4, 7], [2, 5, 8.]], "float32)
+    >>> a = sc.array([[0, 3, 6], [1, 4, 7], [2, 5, 8.]], "float32")
     >>> l, u, p = sc.lu(a)
     >>> l.display()
     [3 3 1 1]

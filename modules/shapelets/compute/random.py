@@ -63,7 +63,7 @@ class ShapeletsRandomEngine:
 
         .. math::
 
-            X \sim \Gamma(\frac{df}{2},2) \longrightarrow \chi^2(df)
+            X \sim \Gamma(\frac{\mathrm{df}}{2},2) \longrightarrow \chi^2(\mathrm{df})
 
         Parameters
         ----------

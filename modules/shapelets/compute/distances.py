@@ -1484,7 +1484,7 @@ def kullback(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       d_{kl} = \sum_{i=1}^{d}P_i \, \textup{ln}\frac{P_i}{Q_i}
+       d_{kl} = \sum_{i=1}^{d}P_i \, \mathrm{ln}\frac{P_i}{Q_i}
 
     *Please note this distance is not simmetric!*
 
@@ -1526,7 +1526,7 @@ def jeffrey(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       d_{j} = \sum_{i=1}^{d}(P_i-Q_i)\textup{ln}\frac{P_i}{Q_i}
+       d_{j} = \sum_{i=1}^{d}(P_i-Q_i)\mathrm{ln}\frac{P_i}{Q_i}
 
     This function will compute the jeffrey distance for every column vector 
     in xa against all column vectors in xb.  If the length of the column vectors is 
@@ -1572,7 +1572,7 @@ def k_divergence(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       d_{Kdiv} = \sum_{i=1}^{d}P_i \, \textup{ln}\frac{2P_i}{P_i+Q_i}
+       d_{Kdiv} = \sum_{i=1}^{d}P_i \, \mathrm{ln}\frac{2P_i}{P_i+Q_i}
 
     *Please note this distance is not simmetric!*
 
@@ -1607,7 +1607,7 @@ def topsoe(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       d_{top} = \sum_{i=1}^{d} \left [ P_i\,\textup{ln}\left(\frac{2P_i}{P_i+Q_i}\right)+Q_i\,\textup{ln}\left(\frac{2Q_i}{P_i+Q_i}\right) \right ]
+       d_{top} = \sum_{i=1}^{d} \left [ P_i\,\mathrm{ln}\left(\frac{2P_i}{P_i+Q_i}\right)+Q_i\,\mathrm{ln}\left(\frac{2Q_i}{P_i+Q_i}\right) \right ]
 
     Topsoe distance, also called *information statistics*, is the symmetric 
     form of :obj:`~shapelets.compute.distances.k_divergence`
@@ -1652,7 +1652,7 @@ def jensen_shannon(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       d_{JS} = \frac{1}{2}\left[\sum_{i=1}^{d} P_i\,\textup{ln}\left(\frac{2P_i}{P_i+Q_i}\right)+\sum_{i=1}^{d} Q_i\,\textup{ln}\left(\frac{2Q_i}{P_i+Q_i}\right)\right]  
+       d_{JS} = \frac{1}{2}\left[\sum_{i=1}^{d} P_i\,\mathrm{ln}\left(\frac{2P_i}{P_i+Q_i}\right)+\sum_{i=1}^{d} Q_i\,\mathrm{ln}\left(\frac{2Q_i}{P_i+Q_i}\right)\right]  
 
     This distance uses the average method to make :obj:`~shapelets.compute.distances.k_divergence` symmetric.
 
@@ -1696,7 +1696,7 @@ def jensen_difference(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       d_{jd} = \sum_{i=1}^{d}\left [\frac{P_i\textup{ln} P_i + Q_i\textup{ln}Q_i}{2} -\left(\frac{P_i+Q_i}{2} \right )\textup{ln}\left(\frac{P_i+Q_i}{2} \right ) \right ]
+       d_{jd} = \sum_{i=1}^{d}\left [\frac{P_i\mathrm{ln} P_i + Q_i\mathrm{ln}Q_i}{2} -\left(\frac{P_i+Q_i}{2} \right )\mathrm{ln}\left(\frac{P_i+Q_i}{2} \right ) \right ]
 
     Sibson studied the idea of information radius for a measure arising due to concavity property of Shannon's entropy and 
     introduced the Jensen difference. 
@@ -1737,7 +1737,7 @@ def taneja(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       d_{TJ} = \sum_{i=1}^{d}\left(\frac{P_i+Q_i}{2}\right )\textup{ln}\left(\frac{P_i+Q_i}{2\sqrt{P_iQ_i}} \right )
+       d_{TJ} = \sum_{i=1}^{d}\left(\frac{P_i+Q_i}{2}\right )\mathrm{ln}\left(\frac{P_i+Q_i}{2\sqrt{P_iQ_i}} \right )
 
     This function will compute the Taneja distance for every column vector 
     in xa against all column vectors in xb.  If the length of the column vectors is 
