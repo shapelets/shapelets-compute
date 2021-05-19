@@ -38,7 +38,7 @@ extensions = [
     'matplotlib.sphinxext.plot_directive',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
-    'sphinx.ext.imgmath',  
+    'sphinx.ext.mathjax',  
 ]
 
 imgmath_image_format = 'svg'
@@ -77,9 +77,6 @@ autosummary_generate = True
 # a list of builtin themes.
 #
 html_theme = 'pydata_sphinx_theme'
-html_logo = '_static/shapeletslogo.png'
-
-html_css_files = ['shapelets.css']
 
 html_theme_options = {
     "logo_link": "https://shapelets.io",
@@ -117,6 +114,8 @@ html_theme_options = {
    "use_edit_page_button": False,
    "navigation_with_keys": True,
    "show_toc_level": 1,
+   "collapse_navigation": True,
+   "navigation_depth": 2
    # "google_analytics_id": "UA-XXXXXXX",
    # "**": ["search-field.html", "sidebar-nav-bs.html", "sidebar-ethical-ads.html"]
    # "external_links": [
@@ -125,26 +124,24 @@ html_theme_options = {
    # ]
 }
 
+html_title = "%s v%s Manual" % (project, version)
+html_short_title = project
+html_baseurl = "https://docs.shapelets.io/compute"
+html_logo = '_static/shapeletslogo.png'
+html_css_files = ['shapelets.css']
+html_static_path = ['_static']
+
 html_additional_pages = {
     'index': 'indexcontent.html',
 }
 
-html_title = "%s v%s Manual" % (project, version)
-html_static_path = ['_static']
 html_last_updated_fmt = '%b %d, %Y'
-
-# html_baseurl TODO: SET BASE URL
-
 html_use_modindex = True
 html_copy_source = False
 html_domain_indices = False
 html_file_suffix = '.html'
 
-htmlhelp_basename = 'shapelets'
-
-if 'sphinx.ext.pngmath' in extensions:
-    pngmath_use_preview = True
-    pngmath_dvipng_args = ['-gamma', '1.5', '-D', '96', '-bg', 'Transparent']
-
 plot_html_show_formats = False
 plot_html_show_source_link = False
+
+htmlhelp_basename = 'shapelets'
