@@ -5,6 +5,7 @@ Linear Algebra Functions
 
 .. currentmodule:: shapelets.compute
 
+
 Eigenvalues
 -----------
 
@@ -16,6 +17,7 @@ Eigenvalues
    eigvals
    eigvalsh
 
+
 Decompositions
 --------------
 
@@ -25,8 +27,9 @@ Decompositions
    lu
    qr
    svd
-   SVDResult
    cholesky
+   SVDResult
+
 
 Convolutions
 ------------
@@ -38,6 +41,7 @@ Convolutions
    convolve1
    convolve2
    convolve3   
+
 
 Matrix Operations
 -----------------

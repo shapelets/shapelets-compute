@@ -16,6 +16,7 @@ TODO: Add description
 .. toctree::
    :maxdepth: 2
 
+   shapeletsarray
    arr_routines
    ts_routines
 

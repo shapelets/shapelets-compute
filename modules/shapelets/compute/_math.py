@@ -1474,9 +1474,11 @@ def absolute(x: ArrayLike) -> ShapeletsArray:
 
     Returns
     -------
-    A tensor, with the same dimensions as x, containing the absolute value of each 
-    element. For complex value tensors, where each element has the form :math:`a + bi`,
-    the absolute value is computed as :math:`\sqrt{a^{2} + b^{2}}`.
+    ShapeletsArray
+        A new instance of an array, with the same dimensions as x, containing 
+        the absolute value of each element. For complex value tensors, where 
+        each element has the form :math:`a + bi`, the absolute value is computed 
+        as :math:`\sqrt{a^{2} + b^{2}}`.
 
     """
     return _pygauss.absolute(x)

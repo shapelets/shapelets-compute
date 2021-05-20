@@ -33,3 +33,7 @@ h3 {
   color: #013243; /* warm black */
   letter-spacing: -.03em;
 } 
+
+.section {
+  text-align: justify;
+}

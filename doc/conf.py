@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.graphviz',
     'sphinx.ext.ifconfig',
+    'sphinx.ext.autosectionlabel',
     'matplotlib.sphinxext.plot_directive',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
@@ -84,7 +85,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/shapelets/khiva",
+            "url": "https://github.com/shapelets/shapelets-compute",
             "icon": "fab fa-github-square",
         },
         {
@@ -126,7 +127,7 @@ html_theme_options = {
 
 html_title = "%s v%s Manual" % (project, version)
 html_short_title = project
-html_baseurl = "https://docs.shapelets.io/compute"
+html_baseurl = "https://shapelets.io/docs/compute"
 html_logo = '_static/shapeletslogo.png'
 html_css_files = ['shapelets.css']
 html_static_path = ['_static']

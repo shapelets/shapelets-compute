@@ -1,7 +1,7 @@
 .. _arr_routines_binary:
 
-Logic Functions
-***************
+Binary Functions
+****************
 
 .. currentmodule:: shapelets.compute
 
