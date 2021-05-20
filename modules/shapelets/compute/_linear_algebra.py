@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Tuple, Union
 try:
     from typing import Literal
 except ImportError:
@@ -990,48 +990,46 @@ class SVDResult():
         self.vt = vt
         self._pct = None 
 
-    def low_rank(self, rank: int, srank: int = 0) -> ShapeletsArray:
+    def low_rank(self, region: Union[int, Tuple[int,int]]) -> ShapeletsArray:
         """
         Returns a low rank reconstruction of the original matrix by selecting
         a range of factors.
 
         Parameters
         ----------
-        rank : int
-            Rank of the reconstruction.
-        srank : int, optional (default: 0)
+        region : int or tuple of ints 
             In low rank reconstruction scenarios, it is typical to start with 
             the factors in s from the first (0) to rank.  If you wish to use 
-            a concrete region of factors (say, 3 to 7), use this parameter to 
-            indicate the begining of the selection.
+            a concrete region of factors (say, 3 to 7), use this parameter as 
+            a tuple to indicate the begining of the selection.
 
         Returns
         -------
         ShapeletsArray
             Low rank reconstruction of the original matrix.
         """
-        return (self.u[:, srank:rank] * self.s.T[:, srank:rank])@self.vt[srank:rank, :]
+        start,end = region if type(region) is tuple else [0, region]
+        return (self.u[:, start:end] * self.s.T[:, start:end])@self.vt[start:end, :]
 
-    def pct_rank(self, rank: int, srank: int = 0) -> float:
+    def pct_rank(self, region: Union[int, Tuple[int,int]]) -> float:
         """
         Computes how much information is contained in a low rank reconstruction.
 
         Parameters
         ----------
-        rank : int
-            Rank of the reconstruction.
-        srank : int, optional (default: 0)
+        region : int or tuple of ints 
             In low rank reconstruction scenarios, it is typical to start with 
             the factors in s from the first (0) to rank.  If you wish to use 
-            a concrete region of factors (say, 3 to 7), use this parameter to 
-            indicate the begining of the selection.
+            a concrete region of factors (say, 3 to 7), use this parameter as 
+            a tuple to indicate the begining of the selection.
 
         Returns
         -------
         float
             Percentage of the information.
         """
-        return _pygauss.sum(self.pct[srank:rank])
+        start,end = region if type(region) is tuple else [0, region]
+        return _pygauss.sum(self.pct[start:end])
 
     @property
     def acc_pct(self) -> ShapeletsArray:
@@ -1092,6 +1090,6 @@ __all__ = [
     "cholesky", "det", "dot", "dot_scalar", "gemm", "inv", "lu", "matmul", "matmulNT", "matmulTN", 
     "matmulTT", "matmul_chain", "norm", "pinv", "qr", "rank", "svd", "convolve", 
     "convolve1", "convolve2", "convolve3", "eig","eigh", "eigvals", "eigvalsh",
-    "NormType", "ConvMode", "ConvDomain"
+    "NormType", "ConvMode", "ConvDomain", "SVDResult"
 ]
 
