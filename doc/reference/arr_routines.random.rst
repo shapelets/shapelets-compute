@@ -11,9 +11,10 @@ TODO
 .. autosummary::
     :toctree: generated/
  
-    random_engine
+    permutation
+    randint
     randn
     random
-    randint 
-    permutation
+    random_engine
+    RandomEngineType
     ShapeletsRandomEngine

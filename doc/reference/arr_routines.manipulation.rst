@@ -5,21 +5,42 @@ Array Manipulation
 
 .. currentmodule:: shapelets.compute
 
+Shape and type
+--------------
+
 .. autosummary::
     :toctree: generated/
  
-    cast
     flat
-    flip
-    join
-    lower
-    pad
-    reorder
     reshape
-    shift
-    tile
     transpose
-    upper
-    where
-    unpack
+    cast
+
+
+Joining Arrays
+--------------
+
+.. autosummary::
+    :toctree: generated/
+    
+    join   
+
+Rearranging elements
+--------------------
+    
+.. autosummary::
+    :toctree: generated/
+    
+    flip
     pack
+    reorder
+    shift
+    unpack       
+
+Tiling
+------
+        
+.. autosummary::
+    :toctree: generated/
+        
+    tile    

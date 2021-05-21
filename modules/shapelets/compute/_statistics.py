@@ -319,8 +319,8 @@ def xcov(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: Op
         - 'biased': returns the biased average
         - 'unbiased': returns the unbiased average
         - 'coeff': raw results are scaled by :math:`\frac{1}{rms(xss)^Trms(yss)}`, where
-        `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.
-
+          `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.
+    
     Returns
     -------
     XCoResults
@@ -372,7 +372,7 @@ def xcorr(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: O
         - 'biased': returns the biased average
         - 'unbiased': returns the unbiased average
         - 'coeff': raw results are scaled by :math:`\frac{1}{rms(xss)^Trms(yss)}`, where
-        `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.
+          `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.
 
     Returns
     -------
@@ -415,7 +415,7 @@ def acorr(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrSc
         - 'biased': returns the biased average
         - 'unbiased': returns the unbiased average
         - 'coeff': raw results are scaled by :math:`\frac{1}{rms(xss)^Trms(yss)}`, where
-        `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.    
+          `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.    
 
     Returns
     -------
@@ -462,7 +462,7 @@ def acov(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrSca
         - 'biased': returns the biased average
         - 'unbiased': returns the unbiased average
         - 'coeff': raw results are scaled by :math:`\frac{1}{rms(xss)^Trms(yss)}`, where
-        `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.    
+          `rms` stands for ``root mean squared`` of the column vectors on each of the inputs.    
 
     Returns
     -------

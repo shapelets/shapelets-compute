@@ -5,21 +5,46 @@ Array Creation
 
 .. currentmodule:: shapelets.compute
 
+.. module:: shapelets.compute
+
+Building matrices
+-----------------
+
 .. autosummary::
     :toctree: generated/
  
-    arange
     diag
+    iota
+    lower
+    range
+    upper
+
+Numerical Ranges
+----------------
+
+.. autosummary::
+    :toctree: generated/
+    
+    arange
+    geomspace
+    linspace
+    logspace
+    
+    
+Ones and zeros
+--------------
+
+.. autosummary::
+    :toctree: generated/
+    
     empty
     eye
     full
-    geomspace
+    full_like
     identity
-    iota
-    linspace
-    logspace
     ones
-    range
+    ones_like
     zeros
-
+    zeros_like
+    
     

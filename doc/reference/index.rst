@@ -1,16 +1,11 @@
 .. _reference:
 
 ###########################
-Shapelets Compute Reference
+Shapelets-Compute Reference
 ###########################
 
 :Release: |version|
 :Date: |today|
-
-
-.. module:: shapelets.compute
-
-TODO: Add description
 
 
 .. toctree::
@@ -18,5 +13,4 @@ TODO: Add description
 
    shapeletsarray
    arr_routines
-   ts_routines
 

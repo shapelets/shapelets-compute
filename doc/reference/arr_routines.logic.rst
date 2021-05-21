@@ -5,17 +5,6 @@ Logic Functions
 
 .. currentmodule:: shapelets.compute
 
-Truth value testing
--------------------
-
-.. autosummary::
-    :toctree: generated/
- 
-    all
-    all_by_key 
-    any
-    any_by_key
-
 Array Contents
 --------------
 
@@ -25,7 +14,6 @@ Array Contents
     isfinite
     isinf
     isnan
-
     
 Array Type Testing
 ------------------
@@ -35,17 +23,7 @@ Array Type Testing
     
     iscomplex
     isreal  
-
         
-Logical Operations
-------------------
-
-.. autosummary::
-    :toctree: generated/
-
-    logical_and        
-    logical_not
-    logical_or
 
 Comparison    
 ----------
@@ -58,3 +36,33 @@ Comparison
     greater_equal
     less
     less_equal
+
+Logical Operations
+------------------
+
+.. autosummary::
+    :toctree: generated/
+
+    logical_and        
+    logical_not
+    logical_or
+
+    
+Truth value testing
+-------------------
+
+.. autosummary::
+    :toctree: generated/
+ 
+    all
+    all_by_key 
+    any
+    any_by_key
+
+
+
+    
+
+
+        
+

@@ -6,6 +6,19 @@ Linear Algebra Functions
 .. currentmodule:: shapelets.compute
 
 
+Decompositions
+--------------
+
+.. autosummary::
+   :toctree: generated/
+
+   cholesky
+   lu
+   qr
+   svd
+   SVDResult
+
+
 Eigenvalues
 -----------
 
@@ -18,47 +31,39 @@ Eigenvalues
    eigvalsh
 
 
-Decompositions
---------------
-
-.. autosummary::
-   :toctree: generated/
-
-   lu
-   qr
-   svd
-   cholesky
-   SVDResult
-
-
-Convolutions
-------------
+Inversion
+---------
    
 .. autosummary::
    :toctree: generated/
    
-   convolve
-   convolve1
-   convolve2
-   convolve3   
+   inv
+   pinv  
 
 
-Matrix Operations
------------------
+Norms
+-----
 
 .. autosummary::
    :toctree: generated/
 
    det
+   norm
+   rank
+   NormType
+   
+Products
+--------
+
+.. autosummary::
+   :toctree: generated/
+
    dot
    dot_scalar
    gemm
-   inv
-   pinv
    matmul
+   matmul_chain
    matmulNT
    matmulTN
    matmulTT
-   norm
-   rank
    

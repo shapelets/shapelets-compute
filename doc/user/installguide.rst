@@ -6,9 +6,12 @@ Installation Guide
 To install a binary distribution, the only requirement is to have a working (recent, 
 3.7 and onwards) version of Python in your system.  
 
-+++
++++++++++++++++++++
+Binary Installation 
++++++++++++++++++++
+
 PIP 
-+++
+---
 The installation process is a two step process.  The first step is to install 
 **Shapelets-Compute** as a conventional package::
 
@@ -47,7 +50,7 @@ backends are supported by simply installing them individually.
 
 
 Checking Your Installation
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 To ensure your installation is working, use the commandline tool that ships with 
 Shapelets-Compute.  Simply issue an ```info``` command, like the one shown::
 
@@ -89,10 +92,10 @@ computation workflows like matrix multiplication (```blas```) or Fast Fourier Tr
     4096 | 860.105441 ███████████████████████▍
 
 
-+++++
 Conda
-+++++
+-----
 Conda installation is, currently, work in progress
+
 
 ++++++++++++++++++++++++
 Installation from source
@@ -168,8 +171,8 @@ download, but it is possible to execute it in advance by running
 `vcpkg`_
 ~~~~~~~~
 For any other library that doesn't require any special treatment,
-``vcpkg`` is used, using ``vcpkg.json`` in the root project folder
-to outline the libraries and versions required for the build.
+``vcpkg`` is used. ``vcpkg.json`` in the root project folder
+outlines the libraries and versions required for the build.
 
 The build process will automate the download, set up and integration of
 ``vcpkg`` if no suitable installation is found.
@@ -178,9 +181,9 @@ To reuse an existing installation, ensure the presence of an environment
 variable ``VCPKG_ROOT`` or ``VCPKG_INSTALLATION_ROOT``, which should be
 pointing to the main directory of your ``vcpkg`` installation.
 
-When ``VCPKG_ROOT`` is not defined, the build process will download and
-setup a copy of vcpkg automatically; the destination folder will be
-``external\vcpkg``.
+When ``VCPKG_ROOT`` or ``VCPKG_INSTALLATION_ROOT`` are not defined, the 
+build process will download and setup a copy of vcpkg automatically; 
+the destination folder will be ``external\vcpkg``.
 
 `pybind11`_
 ~~~~~~~~~~~

@@ -1612,8 +1612,8 @@ def nan_to_num(a: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> ShapeletsArr
     r"""
     Returns a new array where the NaN and Inf values have been replaced.
 
-    Params
-    ------
+    Parameters
+    ----------
     a: ArrayLike
         A valid array expression
 
@@ -1628,7 +1628,7 @@ def nan_to_num(a: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> ShapeletsArr
     A new array with no NaN or Inf values.
 
     Examples
-    -------
+    --------
     >>> import shapelets.compute as sc  
     >>> import numpy as np
     >>> sc.nan_to_num([[np.NaN, 1.0], [np.Inf, 3.0]], 0.0, 2.0)

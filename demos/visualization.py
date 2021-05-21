@@ -82,3 +82,12 @@ plt.show()
 # %%
 svd.pct
 # %%
+import matplotlib.pyplot as plt
+import shapelets.compute as sc
+import numpy as np
+r = sc.random.random_engine()
+x = r.gamma(2.0, 0.5, shape=100000)
+plt.hist(x, 200)
+plt.grid()
+plt.show()
+# %%

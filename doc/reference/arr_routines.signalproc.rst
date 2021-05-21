@@ -4,6 +4,7 @@ Signal Processing Functions
 ***************************
 
 .. currentmodule:: shapelets.compute.fft
+.. module:: shapelets.compute.fft
 
 Fourier Transform
 -----------------
@@ -12,10 +13,26 @@ Fourier Transform
    :toctree: generated/
 
    fft
-   ifft
-   rfft
-   irfft
    fftfreq
+   fftshift
+   ifft
+   irfft
+   rfft
    rfftfreq
    spectral_derivative
-   fftshift
+   NormType
+
+.. currentmodule:: shapelets.compute
+
+Convolution
+-----------
+   
+.. autosummary::
+   :toctree: generated/
+
+   convolve
+   convolve1
+   convolve2
+   convolve3
+   ConvDomain
+   ConvMode   

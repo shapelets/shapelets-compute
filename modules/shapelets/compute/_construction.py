@@ -570,7 +570,7 @@ def range(shape: ShapeLike, seq_dim: int = 0, dtype: DataTypeLike = 'float32') -
     return _pygauss.range(shape, seq_dim, dtype)
 
 __all__ = [
-    "geomspace", "logspace", "linspace", "arange", "arange", "empty", "eye", 
+    "geomspace", "logspace", "linspace", "arange", "empty", "eye", 
     "identity", "full", "zeros", "ones", "diag", "iota", "range",
     "zeros_like", "ones_like", "full_like"
 ]

@@ -307,8 +307,6 @@ class ShapeletsRandomEngine:
         -------
         ShapeletsArray
             An new array instance whose values are drawn from the inverse Gaussian distribution.
-
-
         """
 
     def permutation(self, x: ArrayLike, axis=0) -> ShapeletsArray:

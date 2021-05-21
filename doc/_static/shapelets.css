@@ -37,3 +37,7 @@ h3 {
 .section {
   text-align: justify;
 }
+
+.sig-prename {
+  display: none;
+}
