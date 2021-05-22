@@ -1,6 +1,4 @@
-#include <gauss/internal/scopedHostPtr.h>
 #include <gauss/random.h>
-#include <iostream>
 
 #define FLOAT32_EPS 1.1920929e-07
 
@@ -29,10 +27,14 @@ af::array gauss::random::randint(int64_t low,
     return u.as(dtype);
 }
 
-af::array gauss::random::logistic(double loc, double scale,
+af::array gauss::random::logistic(double loc, 
+                                  double scale,
                                   const af::dim4 &shape,
                                   const af::dtype &dtype,
                                   const std::optional<af::randomEngine> &engine) {
+
+    if (scale <= 0.0)
+        throw std::invalid_argument("scale should be greater than zero");
 
     auto re = engine.value_or(af::getDefaultRandomEngine());
     auto u = af::randu(shape, af::dtype::f32, re);
@@ -48,6 +50,8 @@ af::array gauss::random::lognormal(double mean,
                                    const af::dim4 &shape,
                                    const af::dtype &dtype,
                                    const std::optional<af::randomEngine> &engine) {
+    if (sigma <= 0.0)
+        throw std::invalid_argument("sigma should be greater than zero");
 
     auto re = engine.value_or(af::getDefaultRandomEngine());
     auto u = af::randn(shape, af::dtype::f32, re);
@@ -60,6 +64,9 @@ af::array gauss::random::normal(double mean,
                                 const af::dtype &dtype,
                                 const std::optional<af::randomEngine> &engine) {
 
+    if (sigma <= 0.0)
+        throw std::invalid_argument("sigma should be greater than zero");
+
     auto re = engine.value_or(af::getDefaultRandomEngine());
     auto u = af::randn(shape, af::dtype::f32, re);
     return mean + (sigma * u);
@@ -70,6 +77,12 @@ af::array gauss::random::wald(double mean,
                               const af::dim4 &shape,
                               const af::dtype &dtype,
                               const std::optional<af::randomEngine> &engine) {
+
+    if (mean <= 0.0)
+        throw std::invalid_argument("mean should be greater than zero");
+
+    if (scale <= 0.0)
+        throw std::invalid_argument("scale should be greater than zero");
 
     auto n = shape.elements();
     auto re = engine.value_or(af::getDefaultRandomEngine());
@@ -93,6 +106,12 @@ af::array gauss::random::gamma(double alpha,
                                const af::dim4 &shape,
                                const af::dtype &dtype,
                                const std::optional<af::randomEngine> &engine) {
+
+    if (alpha <= 0.0)
+        throw std::invalid_argument("alpha should be greater than zero");
+
+    if (lambda <= 0.0)
+        throw std::invalid_argument("lambda should be greater than zero");
 
     auto n = shape.elements();
     auto re = engine.value_or(af::getDefaultRandomEngine());
@@ -193,6 +212,9 @@ af::array gauss::random::exponential(double scale,
                                      const af::dtype &dtype,
                                      const std::optional<af::randomEngine> &engine) {
 
+    if (scale <= 0.0)
+        throw std::invalid_argument("scale should be greater than zero");
+
     auto re = engine.value_or(af::getDefaultRandomEngine());
     auto v = af::randu(shape, dtype, re);
     v = af::min(v, 1.0 - FLOAT32_EPS);
@@ -204,6 +226,8 @@ af::array gauss::random::chisquare(double df,
                                    const af::dim4 &shape,
                                    const af::dtype &dtype,
                                    const std::optional<af::randomEngine> &engine) {
+    if (df <= 0.0)
+        throw std::invalid_argument("df should be greater than zero");
 
     return gamma(df / 2.0, 0.5, shape, dtype, engine);
 }
@@ -213,6 +237,11 @@ af::array gauss::random::beta(double alpha,
                               const af::dim4 &shape,
                               const af::dtype &dtype,
                               const std::optional<af::randomEngine> &engine) {
+    if (alpha <= 0.0)
+        throw std::invalid_argument("alpha should be greater than zero");
+
+    if (beta <= 0.0)
+        throw std::invalid_argument("beta should be greater than zero");
 
     auto x = gamma(alpha, 1.0, shape, dtype, engine);
     auto y = gamma(beta, 1.0, shape, dtype, engine);
@@ -236,13 +265,13 @@ af::array gauss::random::multivariate_normal(int64_t samples,
     auto check_mean = af::moddims(mean, 1, d);
 
     if (cov.dims(0) != cov.dims(1))
-        throw std::runtime_error("Either the covariance matrix is not rectangular");
+        throw std::domain_error("The covariance matrix is not rectangular");
 
     if (cov.dims(0) != d)
-        throw std::runtime_error("The dimensions of the mean vector and the covariance matrix doesn't match");
+        throw std::domain_error("The dimensions of the mean vector and the covariance matrix doesn't match");
 
     if (cov.type() != dtype)
-        throw std::runtime_error("The types of the mean and covariance matrices do not match.");
+        throw std::domain_error("The types of the mean and covariance matrices do not match.");
 
     // induce epsilon to alleviate the possibility of introducing numerical problems
     auto cov_e = cov + (af::identity(d, d) * 0.0001);
