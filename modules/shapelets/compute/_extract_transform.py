@@ -599,7 +599,7 @@ def where(condition: ArrayLike, x: ArrayLike = None, y: ArrayLike = None) -> Sha
     return _pygauss.where(condition, x, y)
 
 
-def unpack(a: ArrayLike, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0, is_column: bool = True):
+def unpack(a: ArrayLike, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0, is_column: bool = True) -> ShapeletsArray:
     """
     Rearranges window sections of an input into columns or rows.
 
@@ -659,7 +659,7 @@ def unpack(a: ArrayLike, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: in
     return _pygauss.unpack(a, wx, wy, sx, sy, px, py, is_column)
 
 
-def pack(a: ArrayLike, ox: int, oy: int, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0, is_column: bool = True):
+def pack(a: ArrayLike, ox: int, oy: int, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0, is_column: bool = True) -> ShapeletsArray:
     """
     Reverses the :obj:`~shapelets.compute.unpack` operation
 

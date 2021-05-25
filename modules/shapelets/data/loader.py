@@ -1,25 +1,75 @@
 from __future__ import annotations
+from typing import NamedTuple, Optional, Union
 
-from ..compute import ShapeletsArray, array as scarray
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
+from ..compute import ShapeletsArray, array as scarray, DataTypeLike
 import numpy as np
 import pathlib
 import os
 
+class Dataset(NamedTuple):
+    file: str
+    description: str 
+    data_frequency: str
+    source: str
 
+datasets = {
+    'solar_forecast': Dataset('entoe_2016_es_solar_forecast.gz', 
+                              'Spanish solar energy production forecast for 2016 in 1h periods', 
+                              '1h', 'https://transparency.entsoe.eu/'),
 
-def load_dataset(name:str, dtype: np.dtype = "float32") -> ShapeletsArray:
+    'wind_forecast': Dataset('entoe_2016_es_wind_forecast.gs', 
+                             'Spanish wind energy production forecast for 2016 in 1h periods', 
+                             '1h', 'https://transparency.entsoe.eu/'),
+
+    'load': Dataset('entoe_2016_es_load.gz', 
+                    'Spanish energy load for 2016 in 1h periods', 
+                    '1h', 'https://transparency.entsoe.eu/'),
+
+    'load_forecast': Dataset('entoe_2016_es_load_forecast.gz', 
+                             'Spanish energy load forecast for 2016 in 1h periods', 
+                             '1h', 'https://transparency.entsoe.eu/'),
+    
+    'day_ahead_prices': Dataset('entoe_2016_es_day_ahead_prices.gz', 
+                                'Spanish energy day ahead prices for 2016 in 1h periods', 
+                                '1h', 'https://transparency.entsoe.eu/'),                             
+
+    'italian_power_demand': Dataset('italian_power_demand.gz', 
+                                'Power demand by a small italian city in 1h intervals during 3 years, beginning on Jan 1 st 1995.', 
+                                '1h', 'https://www.cs.ucr.edu/~eamonn/Time_Series_Snippets_10pages.pdf'),                             
+}
+
+DSKeys = Literal['solar_forecast', 'wind_forecast', 'load', 
+                 'load_forecast', 'day_ahead_prices',
+                 'italian_power_demand']
+
+def dataset_info(ds: DSKeys) -> Optional[Dataset]:
+    found = ds in datasets
+    if found: 
+        return datasets[ds]
+    return None
+
+def load_dataset(ds: Union[DSKeys, str], dtype: DataTypeLike = "float32") -> ShapeletsArray:
     current_path = pathlib.Path(__file__).parent.absolute()
-    file = os.path.join(current_path, name)
-    data = np.loadtxt(file)
-    return scarray(data, dtype=dtype)
 
-def load_mat(name: str, section: str = "data", dtype: np.dtype = "float32") -> ShapeletsArray:
-    current_path = pathlib.Path(__file__).parent.absolute()
-    file = os.path.join(current_path, name)
-    import scipy.io
-    mat = scipy.io.loadmat(file)
-    return scarray(mat[section], dtype=dtype)
+    if ds in datasets:
+        file_name = datasets[ds].file 
+    else: 
+        file_name = str(ds)
+
+    file = os.path.join(current_path, file_name)
+    if not file.endswith('.gz'):
+        file += '.gz'
+
+    if not os.path.exists(file):
+        raise FileNotFoundError(f'Unable to find file {ds}')
+
+    nparray = np.loadtxt(file)
+    return scarray(nparray, dtype=dtype)
 
 
-
-__all__ = [ "load_dataset", "load_mat"]
+__all__ = [ 'load_dataset', 'dataset_info', 'DSKeys','Dataset' ]

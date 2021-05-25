@@ -40,6 +40,7 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
     'sphinx.ext.mathjax',  
+    'sphinx_tabs.tabs'
 ]
 
 imgmath_image_format = 'svg'
@@ -144,5 +145,12 @@ html_file_suffix = '.html'
 
 plot_html_show_formats = False
 plot_html_show_source_link = False
+plot_rcparams = {
+    'font.size': 20,
+    'savefig.bbox': 'tight',
+    'font.family': 'sans-serif',
+    'font.sans-serif': 'Lato',
+    'savefig.pad_inches': 0.1
+}
 
 htmlhelp_basename = 'shapelets'

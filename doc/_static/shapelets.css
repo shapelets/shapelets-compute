@@ -41,3 +41,24 @@ h3 {
 .sig-prename {
   display: none;
 }
+
+img.plot-directive {
+  border: 0;
+  max-width: 100%;
+}
+
+.sphinx-tabs-panel {
+  border: 0px solid #a0b3bf;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+button.sphinx-tabs-tab {
+  outline: none;
+  box-shadow: none;
+  outline: 0 !important;
+}
+
+div.figure, figure {
+  padding: 0.01rem;
+}

@@ -163,8 +163,7 @@ def create_metadata(full_version, doc_url):
         python_requires='>=3.7',
         package_data={
             'shapelets': [
-                'data/*.txt', 
-                'data/*.mat', 
+                'data/*.gz'
             ],
         },
         include_package_data = True,

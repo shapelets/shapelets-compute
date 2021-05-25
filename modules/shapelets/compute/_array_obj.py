@@ -528,5 +528,5 @@ def array(array_like: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optio
 
 
 __all__ = [
-    "array", "parallel_range", "ShapeletsArray", "ParallelFor"
+    "array", "parallel_range", "ShapeletsArray", "ParallelFor", "DataTypeLike"
 ]

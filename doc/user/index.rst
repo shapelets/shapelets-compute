@@ -11,4 +11,5 @@ Shapelets-Compute user guide
 
    whatissc
    installguide
+   tutorials
    license
