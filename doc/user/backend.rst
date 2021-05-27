@@ -11,7 +11,7 @@ order: `cuda` -> `opencl` -> `cpu`.
 
 The availability of a backend is determined by two factors: 
 
-a) The backend runtime is available, task that can be easily achieve through the commandline tool 
+a) The backend runtime is available, task that can be easily achieve through the command-line tool 
    that ships with this package (see :ref:`user/installguide:Checking Your Installation` in the installation guide).
 b) The operating system has the necessary drivers and libraries your environment.  
 

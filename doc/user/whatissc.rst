@@ -3,7 +3,7 @@
 What is Shapelets-Compute?
 ##########################
 
-Within Shapelets_ software stack, **Shapelets-Compute** is a recollection of algorithms 
+Within Shapelets_ software stack, **Shapelets-Compute** is a collection of algorithms 
 and computational facilities to work efficiently with time series represented as dense arrays.  
 
 The server side version of Shapelets, which deals with complexities like storage, indexing, ingestion, etc..., 
@@ -14,7 +14,7 @@ who uses Shapelets-Compute to execute operations and instructions over sequences
 
 Therefore, **Shapelets-Compute** offers you the same computational semantics as Shapelets server side, with the 
 benefit of running it as open source library, directly in your machine without complex deployments nor the 
-need to adquire server resources. 
+need to acquire server resources. 
 
 Shapelets-Compute should help you during your investigation phase, where versatility and computational 
 efficiency allows to try new analytical pipelines as fast as possible.

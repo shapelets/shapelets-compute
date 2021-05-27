@@ -9,7 +9,7 @@ trends.
 
 Whilst common visualization techniques, line charts and derivates, are usually satisfactory for 
 quick exploration, a few techniques could help us improving discovery workflows with tools 
-already present in our toolbelt.
+already present in our tool belt.
 
 Let's use a couple of series that ship with *Shapelets-Compute* as a driving example:  Both series 
 correspond to energy forecasts for the Spanish market in 2016 [1]_; one describes day-ahead energy prices 
