@@ -270,7 +270,7 @@ def spectral_derivative(signal: ArrayLike, kappa_spec: Union[float, ArrayLike] =
         Column vector with the signal 
 
     kappa_spec: float, defaults to 1.0
-        The specification for building the kappa coeffients.  It could be either double number, 
+        The specification for building the kappa coefficients.  It could be either double number, 
         denoting a domain length to scale the automatic generation of kappa vector from ``-n/2`` to ``n/2``.  
         Alternatively, one can pass a column vector of size n for the desired values.    
 
@@ -282,6 +282,32 @@ def spectral_derivative(signal: ArrayLike, kappa_spec: Union[float, ArrayLike] =
     -------
     ShapeletsArray
         Derivative using FFT.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        import shapelets.compute as sc 
+        import matplotlib.pyplot as plt 
+
+        n = 64
+        L = 30
+        dx = L/n
+        x = sc.arange(-L/2, L/2, dx)
+        f = sc.cos(x)*sc.exp(-x**2/25)
+        df = -(sc.sin(x) * sc.exp(-x**2/25) + (2/25)*x*f)
+        kappa = (2.0*sc.pi/L)*sc.arange(-n/2, n/2, 1)
+
+        fhat = sc.fft.spectral_derivative(f, kappa)
+        
+        fig, ax = plt.subplots(figsize=(16, 8))
+        ax.plot(x, fhat, label='spectral')
+        ax.plot(x, df, 'go', label='exact', alpha=0.4)
+        plt.legend()
+        plt.show()
+
 
     References
     ----------

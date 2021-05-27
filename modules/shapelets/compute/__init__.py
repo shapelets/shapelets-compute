@@ -102,3 +102,8 @@ __all__ += _extract_transform.__all__
 __all__ += _linear_algebra.__all__
 __all__ += _statistics.__all__
 __all__ += ["__library_dir__", "__af_version__"]
+
+# add useful constants
+pi = 3.141592653589793238462643383279502884
+e = 2.718281828459045235360287471352662498
+__all__ += ["pi", "e"]
