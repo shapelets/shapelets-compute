@@ -1,4 +1,4 @@
-.. _arr_routines_distances:
+.. _routines_distances:
 
 Distances
 *********

@@ -176,10 +176,8 @@ def join(lst: List[ArrayLike], dimension: int = 0) -> ShapeletsArray:
     [2 1 3 1]
             1 
             2 
-
             3 
             4 
-
             5 
             6                 
     """

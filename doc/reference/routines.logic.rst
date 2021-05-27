@@ -1,4 +1,4 @@
-.. _arr_routines_logic:
+.. _routines_logic:
 
 Logic Functions
 ***************

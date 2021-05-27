@@ -9,13 +9,13 @@ gb = 24
 day_ahead_by_day = sc.unpack(day_ahead, gb, 1, gb, 1)
 
 svd_results = sc.svd(day_ahead_by_day)
-reconstructed = svd_results.low_rank(1)
-rr = sc.pack(reconstructed, reconstructed.size, 1, gb, 1, gb, 1)
+lr = svd_results.low_rank(1)
+reconstructed = sc.pack(lr, lr.size, 1, gb, 1, gb, 1)
 
 fig, ax = plt.subplots(2, 1, figsize=(18, 10))
 ax[0].plot(day_ahead)
 ax[0].set_title("Original Series")
-ax[1].plot(rr)
+ax[1].plot(reconstructed)
 ax[1].set_title("From 1st Factor")
 plt.show()
 
@@ -23,6 +23,6 @@ points = 24*7
 
 fig, ax = plt.subplots(figsize=(18, 8))
 ax.plot(day_ahead_by_day[:points], label='Original')
-ax.plot(rr[:points], label='From 1st Factor')
+ax.plot(reconstructed[:points], label='From 1st Factor')
 plt.legend()
 plt.show()

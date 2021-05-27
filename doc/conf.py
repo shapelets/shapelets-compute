@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.graphviz',
     'sphinx.ext.ifconfig',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
     'matplotlib.sphinxext.plot_directive',
     'IPython.sphinxext.ipython_console_highlighting',
@@ -43,12 +44,18 @@ extensions = [
     'sphinx_tabs.tabs'
 ]
 
+intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
+                       'numpy': ('https://numpy.org/doc/stable/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
+                       'matplotlib': ('https://matplotlib.org/stable', None)}
+
 imgmath_image_format = 'svg'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 source_suffix = '.rst'
+autosectionlabel_prefix_document = True
 
 master_doc = 'contents'
 
@@ -57,7 +64,11 @@ autodoc_type_aliases = {
     'ShapeletsArray': 'ShapeletsArray',
     'DataTypeLike': 'DataTypeLike',
     'ShapeLike': 'ShapeLike',
-    'DistanceType': 'DistanceType'
+    'DistanceType': 'DistanceType',
+    'NormType': 'NormType',
+    'DeviceInfo': 'DeviceInfo',
+    'DeviceMemory': 'DeviceMemory',
+    'ShapeletsRandomEngine': 'ShapeletsRandomEngine'
 }
 
 # List of patterns, relative to source directory, that match files and
@@ -112,12 +123,15 @@ html_theme_options = {
          "href": "https://shapelets.io/static/images/favicon.ico"
       },
    ],
-   "show_prev_next": True,
+   "show_prev_next": False,
    "use_edit_page_button": False,
    "navigation_with_keys": True,
    "show_toc_level": 1,
    "collapse_navigation": True,
-   "navigation_depth": 2
+   "navigation_depth": 2,
+#    "navbar_align": "right",
+#    "sidebarwidth" : 470,
+#    "sidebar_includehidden" : True
    # "google_analytics_id": "UA-XXXXXXX",
    # "**": ["search-field.html", "sidebar-nav-bs.html", "sidebar-ethical-ads.html"]
    # "external_links": [

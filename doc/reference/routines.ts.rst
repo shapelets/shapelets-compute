@@ -1,4 +1,4 @@
-.. _arr_routines_ts:
+.. _routines_ts:
 
 Time Series
 ***********

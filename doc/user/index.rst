@@ -11,5 +11,7 @@ Shapelets-Compute user guide
 
    whatissc
    installguide
+   shapeletsarray
+   backend
    tutorials
    license

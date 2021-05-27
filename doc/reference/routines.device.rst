@@ -1,4 +1,4 @@
-.. _arr_routines_device:
+.. _routines_device:
 
 Devices and Backends
 ********************

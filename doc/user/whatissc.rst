@@ -36,7 +36,7 @@ Therefore, whilst examining Shapelets-Compute, you will see that:
 * Shapelets-Compute goes at great length to offer a similar API to NumPy, creating a seamless experience when 
   coding new algorithms to run in either Shapelets-Compute or Shapelets server side.
 
-* :ref:`Shapelets Arrays` are our internal abstraction to work with dense array and tensors.  The 
+* *ShapeletsArrays* are our internal abstraction to work with dense array and tensors.  The 
   compatibility with the rest the Python infrastructure and libraries is achieved by implementing 
   `Buffer Protocol`_ on top of ArrayFire_ abstractions.
 

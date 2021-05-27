@@ -1,4 +1,4 @@
-.. _arr_routines_statistics:
+.. _routines_statistics:
 
 Statistics
 **********

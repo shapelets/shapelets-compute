@@ -1,4 +1,4 @@
-.. _arr_routines_ssc:
+.. _routines_ssc:
 
 Sorting, Searching and Counting
 *******************************

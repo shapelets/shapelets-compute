@@ -42,7 +42,7 @@ def mean(data: ArrayLike, weights: ArrayLike = None, dim: int = None) -> Union[F
     dim: Optional int (default: None)
         Dimension for the operation.  When no dimension is given, a scalar value will be returned.
 
-    Results
+    Returns
     -------
     FloatOrComplex
         When no dimension is given or, alternatively,
@@ -79,7 +79,7 @@ def median(data: ArrayLike, dim: int = None) -> Union[FloatOrComplex, ShapeletsA
     dim: Optional int (default: None)
         Dimension for the operation.  When no dimension is given, a scalar value will be returned.
 
-    Results
+    Returns
     -------
     FloatOrComplex
         When no dimension is given or, alternatively,

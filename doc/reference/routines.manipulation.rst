@@ -1,4 +1,4 @@
-.. _arr_routines_manipulation:
+.. _routines_manipulation:
 
 Array Manipulation
 ******************
@@ -25,6 +25,15 @@ Joining Arrays
     
     join   
 
+Padding Arrays
+--------------
+    
+.. autosummary::
+    :toctree: generated/
+    
+    pad
+    BorderType    
+    
 Rearranging elements
 --------------------
     

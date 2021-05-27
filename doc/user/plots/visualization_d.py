@@ -8,9 +8,9 @@ gb = 24
 solar_forecast_by_day = sc.unpack(solar_forecast, gb, 1, gb, 1)
 
 filter = sc.array([
-    [0, 1, 0],
-    [1, 1, 1],
-    [0, 1, 0]
+    [0, 5, 0],
+    [5, 1, 5],
+    [0, 5, 0]
 ], dtype= "float32") 
 
 filter /= sc.sum(filter)

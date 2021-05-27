@@ -656,7 +656,7 @@ def czekanowski(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     .. math::
 
-       s_{cze} = \frac{2 \sum_{i-1}^{d}\min(P_i, Q_i}{\sum_{i-1}^{d}(P_i+Q_i)}  
+       s_{cze} = \frac{2 \sum_{i-1}^{d}\min(P_i, Q_i)}{\sum_{i-1}^{d}(P_i+Q_i)}  
 
     This function will compute the czekanowski simmilarity for every column vector 
     in xa against all column vectors in xb.  If the length of the column vectors is 
@@ -1546,7 +1546,7 @@ def jeffrey(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     See Also
     --------
     kullback
-
+    
     Returns
     -------
     ShapeletsArray
@@ -1565,7 +1565,7 @@ def jeffrey(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     [3] Generalized Information Measures and Their Applications
         TANEJA. I.J. (2001)
-        `Online book <www.mtm.ufsc.br/~taneja/book/book.html>`_
+        `Online book <http://www.mtm.ufsc.br/~taneja/book/book.html>`_
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Jeffrey)
 
@@ -1686,7 +1686,8 @@ def jensen_shannon(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     ----------
     [1] Generalized Information Measures and Their Applications
         TANEJA. I.J. (2001)
-        `Online book <www.mtm.ufsc.br/~taneja/book/book.html>`_
+        `Online book <http://www.mtm.ufsc.br/~taneja/book/book.html>`_
+
     [2] Dictionary of Distances
         Deza E. and Deza M.M.
         Elsevier, 2006  
@@ -1730,7 +1731,7 @@ def jensen_difference(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
 
     [2] Generalized Information Measures and Their Applications
         TANEJA. I.J. (2001)
-        `Online book <www.mtm.ufsc.br/~taneja/book/book.html>`_        
+        `Online book <http://www.mtm.ufsc.br/~taneja/book/book.html>`_        
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Jensen_Difference)
 

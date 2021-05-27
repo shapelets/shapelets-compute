@@ -3,22 +3,10 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 
-.navbar-brand img {
-   height: 75px;
-}
-
-.navbar-brand {
-   height: 75px;
-}
 
 body {
   font-family: 'Poppins', sans-serif;
-  color:#4A4A4A; /* numpy.org body color */
-}
-
-pre, code {
-  font-size: 100%;
-  line-height: 155%;
+  color:#4A4A4A;
 }
 
 h1 {
@@ -63,7 +51,7 @@ dt:target, span.highlighted {
 }
 
 .sig-prename {
-  display: none;
+  display: none;  /* avoid shapelets.compute in every's function name! */
 }
 
 /*
@@ -103,4 +91,52 @@ dl.py > dt {
 
 dt {
   font-weight: 500;
+}
+
+/* Colors for nav bar and left hand side */
+#navbar-start {
+  background-color: #111D2C;
+  width: 100%;
+}
+
+.bd-sidebar {
+  background-color: #111D2C;
+}
+
+footer {
+  background-color: #111D2C;
+  color: white;
+  font-size: 1rem;
+}
+
+.copyright {
+  color: rgb(238, 229, 229);
+  font-size: 1rem;
+}
+
+.sphinx-version {
+  color: rgb(238, 229, 229);
+  font-size: 1rem;
+}
+
+#bd-docs-nav > div > ul > li > a {
+  font-family: "Lato", sans-serif;
+  color: white;
+  font-size: 1rem;
+}
+
+#bd-docs-nav > div > ul > li > ul > li> a {
+  font-family: "Lato", sans-serif;
+  color: white;
+  font-size: 1rem;
+}
+
+nav > .container-xl {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+#navbar-start {
+  width: 100%;
+  height: 100%;
 }

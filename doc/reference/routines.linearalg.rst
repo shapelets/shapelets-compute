@@ -1,4 +1,4 @@
-.. _arr_routines_linearalg:
+.. _routines_linearalg:
 
 Linear Algebra Functions
 ************************

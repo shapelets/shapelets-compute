@@ -1,4 +1,4 @@
-.. _arr_routines_signalproc:
+.. _routines_signalproc:
 
 Signal Processing Functions
 ***************************

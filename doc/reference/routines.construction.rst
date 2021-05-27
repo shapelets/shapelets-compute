@@ -1,4 +1,4 @@
-.. _arr_routines_construction:
+.. _routines_construction:
 
 Array Creation
 **************

@@ -17,18 +17,18 @@ The installation process is a two step process.  The first step is to install
 
     pip install shapelets-compute
 
-Due to the large size of runtime depedencies (MKL, CUDA, OpenCL), there is a second 
+Due to the large size of runtime dependencies (MKL, CUDA, OpenCL), there is a second 
 step in the installation process; PyPI repositories impose size restrictions on the 
 packages they serve.
 
 To install the required runtime libraries, one could proceed to download it directly 
 from `ArrayFire's downloads`_ site.  If you already have a valid installation of 
 ArrayFire in your environment, you validate that everything is working correctly by
-following the steps outlined in the section :ref:`Checking Your Installation`.
+following the steps outlined in the section :ref:`user/installguide:Checking Your Installation`.
 
-Our recommended approach to install run time depedencies is to use the command line 
+Our recommended approach to install run time dependencies is to use the command line 
 tool, `shapelets`, to set up the exact binaries Shapelets-Compute has been compiled 
-with.  The process is extremelly simple::
+with.  The process is extremely simple::
 
     shapelets install <<backend>>
 
@@ -38,7 +38,7 @@ backends are supported by simply installing them individually.
 .. note::
 
     When installing `opencl` or `cuda`, your environment should have the 
-    required devide drivers.
+    required device drivers.
     
 .. admonition:: Writing permissions
 
@@ -51,7 +51,7 @@ backends are supported by simply installing them individually.
 
 Checking Your Installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-To ensure your installation is working, use the commandline tool that ships with 
+To ensure your installation is working, use the command-line tool that ships with 
 Shapelets-Compute.  Simply issue an ```info``` command, like the one shown::
 
     $ shapelets info 
@@ -120,7 +120,7 @@ When building on windows, it is required the following components:
 
 - ``7 zip``: Required to unpack ArrayFire run-time distribution (if you
   don't have it installed already, the building process will download a
-  copy and install it locally to this proyect).
+  copy and install it locally to this project).
 - ``Windows 10 SDK`` or ``Visual Studio`` with C++/CLI building tools.
 - CMake
 
@@ -230,7 +230,7 @@ Creating a distribution
 Install tox (``pip install tox``) to run an automated build and test
 cycle. ``tox.ini`` is configured at root folder and it will build and
 test a distribution for Python 3.7, 3.8 and 3.9. If you are using
-``pyenv`` to controll your python environment, do install ``tox-pyenv``.
+``pyenv`` to control your python environment, do install ``tox-pyenv``.
 
 Binary wheels built after executing ``tox`` will be found in the
 ``dist`` folder.

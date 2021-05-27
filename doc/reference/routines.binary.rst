@@ -1,4 +1,4 @@
-.. _arr_routines_binary:
+.. _routines_binary:
 
 Binary Operations
 *****************

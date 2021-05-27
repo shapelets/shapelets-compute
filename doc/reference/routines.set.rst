@@ -1,4 +1,4 @@
-.. _arr_routines_set:
+.. _routines_set:
 
 Set Routines
 ************

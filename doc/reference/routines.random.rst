@@ -1,4 +1,4 @@
-.. _arr_routines_random:
+.. _routines_random:
 
 Random Operations
 *****************

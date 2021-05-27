@@ -1,4 +1,4 @@
-.. _arr_routines_math:
+.. _routines_math:
 
 Math Functions
 **************

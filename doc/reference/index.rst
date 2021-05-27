@@ -1,16 +1,13 @@
-.. _reference:
+.. _reference_main:
 
-###########################
-Shapelets-Compute Reference
-###########################
+API Reference
+*************
 
 :Release: |version|
 :Date: |today|
 
 
 .. toctree::
-   :maxdepth: 2
+    :hidden:
 
-   shapeletsarray
-   arr_routines
-
+    routines
