@@ -32,8 +32,9 @@ def visvalingam(x: ArrayLike, y: ArrayLike, num_points: int) -> ShapeletsArray:
 
     References
     ----------
-    [1] Line generalisation by repeated elimination of points
-        M. Visvalingam and J. D. Whyatt. The Cartographic Journal, 1993.
+    | [1] **Line generalisation by repeated elimination of points**
+    |    M. Visvalingam and J. D. Whyatt. 
+    |    The Cartographic Journal, 1993.
     """
     return _pygauss.visvalingam(x, y, num_points)
 
@@ -57,8 +58,9 @@ def pip(x: ArrayLike, y: ArrayLike, ips: int) -> ShapeletsArray:
     
     References
     ----------
-    [1] Representing financial time series based on data point importance. 
-        Fu TC, Chung FL, Luk R, and Ng CM. Engineering Applications of Artificial Intelligence, 21(2):277-300, 2008.
+    | [1] **Representing financial time series based on data point importance.** 
+    |    Fu TC, Chung FL, Luk R, and Ng CM. 
+    |    Engineering Applications of Artificial Intelligence, 21(2):277-300, 2008.
     """
     return _pygauss.pip(x, y, ips)
 

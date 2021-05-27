@@ -155,7 +155,7 @@ def geomspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = 
     """
     Creates a new array whose values are evenly spaced over a geometric scale.
 
-    This function is quite simmilar to :obj:`~shapelelets.compute.logspace`, but with the 
+    This function is quite similar to :obj:`~shapelelets.compute.logspace`, but with the 
     start and end values explicitely stated.
 
     Parameters
@@ -208,7 +208,7 @@ def empty(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     holding some future results.  
 
     The memory is not guaranteed to be initialized; use `full`, `ones`, `zeros` or other 
-    initialization methods if you need the memory to be fully initialized before acceesing it.
+    initialization methods if you need the memory to be fully initialized before accessing it.
 
     Parameters
     ----------

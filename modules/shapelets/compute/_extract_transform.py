@@ -387,7 +387,7 @@ def shift(array_like: ArrayLike, x: int, y: int = 0, z: int = 0, w: int = 0) -> 
     Shifts or rotates an array
 
     Positive shifts will rotate to the "right", whilst negative shifts will rotate to the "left". 
-    Shift quatities will be subject to the modulus of the dimension cardinality.
+    Shift quantities will be subject to the modulus of the dimension cardinality.
 
     Parameters
     ----------
@@ -677,9 +677,9 @@ def pack(a: ArrayLike, ox: int, oy: int, wx: int, wy: int, sx: int, sy: int, px:
     wy: int    
         Window size along 2st dimension 
     sx: int    
-        Strade along 1st dimension 
+        Stride along 1st dimension 
     sy: int    
-        Strade along 2st dimension
+        Stride along 2st dimension
     px: int (default: 0)    
         Padding along 1st dimension 
     py: int (default: 0)       

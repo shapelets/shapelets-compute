@@ -1,7 +1,7 @@
 .. _tutorial_visualization:
 
-Unpack Your Sequences
-=====================
+Unpacking Sequences
+===================
 
 When working with time series, a good set of visualization techniques are quite important as, 
 unfortunately, very few processes beat the human eye when it comes to recognising patterns and 

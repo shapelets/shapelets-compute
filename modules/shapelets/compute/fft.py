@@ -36,7 +36,7 @@ def ifft(c: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[N
         it controls cropping and padding, very much in the same way as the :obj:`~shapelets.compute.fft.fft` operation does.
 
     norm: NormType or float, defaults to None
-        When not explicetely set, it defaults to 'backward'.  See function :obj:`~shapelets.compute.fft.fft` for a list of 
+        When not explicitly set, it defaults to 'backward'.  See function :obj:`~shapelets.compute.fft.fft` for a list of 
         supported values and their interpretation.
     
     Returns
@@ -207,7 +207,7 @@ def irfft(c: ArrayLike, shape: ShapeLike, norm: Optional[Union[NormType,float]] 
         Expected dimensionality of the transformation.
 
     norm: NormType or float, defaults to None
-        When not explicetely set, it defaults to 'backward'.  See function :obj:`~shapelets.compute.fft.rfft` for a list of 
+        When not explicitly set, it defaults to 'backward'.  See function :obj:`~shapelets.compute.fft.rfft` for a list of 
         supported values and their interpretation.
     
     Returns
@@ -311,8 +311,8 @@ def spectral_derivative(signal: ArrayLike, kappa_spec: Union[float, ArrayLike] =
 
     References
     ----------
-    [1] Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control
-        Steven L. Brunton
+    | [1] Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control
+    |     Steven L. Brunton
     """
     return _pygauss.spectral_derivative(signal, kappa_spec, shift)
 

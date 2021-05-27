@@ -218,7 +218,7 @@ def convolve(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', d
     rank of the signal and filter parameters.
 
     When multiple convolve operations are required, either one signal to many filters, many signals to one filter or,
-    alternatively, mutliple signals to multiple filters, use the specialized version and adjust the dimensions 
+    alternatively, multiple signals to multiple filters, use the specialized version and adjust the dimensions 
     of signal and filter to benefit from the implicit parallelism.
 
     See Also
@@ -419,7 +419,7 @@ def cholesky(x: ArrayLike, is_upper: bool = True) -> ShapeletsArray:
 
     Examples
     --------
-    Peforming a decomposition
+    Performing a decomposition
 
     >>> import shapelets.compute as sc
     >>> x = [[2.+0.j, -0.-3.j], [0.+3.j, 5.+0.j]]
@@ -727,7 +727,7 @@ def matmul(lhs: ArrayLike, rhs: ArrayLike, lhs_options: MatMulOptions = 'none', 
     +-----------+-----------+--------------+
 
     The last two entries in the table, the 2D matrix is broadcasted to match the dimensions of the other array; this
-    operation doesn't alocate any additional memory.
+    operation doesn't allocate any additional memory.
 
     References
     ----------
@@ -1034,7 +1034,7 @@ class SVDResult():
     @property
     def acc_pct(self) -> ShapeletsArray:
         """
-        Cummulative percentage of information implied by a low rank reconstruction
+        Cumulative percentage of information implied by a low rank reconstruction
         """
         return _pygauss.cumsum(self.pct)
 

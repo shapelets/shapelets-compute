@@ -796,7 +796,7 @@ def nancumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArr
 
 def scan(a: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
     r"""
-    Generalization of cummulative operations over a particular axis
+    Generalization of cumulative operations over a particular axis
 
     Parameters
     ----------
@@ -843,7 +843,7 @@ def scan(a: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = 
 
 def nanscan(a: ArrayLike, dim: int = 0, nan: float = 0.0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
     r"""
-    Generalization of cummulative operations over a particular axis
+    Generalization of cumulative operations over a particular axis
 
     Parameters
     ----------
@@ -1740,7 +1740,7 @@ def any_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     by keys.
 
     Keys must be a columnar vector compatible with the dimension of the reduction.  Please note that keys types are 
-    restricted to signed or usigned ints; if the function is called with any other type, an implicit conversion to 
+    restricted to signed or unsigned ints; if the function is called with any other type, an implicit conversion to 
     signed int will occur automatically.
     
     Keys values may repeat, however only consecutive key values would be considered for each reduction. If a key 
@@ -1755,7 +1755,7 @@ def any_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
         Tensor with values; if the values are not boolean, zeros will be interpreted as `False`; otherwise, `True`.
 
     dim: Optional, int.  Defaults to None
-        Axis for the operation to ocurr.  
+        Axis for the operation.
 
     Returns
     -------
@@ -1795,7 +1795,7 @@ def all_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     using the values in `keys`.
 
     Keys must be a columnar vector compatible with the dimension of the reduction.  Please note that keys types are 
-    restricted to signed or usigned ints; if the function is called with any other type, an implicit conversion to 
+    restricted to signed or unsigned ints; if the function is called with any other type, an implicit conversion to 
     signed int will occur automatically.
     
     Keys values may repeat, however only consecutive key values would be considered for each reduction. If a key 

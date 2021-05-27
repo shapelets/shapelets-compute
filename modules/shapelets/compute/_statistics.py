@@ -526,7 +526,7 @@ def topk_max(data: ArrayLike, k: int, dim: int = 0) -> TopKResult:
     in the input array.
 
     Whilst this function provides the ability to change the dimension 
-    of the reducction, the underlying implementation only supports
+    of the reduction, the underlying implementation only supports
     setting this value to 0. 
     """
     if dim != 0:
@@ -564,7 +564,7 @@ def topk_min(data: ArrayLike, k: int, dim: int = 0) -> TopKResult:
     in the input array.
 
     Whilst this function provides the ability to change the dimension 
-    of the reducction, the underlying implementation only supports
+    of the reduction, the underlying implementation only supports
     setting this value to 0. 
     """    
     if dim != 0:

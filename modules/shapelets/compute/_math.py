@@ -393,7 +393,7 @@ def exp(y: ArrayLike) -> ShapeletsArray:
     Returns
     -------
     ShapeletsArray
-        A new array instance with the results of the elment-wise operation
+        A new array instance with the results of the element-wise operation
     
     See also
     --------
@@ -421,7 +421,7 @@ def exp2(y: ArrayLike) -> ShapeletsArray:
     Returns
     -------
     ShapeletsArray
-        A new array instance with the results of the elment-wise operation
+        A new array instance with the results of the element-wise operation
     
     See also
     --------
@@ -448,7 +448,7 @@ def expm1(y: ArrayLike) -> ShapeletsArray:
     Returns
     -------
     ShapeletsArray
-        A new array instance with the results of the elment-wise operation
+        A new array instance with the results of the element-wise operation
     
     See also
     --------

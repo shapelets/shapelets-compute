@@ -117,10 +117,10 @@ def matrix_profile_lr(ta: ArrayLike, m: int) -> MatrixProfileLR:
 
     References
     ----------
-    [1] Matrix Profile VII: Time Series Chains: A New Primitive for Time Series Data Mining.
-        Zhu, Y.; Imamura, M.; Nikovski, D.N.; Keogh, E.
-        `TR2017-168 <https://www.merl.com/publications/docs/TR2017-168.pdf>`_ November 2017
-        `Alternative Reference <http://www.cs.ucr.edu/~eamonn/chains_ICDM.pdf>`_
+    | [1] **Matrix Profile VII**: Time Series Chains: A New Primitive for Time Series Data Mining.
+    |     Zhu, Y.; Imamura, M.; Nikovski, D.N.; Keogh, E.
+    |     `TR2017-168 <https://www.merl.com/publications/docs/TR2017-168.pdf>`_ November 2017
+    |     `Alternative Reference <http://www.cs.ucr.edu/~eamonn/chains_ICDM.pdf>`_
     """
     raw_result = _pygauss.matrixprofileLR(ta, m)
     left_value = MatrixProfile(*raw_result[0])
@@ -147,11 +147,11 @@ def mpdist_vect(ts: ArrayLike, tsb: ArrayLike, w: int, threshold: Optional[float
 
     References
     ----------
-    [1] Matrix Proﬁle XII: MPdist: A Novel Time Series Distance Measure to Allow Data Mining in More Challenging Scenarios. 
-    Shaghayegh Gharghabi, Shima Imani, Anthony Bagnall, Amirali Darvishzadeh, Eamonn Keogh. 
-    ICDM 2018
-    DOI: `10.1109/ICDM.2018.00119 <https://doi.org/10.1109/ICDM.2018.00119>`_
-    `Alternative Reference <https://www.cs.ucr.edu/~eamonn/MPdist_Expanded.pdf>`_
+    | [1] **Matrix Proﬁle XII**: MPdist: A Novel Time Series Distance Measure to Allow Data Mining in More Challenging Scenarios. 
+    |     Shaghayegh Gharghabi, Shima Imani, Anthony Bagnall, Amirali Darvishzadeh, Eamonn Keogh. 
+    |     ICDM 2018
+    |     DOI: `10.1109/ICDM.2018.00119 <https://doi.org/10.1109/ICDM.2018.00119>`_
+    |     `Alternative Reference <https://www.cs.ucr.edu/~eamonn/MPdist_Expanded.pdf>`_
     """
     return _pygauss.mpdist_vect(ts, tsb, w, threshold)
 
@@ -183,11 +183,11 @@ def cac(profile: ArrayLike, index: ArrayLike, window: int) -> ShapeletsArray:
 
     References
     ----------
-    [1] Matrix Profile VIII: Domain Agnostic Online Semantic Segmentation at Superhuman Performance Levels. 
-        Shaghayegh Gharghabi, Yifei Ding, Chin-Chia Michael Yeh, Kaveh Kamgar, Liudmila Ulanova, and Eamonn Keogh.
-        ICDM 2017.
-        DOI: `10.1109/ICDM.2017.21 <https://doi.org/10.1109/ICDM.2017.21>`_
-        `Alternative Reference <http://www.cs.ucr.edu/~eamonn/Segmentation_ICDM.pdf>`_
+    | [1] **Matrix Profile VIII**: Domain Agnostic Online Semantic Segmentation at Superhuman Performance Levels.
+    |     Shaghayegh Gharghabi, Yifei Ding, Chin-Chia Michael Yeh, Kaveh Kamgar, Liudmila Ulanova, and Eamonn Keogh.
+    |     ICDM 2017.
+    |     DOI: `10.1109/ICDM.2017.21 <https://doi.org/10.1109/ICDM.2017.21>`_
+    |     `Alternative Reference <http://www.cs.ucr.edu/~eamonn/Segmentation_ICDM.pdf>`_
     """
     return _pygauss.cac(profile, index, window)
 
@@ -208,7 +208,7 @@ def segment(profile: ArrayLike, index: ArrayLike, window: int, num_reg: int = -1
     
     num_reg: int, defaults to -1
         Maximum number of indices to obtain; when left unset or set to -1, it will return all 
-        thoses indices found during the sementation analysis; when set to a positive number,
+        those indices found during the sementation analysis; when set to a positive number,
         it will return at most ``num_reg`` indices.
     
     ez: int, defaults to 5
@@ -227,11 +227,11 @@ def segment(profile: ArrayLike, index: ArrayLike, window: int, num_reg: int = -1
 
     References
     ----------
-    [1] Matrix Profile VIII: Domain Agnostic Online Semantic Segmentation at Superhuman Performance Levels. 
-        Shaghayegh Gharghabi, Yifei Ding, Chin-Chia Michael Yeh, Kaveh Kamgar, Liudmila Ulanova, and Eamonn Keogh.
-        ICDM 2017.
-        DOI: `10.1109/ICDM.2017.21 <https://doi.org/10.1109/ICDM.2017.21>`_
-        `Alternative Reference <http://www.cs.ucr.edu/~eamonn/Segmentation_ICDM.pdf>`_
+    | [1] **Matrix Profile VIII**: Domain Agnostic Online Semantic Segmentation at Superhuman Performance Levels.
+    |     Shaghayegh Gharghabi, Yifei Ding, Chin-Chia Michael Yeh, Kaveh Kamgar, Liudmila Ulanova, and Eamonn Keogh.
+    |     ICDM 2017.
+    |     DOI: `10.1109/ICDM.2017.21 <https://doi.org/10.1109/ICDM.2017.21>`_
+    |     `Alternative Reference <http://www.cs.ucr.edu/~eamonn/Segmentation_ICDM.pdf>`_
     """
     return _pygauss.segment(profile, index, window, num_reg, ez)
 

@@ -110,7 +110,7 @@ def zscore(tss: ArrayLike, axis: int = 0, ddof: int = 0) -> ShapeletsArray:
     tss: ArrayLike
         Input array expression
     
-    axis: int (defaul: 0)
+    axis: int (default: 0)
         Axis where the sequences are defined.
 
     ddof: int (default: 0)

@@ -66,61 +66,61 @@ class ShapeletsArray:
 
     def __iadd__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise addition
+        In place element-wise addition
         """
     def __iand__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise ``bitwise and``
+        In place element-wise ``bitwise and``
         """
 
     def __ilshift__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise left shift
+        In place element-wise left shift
         """
 
     def __imod__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise mod operation
+        In place element-wise mod operation
         """
 
     def __imul__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise multiplication
+        In place element-wise multiplication
         """
 
     def __ior__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise ``bitwise or`` operation
+        In place element-wise ``bitwise or`` operation
         """
 
     def __ipow__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise power operation
+        In place element-wise power operation
         """
 
     def __irshift__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise right shift        
+        In place element-wise right shift        
         """
 
     def __isub__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise substraction        
+        In place element-wise substraction        
         """
 
     def __itruediv__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise true division
+        In place element-wise true division
         """
 
     def __ifloordiv__(self, other: ArrayLike) -> ShapeletsArray:         
         """
-        Implace element-wise floor division
+        In place element-wise floor division
         """
 
     def __ixor__(self, other: ArrayLike) -> ShapeletsArray: 
         """
-        Inplace element-wise ``bitwise xor`` operation
+        In place element-wise ``bitwise xor`` operation
         """
 
     def __le__(self, other: ArrayLike) -> ShapeletsArray: 
@@ -277,7 +277,7 @@ class ShapeletsArray:
 
         Notes
         -----
-        Methods like :obj:`~shapelets.compute.ShapeletsArray.display()` implicetly 
+        Methods like :obj:`~shapelets.compute.ShapeletsArray.display()` implicitly 
         execute an ``eval`` operation.
 
         See Also

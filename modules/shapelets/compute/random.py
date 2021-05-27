@@ -23,7 +23,7 @@ class ShapeletsRandomEngine:
     Wrapper class around a random number algorithm suitable to be used in GPU / OpenCL computations
 
     Use :obj:`~shapelets.compute.random.random_engine` as a constructor function, where it is possible 
-    to specify the underlyting random generator algorithm as well as the a seed value for controllable 
+    to specify the underlying random generator algorithm as well as the a seed value for controllable 
     results.
     """
 
@@ -109,7 +109,7 @@ class ShapeletsRandomEngine:
         r"""
         Return samples from the gamma distribution.
 
-        The implementation is based on the algorithm 4.33 found in reference [1]
+        The implementation is based on the algorithm 4.33 found in reference [1]_
 
         Parameters
         ----------
@@ -129,10 +129,10 @@ class ShapeletsRandomEngine:
 
         References
         ----------
-        [1] Base line implementation as defined in: 
-            `Handbook of Monte Carlo Methods <http://www.maths.uq.edu.au/~kroese/montecarlohandbook>`_
-            D.P. Kroese, T. Taimre, Z.I. Botev. John Wiley & Sons, 2011.
-
+        .. [1] | **Handbook of Monte Carlo Methods**
+               | D.P. Kroese, T. Taimre, Z.I. Botev. 
+               | John Wiley & Sons, 2011.
+               | `Online reference <http://www.maths.uq.edu.au/~kroese/montecarlohandbook>`_
         """
 
     def logistic(self, loc: float = 0.0, scale: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
@@ -179,7 +179,7 @@ class ShapeletsRandomEngine:
         mean: float, defaults to 0.0
             Expected value (:math:`\mu`)
         sigma: float, defaults to 1.0
-            Standard deviation of the variable's natural logaritm (:math:`\sigma`)
+            Standard deviation of the variable's natural logarithm (:math:`\sigma`)
         shape: ShapeLike, defaults to (1,1)
             Dimensions of the tensor.
         dtype: DataTypeLike, defaults to 'float32'
@@ -206,7 +206,7 @@ class ShapeletsRandomEngine:
             Symmetric and positive-semidefinite covariance matrix
         
         samples: int
-            Determines the lenght of each series to generate.  
+            Determines the length of each series to generate.  
         
         dtype: DataTypeLike, defaults to 'float32'
             Type of the resulting elements            
@@ -214,7 +214,7 @@ class ShapeletsRandomEngine:
         Returns
         -------
         ShapeletsArray
-            A new array, of dimensions Nxsamples. 
+            A new array, of dimensions NxSamples. 
 
         """
 
@@ -365,11 +365,10 @@ def random_engine(type: RandomEngineType = 'default', seed: int = 0) -> Shapelet
 
     References
     ----------
-    [1] Parallel random numbers: As easy as 1, 2, 3.  
-        John K. Salmon, Mark A. Moraes, Ron O. Dror, and David E. Shaw.
-
-        In Proceedings of 2011 International Conference for High Performance Computing, Networking, Storage and Analysis.
-        DOI:`10.1145/2063384.2063405 <https://dl.acm.org/doi/10.1145/2063384.2063405>`_
+    | [1] **Parallel random numbers: As easy as 1, 2, 3.**
+    |     John K. Salmon, Mark A. Moraes, Ron O. Dror, and David E. Shaw.
+    |     In Proceedings of 2011 International Conference for High Performance Computing, Networking, Storage and Analysis.
+    |     DOI:`10.1145/2063384.2063405 <https://dl.acm.org/doi/10.1145/2063384.2063405>`_
 
     """
     native_ret = __RandomEngineType.Default
@@ -471,7 +470,7 @@ def randint(low: int, high: Optional[int] = None, shape: ShapeLike = (1, 1), dty
         When `high` parameter is `None`, it indicates the maximum (exclusive) integer for 
         the range `[0, low(`.  
 
-        If `high` is specified, this parameter sets the miminum (inclusive) of the range.  
+        If `high` is specified, this parameter sets the minimum (inclusive) of the range.  
 
     high: Optional int.  Defaults to None.
         When set, determines the highest (exclusive) value for the range.
@@ -536,7 +535,7 @@ def permutation(x: ArrayLike, axis: int = 0, engine: Optional[ShapeletsRandomEng
     Returns
     -------
     ShapeletsArray
-        A randomly suffled array.
+        A randomly shuffled array.
 
     Examples
     --------

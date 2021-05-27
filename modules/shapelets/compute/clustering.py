@@ -43,10 +43,12 @@ class KShape():
 
     References
     ----------
-    .. [1] `k-Shape: Efficient and Accurate Clustering of Time Series. <https://doi.org/10.1145/2949741.2949758>`_
-           John Paparrizos and Luis Gravano. 2016.
-           SIGMOD Rec. 45, 1 (June 2016), 69-76.
+    .. [1] |`k-Shape: Efficient and Accurate Clustering of Time Series. <https://doi.org/10.1145/2949741.2949758>`_
+           | John Paparrizos and Luis Gravano. 2016.
+           | SIGMOD Rec. 45, 1 (June 2016), 69-76.
+
     .. [2] `Reference Implementation <https://github.com/johnpaparrizos/kshape>`_
+
     """
     def __init__(self, k: int, rnd_labels: bool = False, max_iterations: int = 100) -> None:
         """
@@ -76,7 +78,7 @@ class KShape():
         Notes
         -----
         If no labels are provided, each time series will be assigned an initial label, 
-        either sequentially or randomly choosen from an uniform distribution.
+        either sequentially or randomly chosen from an uniform distribution.
 
         Once this method is invoked, centroids will be computed and stored in ``centroids_``
 
@@ -120,7 +122,7 @@ class KShape():
             A columnar array, 1xM, indicating the closest cluster to each series in X.
         """
         if self.centroids_ is None:
-            raise ValueError("No centroids avaialable for prediction")
+            raise ValueError("No centroids available for prediction")
 
         return _pygauss.kshape_classify(X, self.centroids_)
 

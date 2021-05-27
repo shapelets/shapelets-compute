@@ -95,7 +95,7 @@ def __to_pygauss_backend(backend: Backend):
     elif backend == 'default':
         return _pygauss.Backend.Default
     else:
-        raise ValueError("Unkown backend type")
+        raise ValueError("Unknown backend type")
 
 def __backend_as_literal(backend: _pygauss.Backend) -> Backend:
     if backend == _pygauss.Backend.CPU:
@@ -115,7 +115,7 @@ def device_gc() -> None:
     -----
     Usually, memory pressure and deallocation is handled automatically.  However, if an 
     operation or algorithm allocates memory intensively, one could force a deallocation 
-    of memory buffers by invoking this function explicetly.
+    of memory buffers by invoking this function explicitly.
 
     To check the effect of the operation, use :obj:`~shapelets.compute.get_device_memory` and 
     inspect the properties :obj:`~shapelets.compute.get_device_memory.bytes` and 
