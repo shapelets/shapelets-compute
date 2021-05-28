@@ -151,9 +151,10 @@ And a confusion matrix:
 array([[14,  1],
        [ 0, 13]])
 
-As you can see, the results using k-Shape are quite satisfactory, specially considering how small is the 
-training set and how subtle the differences are between the two classes.         
-        
+As you can see, the results using k-Shape are quite satisfactory, specially considering how small the 
+training set is and how subtle the differences between the two classes are.
+
+
 References
 ----------
 .. [1] | **k-Shape: Efficient and Accurate Clustering of Time Series.**
