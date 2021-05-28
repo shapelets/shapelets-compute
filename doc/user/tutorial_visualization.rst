@@ -288,10 +288,6 @@ factor, will result in the following approximation:
         .. literalinclude:: plots/visualization_h.py
             :language: Python
 
-Final Remarks
--------------
-   TODO
-
 
 .. [1] Energy data is from the `ENTSO-E Transparency Platform <https://transparency.entsoe.eu/>`_.  If 
        you are looking for a Python interface for their API, `entsoe-py <https://github.com/EnergieID/entsoe-py>`_.  
