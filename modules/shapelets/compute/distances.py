@@ -1,11 +1,18 @@
 from __future__ import annotations
+from typing import Optional
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
     
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.spatial.distance import squareform
+
 from .__basic_typing import ArrayLike
-from ._array_obj import ShapeletsArray
+from ._array_obj import ShapeletsArray, array as asarray
+from ._construction import iota
 
 from . import _pygauss
 
@@ -1902,3 +1909,50 @@ def sbd(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     that maximizes the correlation value between each pair of time series.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.SBD)
+
+
+def __draw_timeseries_allclust(ds, leaves, gs, ts_hspace):
+    max_cluster = len(leaves)
+    # flip leaves, as gridspec iterates from top down
+    leaves = leaves[::-1]
+    
+    for cnt in range(len(leaves)):
+        plt.subplot(gs[cnt:cnt+1, max_cluster-ts_hspace:max_cluster])
+        plt.axis("off")
+        
+        # get leafnode name, which corresponds to original data index
+        leafnode = leaves[cnt]
+        timeseries = ds[:,leafnode]
+        for i in range(len(timeseries)):
+            plt.plot(timeseries)
+
+def dendogram_all_ts(data: ArrayLike, method: Optional[str] = None, metric: Optional[DistanceType] = None, Z = None, ts_hspace=2):
+    # distances 
+    ds = asarray(data)
+
+    if Z is None:
+        if method is None or metric is None:
+            raise ValueError("If Z (linkage) is not given, method and metric are required")
+
+        dst = pdist(ds, metric)
+        link_dst = squareform(dst)
+        # agglomerative clustering
+        Z = linkage(link_dst, method, metric='precomputed')
+
+    max_cluster = len(Z) + 1
+
+    # define gridspec space
+    gs = gridspec.GridSpec(max_cluster, max_cluster)
+
+    # add dendrogram to gridspec
+    # add -1 to give timeseries graphs more space
+    plt.subplot(gs[:, 0 : max_cluster - ts_hspace - 1])
+    plt.xlabel("Distance")
+    plt.ylabel("Cluster")
+
+    ddata = dendrogram(Z, orientation="left", show_leaf_counts=True)
+
+    # add timeseries graphs to gridspec
+    __draw_timeseries_allclust(ds, ddata["leaves"], gs, ts_hspace)
+
+    return Z

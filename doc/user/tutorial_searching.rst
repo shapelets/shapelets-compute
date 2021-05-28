@@ -1,7 +1,7 @@
 .. _tutorial_searching:
 
-Similarity Search
-=================
+Have I seen this before?
+========================
 
 Querying a sequence to find the closest match is a fundamental operation in time series pattern mining.  This problem 
 presents itself in range of different contexts:

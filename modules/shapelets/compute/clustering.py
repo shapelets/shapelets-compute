@@ -107,7 +107,7 @@ class KShape():
         self.fit(X, labels)
         return self.labels_            
 
-    def predit(self, X: ArrayLike) -> ShapeletsArray: 
+    def predict(self, X: ArrayLike) -> ShapeletsArray: 
         """
         Predict the closest cluster each time series in X belongs to.
 
@@ -140,15 +140,13 @@ class KShape():
         if txt_legend is None:
             txt_legend = [str(i) for i in range(self.k)]
         
-        if title is None:
-            title = 'KShape Centroids'
-        
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(16,8))
 
         for i in range(self.k):
             ax.plot(self.centroids_[:, i], label = txt_legend[i])
             
         ax.legend()
-        ax.set_title(title)
+        if not title is None:
+            ax.set_title(title)
         plt.show()
 
