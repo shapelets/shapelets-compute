@@ -1,4 +1,5 @@
 numpy~=1.19
+matplotlib~=3.4
 scipy~=1.5.4
 tqdm~=4.59
 tox~=3.23.0
