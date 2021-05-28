@@ -137,8 +137,9 @@ of the accuracy during training:
 >>> metrics.accuracy_score(np.array(labels), np.array(ks.labels_))
 1.0
 
-A 100% success during training is, at the very least, unsettling; it is possible to retrain the model again 
-asking to randomize the labels setting the parameter ``rnd_labels`` to ``True``.  
+A 100% success during training is, at the very least, unsettling; it is possible to retrain the model again, 
+asking to randomize the labels setting the parameter ``rnd_labels`` to ``True``.  k-Shape is not free of 
+local minima issues and it may require running the algorithm multiple times to choose the correct configuration.
 
 Let's measure the prediction's accuracy:
 
