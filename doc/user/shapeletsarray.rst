@@ -128,13 +128,13 @@ The following table outlines supported types and caveats:
     :obj:`numpy.uint16`,     ✓  , , 
     :obj:`numpy.uint32`,     ✓  , , 
     :obj:`numpy.uint64`,     ✓  , , 
-    :obj:`numpy.float16`,    ???, :obj:`numpy.half`, Device depdendent
+    :obj:`numpy.float16`,    ???, :obj:`numpy.half`, Device dependent
     :obj:`numpy.float32`,    ✓  , :obj:`numpy.single`, 
     :obj:`numpy.float64`,    ✓  , :obj:`numpy.double`, 
     :obj:`numpy.float96`,    ✘, , 
     :obj:`numpy.float128`,   ✘, , 
     :obj:`numpy.complex64`,  ✓  , :obj:`numpy.csingle`, 
-    :obj:`numpy.complex128`, ???, :obj:`numpy.cdouble`, Device depdendent
+    :obj:`numpy.complex128`, ???, :obj:`numpy.cdouble`, Device dependent
     :obj:`numpy.complex192`, ✘, , 
     :obj:`numpy.complex256`, ✘, , 
 
@@ -161,8 +161,8 @@ array([2, 4, 6])
 
 And now execute the same code in Shapelets:
 
->>> import numpy as np 
->>> a = np.array([1,2,3])
+>>> import shapelets.compute as sc
+>>> a = sc.array([1,2,3])
 >>> b = a.T 
 >>> a + b 
 [3 3 1 1]
