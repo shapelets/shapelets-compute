@@ -1,3 +1,8 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
 
 # This file helps to compute a version number in source trees obtained from
 # git-archive tarball (such as those provided by githubs download-from-tag
@@ -59,12 +64,14 @@ HANDLERS = {}
 
 def register_vcs_handler(vcs, method):  # decorator
     """Create decorator to mark a method as the handler of a VCS."""
+
     def decorate(f):
         """Store f in HANDLERS[vcs][method]."""
         if vcs not in HANDLERS:
             HANDLERS[vcs] = {}
         HANDLERS[vcs][method] = f
         return f
+
     return decorate
 
 

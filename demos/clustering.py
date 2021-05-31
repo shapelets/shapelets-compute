@@ -1,3 +1,10 @@
+#! /usr/bin/env python3
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 # %%
 import shapelets.compute as sc
 from shapelets.data import load_dataset
@@ -32,7 +39,7 @@ dtype = "float64"
 # print(sc.unique(test_classes))
 
 raw_train = load_dataset("Coffee_TRAIN.txt", dtype)
-train_classes = raw_train[:,0].astype("uint32")
+train_classes = raw_train[:, 0].astype("uint32")
 train_data = raw_train[:, 1:]
 
 raw_test = load_dataset("Coffee_TEST.txt", dtype)
@@ -49,10 +56,9 @@ print(metrics.accuracy_score(np.array(train_classes), np.array(ks.labels_)))
 print(metrics.accuracy_score(np.array(test_classes), np.array(prediction)))
 print(metrics.confusion_matrix(np.array(test_classes), np.array(prediction)))
 
-
 # %%
-
 from tslearn.clustering import KShape as TSK
+
 tks = TSK(n_clusters=2).fit(np.array(train_data), np.array(train_classes))
 pred = tks.predict(np.array(test_data))
 
@@ -63,5 +69,3 @@ print(metrics.confusion_matrix(np.array(test_classes), pred))
 plt.plot(tks.cluster_centers_[0])
 plt.plot(tks.cluster_centers_[1])
 plt.show()
-
-# %%

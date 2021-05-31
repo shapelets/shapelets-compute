@@ -1,28 +1,43 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 
 from typing import Any, List, NamedTuple, Optional
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 
-from . import _pygauss 
+from . import _pygauss
 from ._pygauss import Snippet
+
 
 class Snippet:
     @property
     def index(self) -> int: ...
+
     @property
     def pct(self) -> float: ...
+
     @property
     def distances(self) -> ShapeletsArray: ...
+
     @property
     def indices(self) -> ShapeletsArray: ...
+
     @property
-    def pct(self) -> float: ... 
+    def pct(self) -> float: ...
+
     @property
     def window(self) -> int: ...
-    @property 
-    def size(self) -> int: ... 
+
+    @property
+    def size(self) -> int: ...
+
     def __repr__(self) -> str: ...
+
 
 class MatrixProfile(NamedTuple):
     profile: ShapeletsArray
@@ -32,11 +47,13 @@ class MatrixProfile(NamedTuple):
     window: int
     """Size of the window used to create this matrix profile"""
 
+
 class MatrixProfileLR(NamedTuple):
-    left: MatrixProfile 
+    left: MatrixProfile
     """Left direction"""
     right: MatrixProfile
     """Right direction"""
+
 
 def mass(queries: ArrayLike, series: ArrayLike) -> ShapeletsArray:
     """
@@ -60,6 +77,7 @@ def mass(queries: ArrayLike, series: ArrayLike) -> ShapeletsArray:
         - 3rd dimension is indexed by the number of series.
     """
     return _pygauss.mass(queries, series)
+
 
 def matrix_profile(ta: ArrayLike, m: int, tb: Optional[ArrayLike] = None) -> MatrixProfile:
     """
@@ -90,6 +108,7 @@ def matrix_profile(ta: ArrayLike, m: int, tb: Optional[ArrayLike] = None) -> Mat
 
     """
     return MatrixProfile(*_pygauss.matrixprofile(ta, m, tb))
+
 
 def matrix_profile_lr(ta: ArrayLike, m: int) -> MatrixProfileLR:
     """
@@ -127,6 +146,7 @@ def matrix_profile_lr(ta: ArrayLike, m: int) -> MatrixProfileLR:
     right_value = MatrixProfile(*raw_result[1])
     return MatrixProfileLR(left_value, right_value)
 
+
 def mpdist_vect(ts: ArrayLike, tsb: ArrayLike, w: int, threshold: Optional[float] = 0.05) -> ShapeletsArray:
     """
     Computes a vector of MPDist measures.
@@ -154,6 +174,7 @@ def mpdist_vect(ts: ArrayLike, tsb: ArrayLike, w: int, threshold: Optional[float
     |     `Alternative Reference <https://www.cs.ucr.edu/~eamonn/MPdist_Expanded.pdf>`_
     """
     return _pygauss.mpdist_vect(ts, tsb, w, threshold)
+
 
 def cac(profile: ArrayLike, index: ArrayLike, window: int) -> ShapeletsArray:
     """
@@ -191,7 +212,8 @@ def cac(profile: ArrayLike, index: ArrayLike, window: int) -> ShapeletsArray:
     """
     return _pygauss.cac(profile, index, window)
 
-def segment(profile: ArrayLike, index: ArrayLike, window: int, num_reg: int = -1, ez:int = 5) -> List[int]:
+
+def segment(profile: ArrayLike, index: ArrayLike, window: int, num_reg: int = -1, ez: int = 5) -> List[int]:
     """
     Unsupervised semantic segmentation derived from a matrix profile.
 
@@ -235,17 +257,21 @@ def segment(profile: ArrayLike, index: ArrayLike, window: int, num_reg: int = -1
     """
     return _pygauss.segment(profile, index, window, num_reg, ez)
 
-def snippets(ts: ArrayLike, snippet_size: int, num_snippets: int, window_size: Optional[int] = None)-> List[Any]:
-    import numpy as np 
-    import matrixprofile as morg 
+
+def snippets(ts: ArrayLike, snippet_size: int, num_snippets: int, window_size: Optional[int] = None) -> List[Any]:
+    import numpy as np
+    import matrixprofile as morg
     return morg.discover.snippets(np.array(ts), snippet_size, num_snippets)
-    
-def snippets_int(ts: ArrayLike, snippet_size: int, num_snippets: int, window_size: Optional[int] = None)-> List[Snippet]:
+
+
+def snippets_int(ts: ArrayLike, snippet_size: int, num_snippets: int, window_size: Optional[int] = None) -> List[
+    Snippet]:
     return _pygauss.snippets(ts, snippet_size, num_snippets, window_size)
 
+
 __all__ = [
-    "Snippet", "MatrixProfile", "MatrixProfileLR", 
-    "mass", "matrix_profile", "matrix_profile_lr", 
+    "Snippet", "MatrixProfile", "MatrixProfileLR",
+    "mass", "matrix_profile", "matrix_profile_lr",
     "mpdist_vect", "cac", "segment",
     "snippets", "snippets_int"
 ]

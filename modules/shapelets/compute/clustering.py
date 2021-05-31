@@ -1,9 +1,16 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from typing import Optional
 import warnings
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 
-from . import _pygauss 
+from shapelets.compute import _pygauss
+
 
 class KShape():
     """
@@ -50,6 +57,7 @@ class KShape():
     .. [2] `Reference Implementation <https://github.com/johnpaparrizos/kshape>`_
 
     """
+
     def __init__(self, k: int, rnd_labels: bool = False, max_iterations: int = 100) -> None:
         """
         Creates a new instace
@@ -57,11 +65,11 @@ class KShape():
         if (k <= 0):
             raise ValueError("The number of clusters must be a integer greater than 0")
 
-        self.k = k 
+        self.k = k
         self.max_iterations = max_iterations
         self.rnd_labels = rnd_labels
-        self.labels_ = None 
-        self.centroids_ = None 
+        self.labels_ = None
+        self.centroids_ = None
 
     def fit(self, X: ArrayLike, labels: Optional[ArrayLike] = None):
         """
@@ -105,9 +113,9 @@ class KShape():
             Implied labels after running the fitting algorithm.    
         """
         self.fit(X, labels)
-        return self.labels_            
+        return self.labels_
 
-    def predict(self, X: ArrayLike) -> ShapeletsArray: 
+    def predict(self, X: ArrayLike) -> ShapeletsArray:
         """
         Predict the closest cluster each time series in X belongs to.
 
@@ -135,18 +143,17 @@ class KShape():
             import matplotlib.pyplot as plt
         except ImportError:
             warnings.warn("matplotlib is not available")
-            return 
+            return
 
         if txt_legend is None:
             txt_legend = [str(i) for i in range(self.k)]
-        
-        fig, ax = plt.subplots(figsize=(16,8))
+
+        fig, ax = plt.subplots(figsize=(16, 8))
 
         for i in range(self.k):
-            ax.plot(self.centroids_[:, i], label = txt_legend[i])
-            
+            ax.plot(self.centroids_[:, i], label=txt_legend[i])
+
         ax.legend()
         if not title is None:
             ax.set_title(title)
         plt.show()
-

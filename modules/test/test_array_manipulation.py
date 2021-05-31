@@ -1,4 +1,9 @@
-import pytest
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 import numpy as np
 import shapelets.compute as sh
 
@@ -209,15 +214,14 @@ def test_reorder():
 
 def test_replace():
     a = sh.iota(10)
-    sh.where(a<5, a, 10*a).same_as([0., 1, 2, 3, 4, 50, 60, 70, 80, 90])
+    sh.where(a < 5, a, 10 * a).same_as([0., 1, 2, 3, 4, 50, 60, 70, 80, 90])
 
     a = sh.iota((3, 3), 1)
     a = sh.where(a < 4, a, sh.full((3, 3), -1))
     assert a.same_as([[0., 3, -1], [1, -1, -1], [2, -1, -1]])
 
     a = sh.iota((3, 3), 1)
-    assert (a<4).same_as([[True, True, False], [True, False, False], [True, False, False]])
-
+    assert (a < 4).same_as([[True, True, False], [True, False, False], [True, False, False]])
 
 
 def test_shift():
@@ -276,7 +280,6 @@ def test_numpy_interface_n_s_n():
 
 
 def test_memory_view():
-
     a = sh.iota((3, 5, 7, 11), 1, dtype="float32")
     b = memoryview(a)
     assert b.shape == a.shape
@@ -289,7 +292,7 @@ def test_memory_view():
     # data is shared for CPU backend.
     sh.set_backend('cpu')
     assert sh.get_backend() == 'cpu'
-    
+
     # memoryview doesn't have indexing
     # implemented
     a = sh.iota(10)
@@ -301,8 +304,9 @@ def test_memory_view():
     assert b.ndim == a.ndim
     assert b.contiguous
     b[3] = -3
-    assert a.same_as([0,1,2,-3,4,5,6,7,8,9])
-    
+    assert a.same_as([0, 1, 2, -3, 4, 5, 6, 7, 8, 9])
+
+
 def test_join():
     a = sh.array([1, 2, 3, 4])
     b = sh.array([5, 6, 7, 8])
@@ -311,6 +315,7 @@ def test_join():
     assert sh.join([a, b, c], 0).same_as([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     # join on columns
     assert sh.join([a, b, c], 1).same_as([[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]])
+
 
 def test_linspace():
     sh.linspace(1, 100, num=10).same_as(np.linspace(1, 100, num=10))

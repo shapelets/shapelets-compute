@@ -1,5 +1,12 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import Optional
+
 try:
     from typing import Literal
 except ImportError:
@@ -17,6 +24,7 @@ from ._pygauss import (
     ShapeletsRandomEngine,
     RandomEngineType as __RandomEngineType
 )
+
 
 class ShapeletsRandomEngine:
     """
@@ -80,7 +88,8 @@ class ShapeletsRandomEngine:
             A new array instance whose values are drawn from the chi square distribution.  
         """
 
-    def exponential(self, scale: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def exponential(self, scale: float = 1.0, shape: ShapeLike = (1, 1),
+                    dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Return samples from the exponential distribution.
 
@@ -105,7 +114,8 @@ class ShapeletsRandomEngine:
             A new array instance whose values are drawn from the exponential distribution.  
         """
 
-    def gamma(self, alpha: float, scale: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def gamma(self, alpha: float, scale: float = 1.0, shape: ShapeLike = (1, 1),
+              dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Return samples from the gamma distribution.
 
@@ -135,7 +145,8 @@ class ShapeletsRandomEngine:
                | `Online reference <http://www.maths.uq.edu.au/~kroese/montecarlohandbook>`_
         """
 
-    def logistic(self, loc: float = 0.0, scale: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def logistic(self, loc: float = 0.0, scale: float = 1.0, shape: ShapeLike = (1, 1),
+                 dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Return samples from the logistic distribution.
 
@@ -164,7 +175,8 @@ class ShapeletsRandomEngine:
             A new array instance whose values are drawn from the logistic distribution.
         """
 
-    def lognormal(self, mean: float = 0.0, sigma: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def lognormal(self, mean: float = 0.0, sigma: float = 1.0, shape: ShapeLike = (1, 1),
+                  dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Return samples from the lognormal distribution.
 
@@ -191,7 +203,8 @@ class ShapeletsRandomEngine:
             A new array instance whose values are drawn from the lognormal distribution.
         """
 
-    def multivariate_normal(self, mean: ArrayLike, cov: ArrayLike, samples: int, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def multivariate_normal(self, mean: ArrayLike, cov: ArrayLike, samples: int,
+                            dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Draw random samples from a multivariate normal distribution.
 
@@ -218,7 +231,8 @@ class ShapeletsRandomEngine:
 
         """
 
-    def normal(self, mean: float = 0.0, sigma: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def normal(self, mean: float = 0.0, sigma: float = 1.0, shape: ShapeLike = (1, 1),
+               dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Draw random samples from a normal (Gaussian) distribution.
 
@@ -264,7 +278,8 @@ class ShapeletsRandomEngine:
 
         """
 
-    def uniform(self, low: float = 0.0, high: float = 1.0, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def uniform(self, low: float = 0.0, high: float = 1.0, shape: ShapeLike = (1, 1),
+                dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Draw samples from a uniform distribution.
 
@@ -288,7 +303,8 @@ class ShapeletsRandomEngine:
             A new array instance whose values are drawn from the uniform distribution.
         """
 
-    def wald(self, mean: float, scale: float, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
+    def wald(self, mean: float, scale: float, shape: ShapeLike = (1, 1),
+             dtype: DataTypeLike = 'float32') -> ShapeletsArray:
         r"""
         Return samples from the Wald distribution, also known as the inverse Gaussian distribution.
 
@@ -384,7 +400,8 @@ def random_engine(type: RandomEngineType = 'default', seed: int = 0) -> Shapelet
     return __default_rng(native_ret, seed)
 
 
-def randn(shape: ShapeLike, dtype: DataTypeLike = 'float32', engine: Optional[ShapeletsRandomEngine] = None) -> ShapeletsArray:
+def randn(shape: ShapeLike, dtype: DataTypeLike = 'float32',
+          engine: Optional[ShapeletsRandomEngine] = None) -> ShapeletsArray:
     """
     Creates an array whose elements are drawn from the standard normal distribution ``N(0,1)``.
 
@@ -425,7 +442,8 @@ def randn(shape: ShapeLike, dtype: DataTypeLike = 'float32', engine: Optional[Sh
     return __randn(shape, dtype, engine)
 
 
-def random(shape: ShapeLike, dtype: DataTypeLike = 'float32', engine: Optional[ShapeletsRandomEngine] = None) -> ShapeletsArray:
+def random(shape: ShapeLike, dtype: DataTypeLike = 'float32',
+           engine: Optional[ShapeletsRandomEngine] = None) -> ShapeletsArray:
     """
     Creates an array whose elements are drawn from the continuous uniform distribution in the interval `[0.0, 1.0)` 
 
@@ -460,7 +478,8 @@ def random(shape: ShapeLike, dtype: DataTypeLike = 'float32', engine: Optional[S
     return __random(shape, dtype, engine)
 
 
-def randint(low: int, high: Optional[int] = None, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'int32', engine: Optional[ShapeletsRandomEngine] = None) -> ShapeletsArray:
+def randint(low: int, high: Optional[int] = None, shape: ShapeLike = (1, 1), dtype: DataTypeLike = 'int32',
+            engine: Optional[ShapeletsRandomEngine] = None) -> ShapeletsArray:
     """
     Return random integers drawn from the “discrete uniform” in the range low (inclusive) to high (exclusive).
 

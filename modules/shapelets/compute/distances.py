@@ -1,10 +1,17 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import Optional
+
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-    
+
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -82,6 +89,7 @@ def __convert_dst_type(type: DistanceType):
     if type in __dst_map:
         return __dst_map[type]
     raise ValueError("Unknown distance type")
+
 
 # TODO: This construct is possible; one can send it through kwargs
 #       and get it executed directly from the c++ side.
@@ -212,6 +220,7 @@ def cdist(xa: ArrayLike, xb: ArrayLike, metric: DistanceType, **kwargs) -> Shape
     """
     return _pygauss.cdist(xa, xb, __convert_dst_type(metric), **kwargs)
 
+
 def euclidean(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute euclidian distance between each pair of the two collections of inputs.
@@ -242,6 +251,7 @@ def euclidean(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
         euclidian distance from the i-th column of xa to the j-th column of xb.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Euclidean)
+
 
 def manhattan(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -277,7 +287,8 @@ def manhattan(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     | [1] **Taxicab Geometry An Adventure in Non-Euclidean Geometry**
     |     Krause E.F.
     """
-    return _pygauss.cdist(a, b, _pygauss.DistanceType.Manhattan)    
+    return _pygauss.cdist(a, b, _pygauss.DistanceType.Manhattan)
+
 
 def minkowski(a: ArrayLike, b: ArrayLike, p: float) -> ShapeletsArray:
     r"""
@@ -311,6 +322,7 @@ def minkowski(a: ArrayLike, b: ArrayLike, p: float) -> ShapeletsArray:
         minkowski distance from the i-th column of xa to the j-th column of xb.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Minkowski, p=p)
+
 
 def chebyshev(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -348,6 +360,7 @@ def chebyshev(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     John Wiley and Sons. 
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Chebyshev)
+
 
 def sorensen(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -397,6 +410,7 @@ def sorensen(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Sorensen)
 
+
 def gower(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute Gower distance between each pair of the two collections of inputs.
@@ -432,6 +446,7 @@ def gower(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Biometrics 27, pp857-874 1971 
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Gower)
+
 
 def soergel(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -469,6 +484,7 @@ def soergel(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Soergel)
 
+
 def kulczynski(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute Kulczynski distance between each pair of the two collections of inputs.
@@ -504,6 +520,7 @@ def kulczynski(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Elsevier, 2006 
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Kulczynski)
+
 
 def canberra(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -549,6 +566,7 @@ def canberra(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Canberra)
 
+
 def lorentzian(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute Lorentzian distance between each pair of the two collections of inputs.
@@ -588,6 +606,7 @@ def lorentzian(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Lorentzian)
 
+
 def intersection(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute Intersection similarity between each pair of the two collections of inputs.
@@ -623,6 +642,7 @@ def intersection(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Wiley, 2001
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Intersection)
+
 
 def wavehedges(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -660,6 +680,7 @@ def wavehedges(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Wave_Hedges)
 
+
 def czekanowski(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute Czekanowski similarity between each pair of the two collections of inputs.
@@ -695,6 +716,7 @@ def czekanowski(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Wiley, 2001
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Czekanowski)
+
 
 def ruzicka(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -732,6 +754,7 @@ def ruzicka(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Ruzicka)
 
+
 def motyka(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute Motyka similarity between each pair of the two collections of inputs.
@@ -767,6 +790,7 @@ def motyka(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Elsevier, 2006
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Motyka)
+
 
 def tanimoto(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -804,6 +828,7 @@ def tanimoto(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Tanimoto)
 
+
 def innerproduct(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the inner product as a similarity measure between each pair of the two collections of inputs.
@@ -838,6 +863,7 @@ def innerproduct(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Innerproduct)
 
+
 def harmonic_mean(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the harmonic mean as a similarity measure between each pair of the two collections of inputs.
@@ -871,6 +897,7 @@ def harmonic_mean(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Elsevier, 2006
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Harmonic_mean)
+
 
 def cosine(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -914,6 +941,7 @@ def cosine(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Cosine)
 
+
 def kumarhassebrook(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the peak-to-correlation energy (PCE) as a similarity measure between 
@@ -948,6 +976,7 @@ def kumarhassebrook(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Appl. Opt. 29, 2997-3006 (1990).
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Kumar_Hassebrook)
+
 
 def jaccard(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -985,6 +1014,7 @@ def jaccard(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Tanimoto, T.T. (1957) 
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Jaccard)
+
 
 def dice(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1028,6 +1058,7 @@ def dice(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Dice)
 
+
 def fidelity(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute sum of geometric means as a similarity measure between 
@@ -1066,6 +1097,7 @@ def fidelity(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Fidelity)
 
+
 def bhattacharyya(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Bhattacharyya distance between each pair of the two collections of inputs.
@@ -1103,6 +1135,7 @@ def bhattacharyya(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Bhattacharyya)
 
+
 def hellinger(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Hellinger distance between each pair of the two collections of inputs.
@@ -1136,6 +1169,7 @@ def hellinger(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Elsevier, 2006 
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Hellinger)
+
 
 def matusita(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1171,6 +1205,7 @@ def matusita(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Matusita)
 
+
 def square_chord(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Square Chord distance between each pair of the two collections of inputs.
@@ -1205,6 +1240,7 @@ def square_chord(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Square_Chord)
 
+
 def squared_euclidean(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the squared Euclidian distance between each pair of the two collections of inputs.
@@ -1232,6 +1268,7 @@ def squared_euclidean(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
         squared Euclidian chord distance from the i-th column of xa to the j-th column of xb.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Squared_Euclidean)
+
 
 def pearson(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1269,6 +1306,7 @@ def pearson(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Pearson)
 
+
 def neyman(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Neyman :math:`\chi^2` distance between each pair of the two collections of inputs.
@@ -1304,6 +1342,7 @@ def neyman(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     In Proceedings of the First Berkley Symposium on Mathematical Statistics and Probability, 1949.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Neyman)
+
 
 def squared_chi(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1348,6 +1387,7 @@ def squared_chi(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Squared_Chi)
 
+
 def prob_symmetric_chi(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Probabilistic Symmetric :math:`\chi^2` distance between each pair of the two collections of inputs.
@@ -1384,6 +1424,7 @@ def prob_symmetric_chi(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Prob_Symmetric_Chi)
 
+
 def divergence(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the divergence distance (non-metric) between each pair of the two collections of inputs.
@@ -1418,6 +1459,7 @@ def divergence(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Divergence)
 
+
 def clark(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Clark distance between each pair of the two collections of inputs.
@@ -1451,6 +1493,7 @@ def clark(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Elsevier, 2006 
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Clark)
+
 
 def additive_symm_chi(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1493,6 +1536,7 @@ def additive_symm_chi(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Additive_Symm_Chi)
 
+
 def kullback(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Kullback-Leibler (KL) distance between each pair of the two collections of inputs.
@@ -1534,6 +1578,7 @@ def kullback(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Elsevier, 2006 
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Kullback)
+
 
 def jeffrey(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1584,6 +1629,7 @@ def jeffrey(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Jeffrey)
 
+
 def k_divergence(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the K-Divergence distance between each pair of the two collections of inputs.
@@ -1618,6 +1664,7 @@ def k_divergence(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
         K-Divergence distance from the i-th column of xa to the j-th column of xb.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.K_Divergence)
+
 
 def topsoe(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1665,6 +1712,7 @@ def topsoe(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Topsoe)
 
+
 def jensen_shannon(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Jensen-Shannon divergence distance between each pair of the two collections of inputs.
@@ -1710,6 +1758,7 @@ def jensen_shannon(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Jensen_Shannon)
 
+
 def jensen_difference(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Jensen difference distance between each pair of the two collections of inputs.
@@ -1751,6 +1800,7 @@ def jensen_difference(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Jensen_Difference)
 
+
 def taneja(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Taneja distance between each pair of the two collections of inputs.
@@ -1784,6 +1834,7 @@ def taneja(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     |     Chapter in: Advances in Imaging and Electron Physics, Ed. P.W. Hawkes, 91, 37-135.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Taneja)
+
 
 def kumar_johnson(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1819,6 +1870,7 @@ def kumar_johnson(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Kumar_Johnson)
 
+
 def avg_l1_linf(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the Average :math:`L_1 - L_\infty` distance between each pair of the two collections of inputs.
@@ -1852,11 +1904,13 @@ def avg_l1_linf(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Avg_L1_Linf)
 
+
 def hamming(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     dist no formula
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.Hamming)
+
 
 def mpdist(a: ArrayLike, b: ArrayLike, w: int, threshold: float = 0.05) -> ShapeletsArray:
     r"""
@@ -1895,11 +1949,13 @@ def mpdist(a: ArrayLike, b: ArrayLike, w: int, threshold: float = 0.05) -> Shape
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.MPDist, w=w, threshold=threshold)
 
+
 def dtw(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
     Calculates the Dynamic Time Warping Distance.
     """
     return _pygauss.cdist(a, b, _pygauss.DistanceType.DTW)
+
 
 def sbd(a: ArrayLike, b: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1915,18 +1971,20 @@ def __draw_timeseries_allclust(ds, leaves, gs, ts_hspace):
     max_cluster = len(leaves)
     # flip leaves, as gridspec iterates from top down
     leaves = leaves[::-1]
-    
+
     for cnt in range(len(leaves)):
-        plt.subplot(gs[cnt:cnt+1, max_cluster-ts_hspace:max_cluster])
+        plt.subplot(gs[cnt:cnt + 1, max_cluster - ts_hspace:max_cluster])
         plt.axis("off")
-        
+
         # get leafnode name, which corresponds to original data index
         leafnode = leaves[cnt]
-        timeseries = ds[:,leafnode]
+        timeseries = ds[:, leafnode]
         for i in range(len(timeseries)):
             plt.plot(timeseries)
 
-def dendogram_all_ts(data: ArrayLike, method: Optional[str] = None, metric: Optional[DistanceType] = None, Z = None, ts_hspace=2):
+
+def dendogram_all_ts(data: ArrayLike, method: Optional[str] = None, metric: Optional[DistanceType] = None, Z=None,
+                     ts_hspace=2):
     # distances 
     ds = asarray(data)
 
@@ -1946,7 +2004,7 @@ def dendogram_all_ts(data: ArrayLike, method: Optional[str] = None, metric: Opti
 
     # add dendrogram to gridspec
     # add -1 to give timeseries graphs more space
-    plt.subplot(gs[:, 0 : max_cluster - ts_hspace - 1])
+    plt.subplot(gs[:, 0: max_cluster - ts_hspace - 1])
     plt.xlabel("Distance")
     plt.ylabel("Cluster")
 

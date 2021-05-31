@@ -1,7 +1,14 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 
 from .__basic_typing import ArrayLike, _ScalarLike
 from typing import Optional, Tuple, Union
+
 try:
     from typing import Literal
 except ImportError:
@@ -16,19 +23,22 @@ FloatOrComplex = Union[float, complex]
 
 ScanOp = Literal['add', 'max', 'min', 'mul']
 
-def __map_scan_op(scanop: ScanOp): 
+
+def __map_scan_op(scanop: ScanOp):
     if scanop == 'add':
-        return _pygauss.ScanOp.Add 
+        return _pygauss.ScanOp.Add
     elif scanop == 'max':
         return _pygauss.ScanOp.Max
     elif scanop == 'min':
         return _pygauss.ScanOp.Min
     elif scanop == 'mul':
-        return _pygauss.ScanOp.Mul 
+        return _pygauss.ScanOp.Mul
     else:
         raise ValueError("Unknown scan operation")
 
-def argmin(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, float], Tuple[int, complex], Tuple[ShapeletsArray, ShapeletsArray]]:
+
+def argmin(a: ArrayLike, dim: Optional[int] = None) -> Union[
+    Tuple[int, float], Tuple[int, complex], Tuple[ShapeletsArray, ShapeletsArray]]:
     r"""
     Locates the minimum values in an array
 
@@ -70,10 +80,12 @@ def argmin(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, float], 
     >>> values
     [1 3 1 1]
         1          2          3              
-    """  
+    """
     return _pygauss.argmin(a, dim)
 
-def nanargmin(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]:
+
+def nanargmin(a: ArrayLike, dim: Optional[int] = None) -> Union[
+    Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]:
     r"""
     Locates the minimum values in an array, discarding nan values
 
@@ -119,7 +131,9 @@ def nanargmin(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, Float
     """
     return _pygauss.nanargmin(a, dim)
 
-def argmax(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
+
+def argmax(a: ArrayLike, dim: Optional[int] = None) -> Union[
+    Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]:
     r"""
     Locates the maximum values in an array
 
@@ -162,9 +176,11 @@ def argmax(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrC
     [1 3 1 1]
         4          5          6    
     """
-    return _pygauss.argmax(a, dim) 
+    return _pygauss.argmax(a, dim)
 
-def nanargmax(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]: 
+
+def nanargmax(a: ArrayLike, dim: Optional[int] = None) -> Union[
+    Tuple[int, FloatOrComplex], Tuple[ShapeletsArray, ShapeletsArray]]:
     r"""
     Locates the maximum values in an array, discarding nan values
 
@@ -208,9 +224,10 @@ def nanargmax(a: ArrayLike, dim: Optional[int] = None) -> Union[Tuple[int, Float
     [1 3 1 1]
         4.0000     5.0000     3.0000 
     """
-    return _pygauss.nanargmax(a, dim) 
+    return _pygauss.nanargmax(a, dim)
 
-def amax(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
+
+def amax(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]:
     r"""
     Return the maximum of an array or along an axis
 
@@ -253,9 +270,10 @@ def amax(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsA
     [1 3 1 1]
         4          5          6 
     """
-    return _pygauss.amax(a, dim)  
+    return _pygauss.amax(a, dim)
 
-def amin(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]: 
+
+def amin(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsArray]:
     r"""
     Return the minimum of an array or along an axis
 
@@ -299,9 +317,10 @@ def amin(a: ArrayLike, dim: Optional[int] = None) -> Union[AnyScalar, ShapeletsA
         1          2          3 
 
     """
-    return _pygauss.amin(a, dim)    
+    return _pygauss.amin(a, dim)
 
-def nanmax(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+
+def nanmax(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]:
     r"""
     Return the maximum of an array or along an axis, ignoring any NaNs.
 
@@ -337,9 +356,10 @@ def nanmax(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, Sha
     [1 3 1 1]
         4.0000     5.0000     3.0000  
     """
-    return _pygauss.nanmax(a, dim)  
+    return _pygauss.nanmax(a, dim)
 
-def nanmin(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+
+def nanmin(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, ShapeletsArray]:
     r"""
     Return the minimum of an array or along an axis, ignoring any NaNs.
 
@@ -377,14 +397,14 @@ def nanmin(a: ArrayLike, dim: Optional[int] = None) -> Union[FloatOrComplex, Sha
     """
     return _pygauss.nanmin(a, dim)
 
-
     # // amin -> Return the minimum of an array or minimum along an axis, propagating NaNs
     # // nanmin -> The minimum value of an array along a given axis, ignoring any NaNs.
     # // minimum -> Element-wise minimum of two arrays, propagating any NaNs.
     # // fmin -> Element-wise minimum of two arrays, ignoring any NaNs.
     # // argmin -> Return the indices of the minimum values.
 
-def maximum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def maximum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise maximum of array elements, respecting Nan values
 
@@ -427,7 +447,8 @@ def maximum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
            nan        nan        nan 
        10.0000    10.0000    10.0000        
     """
-    return _pygauss.maximum(left, right) 
+    return _pygauss.maximum(left, right)
+
 
 def minimum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
@@ -471,10 +492,11 @@ def minimum(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
        -1.0000    -1.0000    -1.0000 
            nan        nan        nan 
         1.0000     2.0000     3.0000 
-    """    
+    """
     return _pygauss.minimum(left, right)
 
-def fmax(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def fmax(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise maximum of array elements, ignoring Nan values
 
@@ -517,9 +539,10 @@ def fmax(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
         1.0000     2.0000     3.0000 
        10.0000    10.0000    10.0000     
     """
-    return _pygauss.fmax(left, right) 
+    return _pygauss.fmax(left, right)
 
-def fmin(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def fmin(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise minimum of array elements, ignoring Nan values
 
@@ -562,9 +585,10 @@ def fmin(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
         1.0000     2.0000     3.0000 
         1.0000     2.0000     3.0000   
     """
-    return _pygauss.fmin(left, right) 
+    return _pygauss.fmin(left, right)
 
-def count_nonzero(a: ArrayLike, dim: Optional[int] = None) -> Union[int, ShapeletsArray]: 
+
+def count_nonzero(a: ArrayLike, dim: Optional[int] = None) -> Union[int, ShapeletsArray]:
     r"""
     Counts the number of non-zero values in the array a.
 
@@ -590,9 +614,11 @@ def count_nonzero(a: ArrayLike, dim: Optional[int] = None) -> Union[int, Shapele
     [1 2 1 1]
          2          0 
     """
-    return _pygauss.count_nonzero(a, dim) 
+    return _pygauss.count_nonzero(a, dim)
 
-def sum(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+
+def sum(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[
+    FloatOrComplex, ShapeletsArray]:
     r"""
     Sums values of an input array along an optional dimension.
 
@@ -623,9 +649,11 @@ def sum(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = No
 
     >>> import shapelets.compute as sc    
     """
-    return _pygauss.sum(a, dim, nan_value) 
+    return _pygauss.sum(a, dim, nan_value)
 
-def product(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[FloatOrComplex, ShapeletsArray]:
+
+def product(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] = None) -> Union[
+    FloatOrComplex, ShapeletsArray]:
     r"""
     Computes the product of values along an optional dimension.
 
@@ -654,9 +682,10 @@ def product(a: ArrayLike, dim: Optional[int] = None, nan_value: Optional[float] 
     [1 2 1 1]
         3          8     
     """
-    return _pygauss.product(a, dim, nan_value) 
+    return _pygauss.product(a, dim, nan_value)
 
-def cumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
+
+def cumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]:
     r"""
     Cumulative sum of the elements along a given axis.
 
@@ -688,9 +717,10 @@ def cumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]:
          4          9         15 
          7         15         24     
     """
-    return _pygauss.cumsum(a, dim) 
+    return _pygauss.cumsum(a, dim)
 
-def nancumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
+
+def nancumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]:
     r"""
     Cumulative sum over a given axis treating NaNs as zero
 
@@ -723,9 +753,10 @@ def nancumsum(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArra
         4.0000     9.0000     9.0000 
         0.0000     8.0000    17.0000     
     """
-    return _pygauss.nancumsum(a, dim) 
+    return _pygauss.nancumsum(a, dim)
 
-def cumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]: 
+
+def cumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]:
     r"""
     Cumulative product of elements along a given axis
 
@@ -757,7 +788,8 @@ def cumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]
          4         20        120 
          7         56        504     
     """
-    return _pygauss.cumprod(a, dim) 
+    return _pygauss.cumprod(a, dim)
+
 
 def nancumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArray]:
     r"""
@@ -793,6 +825,7 @@ def nancumprod(a: ArrayLike, dim: int = 0) -> Union[FloatOrComplex, ShapeletsArr
         1.0000     8.0000    72.0000    
     """
     return _pygauss.nancumprod(a, dim)
+
 
 def scan(a: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
     r"""
@@ -841,7 +874,9 @@ def scan(a: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = 
     """
     return _pygauss.scan(a, dim, __map_scan_op(op), inclusive_scan)
 
-def nanscan(a: ArrayLike, dim: int = 0, nan: float = 0.0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray:
+
+def nanscan(a: ArrayLike, dim: int = 0, nan: float = 0.0, op: ScanOp = 'add',
+            inclusive_scan: bool = True) -> ShapeletsArray:
     r"""
     Generalization of cumulative operations over a particular axis
 
@@ -887,6 +922,7 @@ def nanscan(a: ArrayLike, dim: int = 0, nan: float = 0.0, op: ScanOp = 'add', in
     """
     return _pygauss.nanscan(a, dim, nan, __map_scan_op(op), inclusive_scan)
 
+
 def diff1(a: ArrayLike, dim: int = 0) -> ShapeletsArray:
     r"""
     First order numerical difference along specified dimension.
@@ -921,7 +957,8 @@ def diff1(a: ArrayLike, dim: int = 0) -> ShapeletsArray:
     """
     return _pygauss.diff1(a, dim)
 
-def diff2(a: ArrayLike, dim: int = 0) -> ShapeletsArray: 
+
+def diff2(a: ArrayLike, dim: int = 0) -> ShapeletsArray:
     r"""
     Second order numerical difference along specified dimension
 
@@ -954,7 +991,8 @@ def diff2(a: ArrayLike, dim: int = 0) -> ShapeletsArray:
     """
     return _pygauss.diff2(a, dim)
 
-def sort(a: ArrayLike, dim: int = 0, asc: bool = True) -> ShapeletsArray: 
+
+def sort(a: ArrayLike, dim: int = 0, asc: bool = True) -> ShapeletsArray:
     r"""
     Sorts the input array across a dimension
 
@@ -986,7 +1024,8 @@ def sort(a: ArrayLike, dim: int = 0, asc: bool = True) -> ShapeletsArray:
     """
     return _pygauss.sort(a, dim, asc)
 
-def sort_index(a: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def sort_index(a: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[ShapeletsArray, ShapeletsArray]:
     r"""
     Sorts an array and returns the indices of the original positions across a dimension.
 
@@ -1025,7 +1064,9 @@ def sort_index(a: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[ShapeletsA
     """
     return _pygauss.sort_index(a, dim, asc)
 
-def sort_by_key(keys: ArrayLike, data: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def sort_by_key(keys: ArrayLike, data: ArrayLike, dim: int = 0, asc: bool = True) -> Tuple[
+    ShapeletsArray, ShapeletsArray]:
     r"""
 
     Sorts an array across a dimension using an auxiliary array of keys.
@@ -1070,7 +1111,8 @@ def sort_by_key(keys: ArrayLike, data: ArrayLike, dim: int = 0, asc: bool = True
     """
     return _pygauss.sort_by_key(keys, data, dim, asc)
 
-def flatnonzero(a: ArrayLike) -> ShapeletsArray: 
+
+def flatnonzero(a: ArrayLike) -> ShapeletsArray:
     r"""
     Return indices that are non-zero in the flattened version of a.
 
@@ -1095,7 +1137,8 @@ def flatnonzero(a: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.flatnonzero(a)
 
-def union(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> ShapeletsArray: 
+
+def union(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> ShapeletsArray:
     r"""
     Performs the union of two input arrays
 
@@ -1137,7 +1180,8 @@ def union(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> ShapeletsArr
     """
     return _pygauss.union(x1, x2, is_unique)
 
-def unique(a: ArrayLike, is_sorted: bool = False) -> ShapeletsArray: 
+
+def unique(a: ArrayLike, is_sorted: bool = False) -> ShapeletsArray:
     r"""
     Returns unique values in an array
 
@@ -1174,7 +1218,8 @@ def unique(a: ArrayLike, is_sorted: bool = False) -> ShapeletsArray:
     """
     return _pygauss.unique(a, is_sorted)
 
-def intersect(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> ShapeletsArray: 
+
+def intersect(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> ShapeletsArray:
     r"""
     Finds the intersection between to arrays.
 
@@ -1210,7 +1255,8 @@ def intersect(x1: ArrayLike, x2: ArrayLike, is_unique: bool = False) -> Shapelet
     """
     return _pygauss.intersect(x1, x2, is_unique)
 
-def count_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def count_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]:
     r"""
     Counts the non-zero values of an input array according to an array of keys.
 
@@ -1258,7 +1304,8 @@ def count_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) ->
     """
     return _pygauss.count_by_key(keys, vals, dim)
 
-def max_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def max_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]:
     r"""
     Finds the maximum values per key.
 
@@ -1306,7 +1353,8 @@ def max_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     """
     return _pygauss.max_by_key(keys, vals, dim)
 
-def min_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def min_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]:
     r"""
     Finds the minimun values per key.
 
@@ -1354,7 +1402,9 @@ def min_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     """
     return _pygauss.min_by_key(keys, vals, dim)
 
-def product_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def product_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[
+    ShapeletsArray, ShapeletsArray]:
     r"""
     Finds the product of values per key.
 
@@ -1402,7 +1452,9 @@ def product_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) 
     """
     return _pygauss.product_by_key(keys, vals, dim)
 
-def nanproduct_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 1.0,  dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def nanproduct_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 1.0, dim: Optional[int] = None) -> Tuple[
+    ShapeletsArray, ShapeletsArray]:
     r"""
     Finds the product of values per key, replacing NaN values.
 
@@ -1454,7 +1506,8 @@ def nanproduct_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 1.0, 
     """
     return _pygauss.nanproduct_by_key(keys, vals, nan_value, dim)
 
-def sum_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def sum_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]:
     r"""
     Finds the sum of values per key.
 
@@ -1502,7 +1555,9 @@ def sum_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     """
     return _pygauss.sum_by_key(keys, vals, dim)
 
-def nansum_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 0.0,  dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def nansum_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 0.0, dim: Optional[int] = None) -> Tuple[
+    ShapeletsArray, ShapeletsArray]:
     r"""
     Finds the sum of values per key, replacing NaN values.
 
@@ -1554,7 +1609,9 @@ def nansum_by_key(keys: ArrayLike, vals: ArrayLike, nan_value: float = 0.0,  dim
     """
     return _pygauss.nansum_by_key(keys, vals, nan_value, dim)
 
-def scan_by_key(keys: ArrayLike, vals: ArrayLike, dim: int = 0, op: ScanOp = 'add', inclusive_scan: bool = True) -> ShapeletsArray: 
+
+def scan_by_key(keys: ArrayLike, vals: ArrayLike, dim: int = 0, op: ScanOp = 'add',
+                inclusive_scan: bool = True) -> ShapeletsArray:
     r"""
     Generalized scan by key operation 
 
@@ -1608,6 +1665,7 @@ def scan_by_key(keys: ArrayLike, vals: ArrayLike, dim: int = 0, op: ScanOp = 'ad
     """
     return _pygauss.scan_by_key(keys, vals, dim, __map_scan_op(op), inclusive_scan)
 
+
 def nan_to_num(a: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> ShapeletsArray:
     r"""
     Returns a new array where the NaN and Inf values have been replaced.
@@ -1637,6 +1695,7 @@ def nan_to_num(a: ArrayLike, nan: float = 0.0, inf: float = 0.0) -> ShapeletsArr
         2.0000     3.0000     
     """
     return _pygauss.nan_to_num(a, nan, inf)
+
 
 def all(a: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
     r"""
@@ -1681,6 +1740,7 @@ def all(a: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
          0       
     """
     return _pygauss.all(a, dim)
+
 
 def any(a: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
     r"""
@@ -1734,7 +1794,8 @@ def any(a: ArrayLike, dim: Optional[int] = None) -> Union[bool, ShapeletsArray]:
     """
     return _pygauss.any(a, dim)
 
-def any_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def any_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]:
     r"""
     Reduces the values in `vals` by testing if any of the elements is set to `True`, grouping the results 
     by keys.
@@ -1789,7 +1850,8 @@ def any_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     """
     return _pygauss.any_by_key(keys, vals, dim)
 
-def all_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]: 
+
+def all_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> Tuple[ShapeletsArray, ShapeletsArray]:
     r"""
     Reduces the values in `vals` by testing if all of the elements are set to `True`, by grouping the results 
     using the values in `keys`.
@@ -1844,12 +1906,12 @@ def all_by_key(keys: ArrayLike, vals: ArrayLike, dim: Optional[int] = None) -> T
     """
     return _pygauss.all_by_key(keys, vals, dim)
 
-    
 
 __all__ = [
-    "any", "all", "nan_to_num", "amin", "nanmin", "minimum", "fmin", "argmin", "nanargmin", "amax", "nanmax", "maximum", 
-    "fmax", "argmax", "nanargmax", "count_nonzero", "sum", "product", "cumsum", "nancumsum", "cumprod", "nancumprod", 
-    "scan", "nanscan", "diff1", "diff2", "sort", "sort_index", "sort_by_key", "flatnonzero", "unique", "union", "intersect", 
-    "any_by_key", "all_by_key", "count_by_key", "max_by_key", "min_by_key", "product_by_key", "nanproduct_by_key", 
+    "any", "all", "nan_to_num", "amin", "nanmin", "minimum", "fmin", "argmin", "nanargmin", "amax", "nanmax", "maximum",
+    "fmax", "argmax", "nanargmax", "count_nonzero", "sum", "product", "cumsum", "nancumsum", "cumprod", "nancumprod",
+    "scan", "nanscan", "diff1", "diff2", "sort", "sort_index", "sort_by_key", "flatnonzero", "unique", "union",
+    "intersect",
+    "any_by_key", "all_by_key", "count_by_key", "max_by_key", "min_by_key", "product_by_key", "nanproduct_by_key",
     "sum_by_key", "nansum_by_key", "scan_by_key"
 ]

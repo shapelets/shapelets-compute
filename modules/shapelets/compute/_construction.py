@@ -1,3 +1,9 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import Union, Optional
 
@@ -8,7 +14,9 @@ from . import _pygauss
 
 AnyScalar = _ScalarLike
 
-def linspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0, dtype: DataTypeLike = "float32") -> ShapeletsArray: 
+
+def linspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0,
+             dtype: DataTypeLike = "float32") -> ShapeletsArray:
     """
     Creates a new array whose values are evenly spaced over an interval.
 
@@ -95,7 +103,9 @@ def linspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = T
     """
     return _pygauss.linspace(start, end, num, endpoint, axis, dtype)
 
-def logspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0, base: float = 10.0, dtype: DataTypeLike = "float32") -> ShapeletsArray: 
+
+def logspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0, base: float = 10.0,
+             dtype: DataTypeLike = "float32") -> ShapeletsArray:
     """
     Creates a new array whose values are evenly spaced over a log scale.
 
@@ -151,7 +161,9 @@ def logspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = T
     """
     return _pygauss.logspace(start, end, num, endpoint, axis, base, dtype)
 
-def geomspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0, dtype: DataTypeLike = "float32") -> ShapeletsArray: 
+
+def geomspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = True, axis: int = 0,
+              dtype: DataTypeLike = "float32") -> ShapeletsArray:
     """
     Creates a new array whose values are evenly spaced over a geometric scale.
 
@@ -194,11 +206,14 @@ def geomspace(start: ArrayLike, end: ArrayLike, num: int = 50, endpoint: bool = 
     """
     return _pygauss.geomspace(start, end, num, endpoint, axis, dtype)
 
-def arange(start: Union[int, float], stop: Union[int, float], step: Union[int, float], dtype: DataTypeLike = "float32") -> ShapeletsArray:
+
+def arange(start: Union[int, float], stop: Union[int, float], step: Union[int, float],
+           dtype: DataTypeLike = "float32") -> ShapeletsArray:
     """
     Creates a new array whose values are evenly spaced in a given interval.
     """
     return _pygauss.arange(start, stop, step, dtype)
+
 
 def empty(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
@@ -241,6 +256,7 @@ def empty(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     return _pygauss.empty(shape, dtype)
 
+
 def eye(N: int, M: Optional[int] = None, k: int = 0, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Return a 2-D tensor with ones on the diagonal and zeros elsewhere.
@@ -269,6 +285,7 @@ def eye(N: int, M: Optional[int] = None, k: int = 0, dtype: DataTypeLike = 'floa
     """
     return _pygauss.eye(N, M, k, dtype)
 
+
 def full(shape: ShapeLike, fill_value: AnyScalar, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Return a new array of given shape and type, filled with `fill_value`.
@@ -284,10 +301,12 @@ def full(shape: ShapeLike, fill_value: AnyScalar, dtype: DataTypeLike = 'float32
     dtype : data-type, optional
         The desired data-type for the array  If not specified it will
         default to "float".
-    """   
+    """
     return _pygauss.full(shape, fill_value, dtype)
 
-def full_like(a: ArrayLike, fill_value: AnyScalar, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
+
+def full_like(a: ArrayLike, fill_value: AnyScalar, shape: Optional[ShapeLike] = None,
+              dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
     """
     Return a full array with the same shape and type as a given array.
 
@@ -328,6 +347,7 @@ def full_like(a: ArrayLike, fill_value: AnyScalar, shape: Optional[ShapeLike] = 
     t_dtype = dtype if dtype is not None else template.dtype
     return _pygauss.full(t_shape, fill_value, t_dtype)
 
+
 def identity(shape: Shape, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Creates an identity tensor with diagonal values set to one.
@@ -345,14 +365,16 @@ def identity(shape: Shape, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     -------
     out : Array
         Array of shape ``shape`` whose diagonal elements are all set to zero.
-    """        
+    """
     return _pygauss.identity(shape, dtype)
+
 
 def zeros(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Creates an array with all its elements set to zero.
     """
     return _pygauss.zeros(shape, dtype)
+
 
 def zeros_like(a: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
     """
@@ -388,10 +410,11 @@ def zeros_like(a: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[
         0.0000     0.0000 
 
     """
-    template = asarray(a) 
+    template = asarray(a)
     t_shape = shape if shape is not None else template.shape
     t_dtype = dtype if dtype is not None else template.dtype
-    return _pygauss.zeros(t_shape, t_dtype)    
+    return _pygauss.zeros(t_shape, t_dtype)
+
 
 def ones(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
@@ -399,6 +422,7 @@ def ones(shape: ShapeLike, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
 
     """
     return _pygauss.ones(shape, dtype)
+
 
 def ones_like(a: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[DataTypeLike] = None) -> ShapeletsArray:
     """
@@ -434,10 +458,11 @@ def ones_like(a: ArrayLike, shape: Optional[ShapeLike] = None, dtype: Optional[D
         1.0000     1.0000  
 
     """
-    template = asarray(a) 
+    template = asarray(a)
     t_shape = shape if shape is not None else template.shape
     t_dtype = dtype if dtype is not None else template.dtype
-    return _pygauss.ones(t_shape, t_dtype) 
+    return _pygauss.ones(t_shape, t_dtype)
+
 
 def diag(a: ArrayLike, index: int = 0, extract: bool = False) -> ShapeletsArray:
     """
@@ -494,6 +519,7 @@ def diag(a: ArrayLike, index: int = 0, extract: bool = False) -> ShapeletsArray:
     """
     return _pygauss.diag(a, index, extract)
 
+
 def iota(shape: ShapeLike, tile: Shape = (1, 1), dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Create an sequence ``[0, shape.elements() - 1]`` and modify to specified dimensions 
@@ -532,6 +558,7 @@ def iota(shape: ShapeLike, tile: Shape = (1, 1), dtype: DataTypeLike = 'float32'
     """
     return _pygauss.iota(shape, tile, dtype)
 
+
 def range(shape: ShapeLike, seq_dim: int = 0, dtype: DataTypeLike = 'float32') -> ShapeletsArray:
     """
     Creates an array with [0, n] values along the seq_dim which is tiled across other dimensions.
@@ -569,8 +596,9 @@ def range(shape: ShapeLike, seq_dim: int = 0, dtype: DataTypeLike = 'float32') -
     """
     return _pygauss.range(shape, seq_dim, dtype)
 
+
 __all__ = [
-    "geomspace", "logspace", "linspace", "arange", "empty", "eye", 
+    "geomspace", "logspace", "linspace", "arange", "empty", "eye",
     "identity", "full", "zeros", "ones", "diag", "iota", "range",
     "zeros_like", "ones_like", "full_like"
 ]

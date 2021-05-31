@@ -1,3 +1,9 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import List
 
@@ -488,6 +494,7 @@ def tile(array_like: ArrayLike, x: int, y: int = 1, z: int = 1, w: int = 1) -> S
     """
     return _pygauss.tile(array_like, x, y, z, w)
 
+
 def transpose(array_like: ArrayLike, conjugate: bool = False) -> ShapeletsArray:
     """
     Transposes the input array
@@ -597,7 +604,8 @@ def where(condition: ArrayLike, x: ArrayLike = None, y: ArrayLike = None) -> Sha
     return _pygauss.where(condition, x, y)
 
 
-def unpack(a: ArrayLike, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0, is_column: bool = True) -> ShapeletsArray:
+def unpack(a: ArrayLike, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0,
+           is_column: bool = True) -> ShapeletsArray:
     """
     Rearranges window sections of an input into columns or rows.
 
@@ -657,7 +665,8 @@ def unpack(a: ArrayLike, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: in
     return _pygauss.unpack(a, wx, wy, sx, sy, px, py, is_column)
 
 
-def pack(a: ArrayLike, ox: int, oy: int, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0, is_column: bool = True) -> ShapeletsArray:
+def pack(a: ArrayLike, ox: int, oy: int, wx: int, wy: int, sx: int, sy: int, px: int = 0, py: int = 0,
+         is_column: bool = True) -> ShapeletsArray:
     """
     Reverses the :obj:`~shapelets.compute.unpack` operation
 

@@ -1,10 +1,17 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 
 from . import _pygauss
 
-def add(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def add(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Adds arguments element-wise
 
@@ -38,7 +45,8 @@ def add(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.add(left, right)
 
-def bitwise_and(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def bitwise_and(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Bitwise ``and`` operation applied element-wise
 
@@ -70,7 +78,8 @@ def bitwise_and(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.bitwise_and(left, right)
 
-def bitwise_or(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def bitwise_or(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Bitwise ``or`` operation applied element-wise
 
@@ -101,8 +110,9 @@ def bitwise_or(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
         1          1          3          3      
     """
     return _pygauss.bitwise_or(left, right)
-    
-def bitwise_xor(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+
+def bitwise_xor(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Bitwise ``xor`` operation applied element-wise
 
@@ -134,7 +144,8 @@ def bitwise_xor(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.bitwise_xor(left, right)
 
-def cbrt(x: ArrayLike) -> ShapeletsArray:  
+
+def cbrt(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise cube root 
 
@@ -157,6 +168,7 @@ def cbrt(x: ArrayLike) -> ShapeletsArray:
         0.0000     1.0000     1.2599     1.4422     
     """
     return _pygauss.cbrt(x)
+
 
 def clip(x: ArrayLike, lo: ArrayLike = None, up: ArrayLike = None) -> ShapeletsArray:
     """
@@ -197,13 +209,15 @@ def clip(x: ArrayLike, lo: ArrayLike = None, up: ArrayLike = None) -> ShapeletsA
     """
     return _pygauss.clip(x, lo, up)
 
-def conj(x: ArrayLike) -> ShapeletsArray: 
+
+def conj(x: ArrayLike) -> ShapeletsArray:
     r"""
     Alias for :obj:`~shapelets.compute.conjugate`
     """
     return conjugate(x)
 
-def conjugate(x: ArrayLike) -> ShapeletsArray: 
+
+def conjugate(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes the complex conjugate 
 
@@ -227,6 +241,7 @@ def conjugate(x: ArrayLike) -> ShapeletsArray:
 
     """
     return _pygauss.conjugate(x)
+
 
 def complex(real: ArrayLike, img: ArrayLike) -> ShapeletsArray:
     r"""
@@ -271,8 +286,9 @@ def complex(real: ArrayLike, img: ArrayLike) -> ShapeletsArray:
         (1.0000,6.0000)          (1.0000,5.0000)          (1.0000,4.0000) 
         (2.0000,6.0000)          (2.0000,5.0000)          (2.0000,4.0000) 
         (3.0000,6.0000)          (3.0000,5.0000)          (3.0000,4.0000) 
-    """ 
+    """
     return _pygauss.complex(real, img)
+
 
 def divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
@@ -313,6 +329,7 @@ def divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.divide(left, right)
 
+
 def erf(x: ArrayLike) -> ShapeletsArray:
     r"""
     Applies the error function element-wise
@@ -347,7 +364,8 @@ def erf(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.erf(x)
 
-def erfc(x: ArrayLike) -> ShapeletsArray: 
+
+def erfc(x: ArrayLike) -> ShapeletsArray:
     r"""
     Applies the complementary error function element-wise
 
@@ -381,7 +399,8 @@ def erfc(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.erfc(x)
 
-def exp(y: ArrayLike) -> ShapeletsArray: 
+
+def exp(y: ArrayLike) -> ShapeletsArray:
     r"""
     Computes ``e`` to the power ``y``
 
@@ -409,7 +428,8 @@ def exp(y: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.exp(y)
 
-def exp2(y: ArrayLike) -> ShapeletsArray: 
+
+def exp2(y: ArrayLike) -> ShapeletsArray:
     r"""
     Computes ``2`` to the power ``y``
 
@@ -436,7 +456,8 @@ def exp2(y: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.exp2(y)
 
-def expm1(y: ArrayLike) -> ShapeletsArray: 
+
+def expm1(y: ArrayLike) -> ShapeletsArray:
     r"""
     Computes ``exp(y) - 1`` element-wise
 
@@ -466,7 +487,8 @@ def expm1(y: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.expm1(y)
 
-def fabs(array_like: ArrayLike) -> ShapeletsArray:  
+
+def fabs(array_like: ArrayLike) -> ShapeletsArray:
     r"""
     Compute the absolute values element-wise.
 
@@ -495,7 +517,8 @@ def fabs(array_like: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.fabs(array_like)
 
-def factorial(x: ArrayLike) -> ShapeletsArray:  
+
+def factorial(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes the factorial function element-wise.
 
@@ -526,7 +549,8 @@ def factorial(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.factorial(x)
 
-def floor_divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def floor_divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Return the largest integer smaller or equal to the element-wise division of the inputs.
 
@@ -567,7 +591,8 @@ def floor_divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.floor_divide(left, right)
 
-def imag(x: ArrayLike) -> ShapeletsArray:  
+
+def imag(x: ArrayLike) -> ShapeletsArray:
     r"""
     Returns the imaginary part of complex numbers
 
@@ -594,7 +619,8 @@ def imag(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.imag(x)
 
-def left_shift(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def left_shift(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise left shift operation
 
@@ -634,7 +660,8 @@ def left_shift(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.left_shift(left, right)
 
-def lgamma(x: ArrayLike) -> ShapeletsArray:  
+
+def lgamma(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise application of the natural logarithm of the gamma function.
 
@@ -669,10 +696,11 @@ def lgamma(x: ArrayLike) -> ShapeletsArray:
     >>> sc.lgamma(x)
     [1 8 1 1]
         0.0000    -0.1210    -0.0536     0.1457     0.4462     0.8289     1.2806     1.7918     
-    """    
+    """
     return _pygauss.lgamma(x)
 
-def log(x: ArrayLike) -> ShapeletsArray:  
+
+def log(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise application of the natural logarithm function.
 
@@ -695,7 +723,8 @@ def log(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.log(x)
 
-def log10(x: ArrayLike) -> ShapeletsArray:  
+
+def log10(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise application of the base 10 logarithm function.
 
@@ -717,7 +746,8 @@ def log10(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.log10(x)
 
-def log1p(x: ArrayLike) -> ShapeletsArray:  
+
+def log1p(x: ArrayLike) -> ShapeletsArray:
     r"""
     Calculates ``log(1 + x)``.
 
@@ -740,7 +770,8 @@ def log1p(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.log1p(x)
 
-def log2(array_like: ArrayLike) -> ShapeletsArray:  
+
+def log2(array_like: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise application of the base 10 logarithm function.
 
@@ -762,7 +793,8 @@ def log2(array_like: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.log2(array_like)
 
-def mod(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def mod(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise modulus operation
 
@@ -801,7 +833,8 @@ def mod(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.mod(left, right)
 
-def multiply(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def multiply(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise multiply operation
 
@@ -842,7 +875,8 @@ def multiply(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.multiply(left, right)
 
-def negative(x: ArrayLike) -> ShapeletsArray:  
+
+def negative(x: ArrayLike) -> ShapeletsArray:
     r"""
     Numerical negative, element-wise.
 
@@ -863,7 +897,8 @@ def negative(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.negative(x)
 
-def positive(x: ArrayLike) -> ShapeletsArray:  
+
+def positive(x: ArrayLike) -> ShapeletsArray:
     r"""
     Numerical positive, element-wise.
 
@@ -883,7 +918,8 @@ def positive(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.positive(x)
 
-def power(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def power(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise exponential operation
 
@@ -924,7 +960,8 @@ def power(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.power(left, right)
 
-def real(x: ArrayLike) -> ShapeletsArray:  
+
+def real(x: ArrayLike) -> ShapeletsArray:
     r"""
     Returns the real part of complex numbers
 
@@ -947,7 +984,8 @@ def real(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.real(x)
 
-def reciprocal(x: ArrayLike) -> ShapeletsArray: 
+
+def reciprocal(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise computation of the reciprocal.
 
@@ -970,9 +1008,10 @@ def reciprocal(x: ArrayLike) -> ShapeletsArray:
     [1 4 1 1]
         (1.0000,0.0000)          (1.0000,0.0000)          (1.0000,0.0000)          (1.0000,0.0000)    
     """
-    return _pygauss.reciprocal(x) 
+    return _pygauss.reciprocal(x)
 
-def remainder(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def remainder(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise remainder operation
 
@@ -1009,9 +1048,10 @@ def remainder(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     [1 3 1 1]
         0.0000    -1.0000     0.0000      
     """
-    return _pygauss.rem(left, right) 
+    return _pygauss.rem(left, right)
 
-def right_shift(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def right_shift(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise right shift operation
 
@@ -1050,7 +1090,8 @@ def right_shift(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.right_shift(left, right)
 
-def root(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def root(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise n-th root operation
 
@@ -1082,7 +1123,8 @@ def root(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.root(left, right)
 
-def rsqrt(x: ArrayLike) -> ShapeletsArray:  
+
+def rsqrt(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes the reciprocal or inverse of the square root.
 
@@ -1099,7 +1141,8 @@ def rsqrt(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.rsqrt(x)
 
-def sigmoid(x: ArrayLike) -> ShapeletsArray:  
+
+def sigmoid(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise application of the sigmoid function, defined as :math:`S(x)=\frac{1}{1+e^{-x}}`
 
@@ -1116,7 +1159,8 @@ def sigmoid(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.sigmoid(x)
 
-def sign(x: ArrayLike) -> ShapeletsArray:  
+
+def sign(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise indication of the sign of numbers.
 
@@ -1133,7 +1177,8 @@ def sign(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.sign(x)
 
-def signbit(x: ArrayLike) -> ShapeletsArray:  
+
+def signbit(x: ArrayLike) -> ShapeletsArray:
     r"""
     Tests if values are less than zero.
 
@@ -1150,7 +1195,8 @@ def signbit(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.signbit(x)
 
-def sqrt(x: ArrayLike) -> ShapeletsArray:  
+
+def sqrt(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise squared root
 
@@ -1167,7 +1213,8 @@ def sqrt(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.sqrt(x)
 
-def square(x: ArrayLike) -> ShapeletsArray:  
+
+def square(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise square operation
 
@@ -1184,7 +1231,8 @@ def square(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.square(x)
 
-def substract(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:  
+
+def substract(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise substraction
 
@@ -1217,7 +1265,8 @@ def substract(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.substract(left, right)
 
-def tgamma(x: ArrayLike) -> ShapeletsArray: 
+
+def tgamma(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise application of the gamma function.
 
@@ -1248,10 +1297,11 @@ def tgamma(x: ArrayLike) -> ShapeletsArray:
     >>> sc.tgamma(x)
     [1 8 1 1]
         1.0000     0.8861     0.9478     1.1568     1.5624     2.2909     3.5988     6.0000    
-    """        
+    """
     return _pygauss.tgamma(x)
 
-def true_divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray: 
+
+def true_divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise true division operation
 
@@ -1291,7 +1341,8 @@ def true_divide(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.true_divide(left, right)
 
-def round(x: ArrayLike, decimals: int = 0) -> ShapeletsArray: 
+
+def round(x: ArrayLike, decimals: int = 0) -> ShapeletsArray:
     r"""
     Evenly round to the given number of decimals
 
@@ -1322,7 +1373,8 @@ def round(x: ArrayLike, decimals: int = 0) -> ShapeletsArray:
     """
     return _pygauss.round(x, decimals)
 
-def rint(x: ArrayLike) -> ShapeletsArray: 
+
+def rint(x: ArrayLike) -> ShapeletsArray:
     r"""
     Round elements of the array to the nearest integer.
 
@@ -1350,7 +1402,8 @@ def rint(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.rint(x)
 
-def fix(x: ArrayLike) -> ShapeletsArray: 
+
+def fix(x: ArrayLike) -> ShapeletsArray:
     r"""
     Round to nearest integer towards zero.
 
@@ -1378,7 +1431,8 @@ def fix(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.fix(x)
 
-def floor(x: ArrayLike) -> ShapeletsArray: 
+
+def floor(x: ArrayLike) -> ShapeletsArray:
     r"""
     Return the floor of the input, element-wise.
 
@@ -1406,7 +1460,8 @@ def floor(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.floor(x)
 
-def ceil(x: ArrayLike) -> ShapeletsArray: 
+
+def ceil(x: ArrayLike) -> ShapeletsArray:
     r"""
     Return the ceiling of the input, element-wise.
 
@@ -1434,7 +1489,8 @@ def ceil(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.ceil(x)
 
-def trunc(x: ArrayLike) -> ShapeletsArray: 
+
+def trunc(x: ArrayLike) -> ShapeletsArray:
     r"""
     Return the truncated value of the input, element-wise.
 
@@ -1457,7 +1513,8 @@ def trunc(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.trunc(x)
 
-def absolute(x: ArrayLike) -> ShapeletsArray: 
+
+def absolute(x: ArrayLike) -> ShapeletsArray:
     r"""
     Calculate the absolute value element-wise
 
@@ -1483,7 +1540,8 @@ def absolute(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.absolute(x)
 
-def angle(x: ArrayLike, deg: bool = False) -> ShapeletsArray: 
+
+def angle(x: ArrayLike, deg: bool = False) -> ShapeletsArray:
     r"""
     Calculates the angle, or phase, of a tensor of complex 
     numbers element-wise.
@@ -1505,7 +1563,8 @@ def angle(x: ArrayLike, deg: bool = False) -> ShapeletsArray:
     """
     return _pygauss.angle(x) if deg == False else _pygauss.angle_deg(x)
 
-def arccos(x: ArrayLike) -> ShapeletsArray: 
+
+def arccos(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise computation of the inverse cosine.
 
@@ -1525,7 +1584,8 @@ def arccos(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.arccos(x)
 
-def arcsin(x: ArrayLike) -> ShapeletsArray: 
+
+def arcsin(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise computation of the inverse sine.
 
@@ -1542,10 +1602,11 @@ def arcsin(x: ArrayLike) -> ShapeletsArray:
     ShapeletsArray 
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of applying the inverse sine function to each input element.
-    """    
+    """
     return _pygauss.arcsin(x)
 
-def arctan(x: ArrayLike) -> ShapeletsArray: 
+
+def arctan(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise computation of the inverse tangent.
 
@@ -1562,10 +1623,11 @@ def arctan(x: ArrayLike) -> ShapeletsArray:
     ShapeletsArray 
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of applying the inverse tangent function to each input element.
-    """    
+    """
     return _pygauss.arctan(x)
 
-def arccosh(x: ArrayLike) -> ShapeletsArray: 
+
+def arccosh(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise computation of the inverse hyperbolic cosine function.
 
@@ -1583,10 +1645,11 @@ def arccosh(x: ArrayLike) -> ShapeletsArray:
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of applying the inverse hyperbolic cosine function to each 
         input element.
-    """  
+    """
     return _pygauss.arccosh(x)
 
-def arcsinh(x: ArrayLike) -> ShapeletsArray: 
+
+def arcsinh(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise computation of the inverse hyperbolic sine function.
 
@@ -1604,10 +1667,11 @@ def arcsinh(x: ArrayLike) -> ShapeletsArray:
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of applying the inverse hyperbolic sine function to each 
         input element.
-    """        
+    """
     return _pygauss.arcsinh(x)
 
-def arctanh(x: ArrayLike) -> ShapeletsArray: 
+
+def arctanh(x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise computation of the inverse hyperbolic tangent.
 
@@ -1625,10 +1689,11 @@ def arctanh(x: ArrayLike) -> ShapeletsArray:
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of applying the inverse hyperbolic tangent function to each 
         input element.
-    """       
+    """
     return _pygauss.arctanh(x)
 
-def cos(x: ArrayLike) -> ShapeletsArray: 
+
+def cos(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes cosine function element-wise
 
@@ -1644,10 +1709,11 @@ def cos(x: ArrayLike) -> ShapeletsArray:
     ShapeletsArray 
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of computing cosine to each input element.
-    """    
+    """
     return _pygauss.cos(x)
 
-def cosh(x: ArrayLike) -> ShapeletsArray: 
+
+def cosh(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes hyperbolic cosine element-wise.
 
@@ -1664,10 +1730,11 @@ def cosh(x: ArrayLike) -> ShapeletsArray:
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of computing hyperbolic cosine to each input element.
 
-    """    
+    """
     return _pygauss.cosh(x)
 
-def degrees(x: ArrayLike) -> ShapeletsArray: 
+
+def degrees(x: ArrayLike) -> ShapeletsArray:
     r"""
     Convert angles from radians to degrees.
 
@@ -1689,7 +1756,8 @@ def degrees(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.degrees(x)
 
-def rad2deg(x: ArrayLike) -> ShapeletsArray: 
+
+def rad2deg(x: ArrayLike) -> ShapeletsArray:
     r"""
     Convert angles from radians to degrees.
 
@@ -1712,7 +1780,8 @@ def rad2deg(x: ArrayLike) -> ShapeletsArray:
 
     return _pygauss.rad2deg(x)
 
-def deg2rad(x: ArrayLike) -> ShapeletsArray: 
+
+def deg2rad(x: ArrayLike) -> ShapeletsArray:
     """
     Converts angles from degrees to radians
 
@@ -1732,9 +1801,10 @@ def deg2rad(x: ArrayLike) -> ShapeletsArray:
     radians
         Alias for the same function
     """
-    return _pygauss.deg2grad(x) 
+    return _pygauss.deg2grad(x)
 
-def radians(x: ArrayLike) -> ShapeletsArray: 
+
+def radians(x: ArrayLike) -> ShapeletsArray:
     r"""
     Converts angles from degrees to radians
 
@@ -1757,7 +1827,8 @@ def radians(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.radians(x)
 
-def sin(x: ArrayLike) -> ShapeletsArray: 
+
+def sin(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes sine function element-wise
 
@@ -1777,7 +1848,8 @@ def sin(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.sin(x)
 
-def sinh(x: ArrayLike) -> ShapeletsArray: 
+
+def sinh(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes hyperbolic sine element-wise.
 
@@ -1794,10 +1866,11 @@ def sinh(x: ArrayLike) -> ShapeletsArray:
         A tensor of the same dimensions as ``x``, whose elements are the 
         result of computing hyperbolic sine to each input element.
 
-    """        
+    """
     return _pygauss.sinh(x)
 
-def tan(x: ArrayLike) -> ShapeletsArray: 
+
+def tan(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes tangent function element-wise
 
@@ -1816,7 +1889,8 @@ def tan(x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.tan(x)
 
-def tanh(x: ArrayLike) -> ShapeletsArray: 
+
+def tanh(x: ArrayLike) -> ShapeletsArray:
     r"""
     Computes hyperbolic tangent element-wise.
 
@@ -1835,6 +1909,7 @@ def tanh(x: ArrayLike) -> ShapeletsArray:
 
     """
     return _pygauss.tanh(x)
+
 
 def hypot(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     r"""
@@ -1879,7 +1954,8 @@ def hypot(left: ArrayLike, right: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.hypot(left, right)
 
-def arctan2(y: ArrayLike, x: ArrayLike) -> ShapeletsArray: 
+
+def arctan2(y: ArrayLike, x: ArrayLike) -> ShapeletsArray:
     r"""
     Element-wise arctan operation over the ratio between y and x.
 
@@ -1903,14 +1979,15 @@ def arctan2(y: ArrayLike, x: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.arctan2(x, y)
 
+
 __all__ = [
-    "sin", "cos", "tan", "arcsin", "arccos", "arctan", "hypot", "arctan2", "degrees", 
-    "rad2deg", "radians", "deg2rad", "sinh", "cosh", "tanh", "arcsinh", "arccosh", 
-    "arctanh", "trunc", "floor", "ceil", "rint", "fix", "round", "exp", "expm1", "exp2", 
-    "log", "log10", "log2", "log1p", "signbit", "add", "reciprocal", "positive", "negative", 
-    "multiply", "divide", "true_divide", "power", "substract", "floor_divide", "mod", "remainder", 
-    "real", "imag", "conj", "conjugate", "complex", "angle", "complex", "sqrt", 
-    "cbrt", "square", "absolute", "fabs", "sign", "clip", "sigmoid", "erf", "erfc", "rsqrt", 
-    "factorial", "tgamma", "lgamma", "root", "bitwise_and", "bitwise_or", "bitwise_xor", 
-    "left_shift", "right_shift" 
+    "sin", "cos", "tan", "arcsin", "arccos", "arctan", "hypot", "arctan2", "degrees",
+    "rad2deg", "radians", "deg2rad", "sinh", "cosh", "tanh", "arcsinh", "arccosh",
+    "arctanh", "trunc", "floor", "ceil", "rint", "fix", "round", "exp", "expm1", "exp2",
+    "log", "log10", "log2", "log1p", "signbit", "add", "reciprocal", "positive", "negative",
+    "multiply", "divide", "true_divide", "power", "substract", "floor_divide", "mod", "remainder",
+    "real", "imag", "conj", "conjugate", "complex", "angle", "complex", "sqrt",
+    "cbrt", "square", "absolute", "fabs", "sign", "clip", "sigmoid", "erf", "erfc", "rsqrt",
+    "factorial", "tgamma", "lgamma", "root", "bitwise_and", "bitwise_or", "bitwise_xor",
+    "left_shift", "right_shift"
 ]

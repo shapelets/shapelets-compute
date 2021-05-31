@@ -1,5 +1,11 @@
-# %%
+#! /usr/bin/env python3
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
 
+# %%
 import shapelets.compute as sc
 from numpy import loadtxt
 from shapelets.data import load_dataset
@@ -9,14 +15,10 @@ from shapelets.data import load_dataset
 # test_data = raw_test[:,1:].T
 
 raw_train = load_dataset("Coffee_TRAIN.txt")
-train_classes = raw_train[:,0].T 
+train_classes = raw_train[:, 0].T
 train_data = raw_train[:, 1:].T
 
 # %%
-import numpy as np
-import seaborn as sns
-import pandas as pd
-from scipy import stats
 import scipy.cluster.hierarchy as hac
 from scipy.spatial.distance import squareform
 import matplotlib.pyplot as plt
@@ -29,4 +31,3 @@ plt.xlabel('sample index')
 plt.ylabel('distance')
 hac.dendrogram(Z)
 plt.show()
-# %%

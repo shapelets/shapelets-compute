@@ -1,4 +1,10 @@
 #! /usr/bin/env python3
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 import os
 import sys
 import re
@@ -6,16 +12,15 @@ import platform
 import subprocess
 import versioneer
 from typing import Union, List
-from setuptools import Command, setup, Extension, find_packages
+from setuptools import setup, Extension, find_packages
 from setuptools.command.develop import develop
 from distutils.version import LooseVersion
 import warnings
 import builtins
 
-
-
 # Technique from numpy
 builtins.__SHAPELETS_SETUP__ = True
+
 
 def process_version_information(full_version):
     """ Builds a textual version string out of the information provided by versioneer"""
@@ -27,8 +32,10 @@ def process_version_information(full_version):
         minor=minor,
         is_dev=is_dev)
 
+
 def get_documentation_url(ver_details, doc_root="https:://shapelets.io/doc/"):
     return doc_root + "dev" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
+
 
 def check_submodules():
     """ Ensure we have source code for gauss external repos """
@@ -49,7 +56,9 @@ def check_submodules():
         if line.startswith('-') or line.startswith('+'):
             raise ValueError('Submodule not clean: {}'.format(line))
 
+
 cmdclass = versioneer.get_cmdclass()
+
 
 ##
 # Build native libraries using CMAKE
@@ -64,7 +73,11 @@ cmdclass = versioneer.get_cmdclass()
 class CMakeExtension(Extension):
     """ It will be used in setup method under ext_modules parameter """
 
-    def __init__(self, name, sourcedir='', debug: bool = False, output_dir: str = '', target: Union[List[str], str] = None):
+    def __init__(self,
+                 name, sourcedir='',
+                 debug: bool = False,
+                 output_dir: str = '',
+                 target: Union[List[str], str] = None):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
         self.target = target
@@ -107,8 +120,8 @@ class CMakeBuild(cmdclass["build_ext"]):
             cmake_args += [
                 '-DCOPY_ALL_FILES=OFF'
             ]
-        
-        cfg = 'Debug' if self.debug else 'Release' # 'RelWithDebInfo'
+
+        cfg = 'Debug' if self.debug else 'Release'  # 'RelWithDebInfo'
         build_args = ['--config', cfg]  # cfg]
 
         if platform.system() == "Windows":
@@ -121,8 +134,8 @@ class CMakeBuild(cmdclass["build_ext"]):
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(
-            env.get('CXXFLAGS', ''),                # get existing flags
-            self.distribution.get_version()         # plus version
+            env.get('CXXFLAGS', ''),  # get existing flags
+            self.distribution.get_version()  # plus version
         )
 
         if not os.path.exists(self.build_temp):
@@ -132,18 +145,21 @@ class CMakeBuild(cmdclass["build_ext"]):
         if ext.target:
             if isinstance(ext.target, list):
                 for target in ext.target:
-                    subprocess.check_call(['cmake', '--build', '.', '--target', target] + build_args, cwd=self.build_temp)
+                    subprocess.check_call(['cmake', '--build', '.', '--target', target] + build_args,
+                                          cwd=self.build_temp)
             else:
-                subprocess.check_call(['cmake', '--build', '.', '--target', ext.target] + build_args, cwd=self.build_temp)
+                subprocess.check_call(['cmake', '--build', '.', '--target', ext.target] + build_args,
+                                      cwd=self.build_temp)
         else:
             subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+
 
 class DevelopCommand(develop):
     def run(self):
         global in_development
         in_development = True
         develop.run(self)
-        
+
 
 def create_metadata(full_version, doc_url):
     cmdclass['develop'] = DevelopCommand
@@ -166,10 +182,8 @@ def create_metadata(full_version, doc_url):
                 'data/*.gz'
             ],
         },
-        include_package_data = True,
+        include_package_data=True,
     )
-
-
 
 
 def setup_package():
@@ -203,4 +217,3 @@ def setup_package():
 
 if __name__ == '__main__':
     setup_package()
-

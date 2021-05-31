@@ -1,3 +1,9 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 import numpy as np
 import shapelets.compute as sh
 
@@ -9,7 +15,6 @@ def test_slicing_invert():
 
 
 def test_slicing_ranges():
-
     a = sh.iota((4, 4), 1)
     # first two rows
     assert a[0:2, ::].same_as([[0, 4, 8, 12], [1, 5, 9, 13]])
@@ -38,7 +43,6 @@ def test_equivalence_with_numpy():
     assert a[0:2, ::-1].same_as(n[0:2, ::-1])
     # just one element
     assert a[0, 0].same_as(n[0, 0])
-    
 
 
 def test_ellipsis_operator():
@@ -90,7 +94,7 @@ def test_logical_filters():
 
 
 def test_assigment_scalar():
-    c = sh.zeros((3, 3, 3),dtype="complex64")
+    c = sh.zeros((3, 3, 3), dtype="complex64")
     c[1, ...] = 1 + 1j
     c[..., 1] = 1 - 1j
 
@@ -126,7 +130,7 @@ def test_assignment_vector():
 def test_batch_lambda():
     # Batch is no longer part of the lib
     # in favour for automatic broadcasting
-    assert True   
+    assert True
     # f = sh.array([
     #     [-0.92466235, 0.18082578, 2.544097, 0.35158235, -0.3451673]
     # ], dtype="float32")
@@ -153,7 +157,7 @@ def test_batch_lambda():
 def test_batch_with():
     # batch is no longer part of the api
     # in favour for automatic broadcasting.
-    assert True 
+    assert True
 
     # def my_batch_function(lhs, rhs):
     #     with sh.batch():
@@ -191,26 +195,28 @@ def test_batch_parallel_range():
         b[..., ii] = sh.sin(ii) + a[..., ii]
 
     assert (b - a).same_as([
-        [ 0.0000,  0.0000,  0.0000,  0.0000,  0.0000],
-        [ 0.8415,  0.8415,  0.8415,  0.8415,  0.8415],
-        [ 0.9093,  0.9093,  0.9093,  0.9093,  0.9093],
-        [ 0.1411,  0.1411,  0.1411,  0.1411,  0.1411],
+        [0.0000, 0.0000, 0.0000, 0.0000, 0.0000],
+        [0.8415, 0.8415, 0.8415, 0.8415, 0.8415],
+        [0.9093, 0.9093, 0.9093, 0.9093, 0.9093],
+        [0.1411, 0.1411, 0.1411, 0.1411, 0.1411],
         [-0.7568, -0.7568, -0.7568, -0.7568, -0.7568]
     ])
+
 
 def test_assign_vector_with_boolean_condition():
     a = sh.zeros(10, "bool")
     b = sh.random.randn(10)
-    a[b<0.5] = True 
-    assert a.same_as(b<0.5)
+    a[b < 0.5] = True
+    assert a.same_as(b < 0.5)
+
 
 def test_assign_matrix():
-    a = sh.zeros((10,10), "int32")
+    a = sh.zeros((10, 10), "int32")
     b = sh.array([False, False, False, False, True, False, False, False, False, False], dtype="bool")
     c = sh.array([5], 1, dtype="int32")
-    a[:, b] = sh.array([1,2,3,4,5,6,7,8,9,0]).T
-    a[:, c] = sh.array([1,2,3,4,5,6,7,8,9,0]).T
-    assert a[:,3].same_as(sh.array([0,0,0,0,0,0,0,0,0,0]).T)
-    assert a[:,4].same_as(sh.array([1,2,3,4,5,6,7,8,9,0]).T)
-    assert a[:,5].same_as(sh.array([1,2,3,4,5,6,7,8,9,0]).T)
-    assert a[:,6].same_as(sh.array([0,0,0,0,0,0,0,0,0,0]).T)
+    a[:, b] = sh.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]).T
+    a[:, c] = sh.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]).T
+    assert a[:, 3].same_as(sh.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).T)
+    assert a[:, 4].same_as(sh.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]).T)
+    assert a[:, 5].same_as(sh.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]).T)
+    assert a[:, 6].same_as(sh.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).T)
