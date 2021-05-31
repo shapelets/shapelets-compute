@@ -8,6 +8,11 @@
 /cmake-build-debug
 /pkg
 /dist
+/venv
+/doc/build
+/doc/html
+/doc/plot_directive/
+/raw.githubusercontent.com/
 /modules/shapelets_compute.egg-info
 /modules/shapelets/compute/*.so
 /modules/shapelets/compute/*.dll

@@ -1,3 +1,9 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import Union, Optional, NamedTuple
 
@@ -10,9 +16,9 @@ from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 from . import _pygauss
 
-
 FloatOrComplex = Union[complex, float]
 XCorrScale = Literal['noscale', 'biased', 'unbiased', 'coeff']
+
 
 def __convert_xcorr_scale(v: XCorrScale):
     if v == 'noscale':
@@ -26,7 +32,8 @@ def __convert_xcorr_scale(v: XCorrScale):
     else:
         raise ValueError("Unknown XCorrScale")
 
-def mean(data: ArrayLike, weights: ArrayLike = None, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]: 
+
+def mean(data: ArrayLike, weights: ArrayLike = None, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]:
     """
     Computes the arithmetic mean along an (optional) dimension
 
@@ -67,6 +74,7 @@ def mean(data: ArrayLike, weights: ArrayLike = None, dim: int = None) -> Union[F
     """
     return _pygauss.mean(data, weights, dim)
 
+
 def median(data: ArrayLike, dim: int = None) -> Union[FloatOrComplex, ShapeletsArray]:
     """
     Computes the median over a (optional) dimension
@@ -95,6 +103,7 @@ def median(data: ArrayLike, dim: int = None) -> Union[FloatOrComplex, ShapeletsA
     1.0
     """
     return _pygauss.median(data, dim)
+
 
 def std(data: ArrayLike, ddof: int = 1, dim: int = 0) -> ShapeletsArray:
     """
@@ -132,6 +141,7 @@ def std(data: ArrayLike, ddof: int = 1, dim: int = 0) -> ShapeletsArray:
     """
     return _pygauss.std(data, ddof, dim)
 
+
 def var(data: ArrayLike, ddof: int = 1, dim: int = 0) -> ShapeletsArray:
     """
     Computes the variance across a particular dimension.
@@ -168,7 +178,8 @@ def var(data: ArrayLike, ddof: int = 1, dim: int = 0) -> ShapeletsArray:
     """
     return _pygauss.var(data, ddof, dim)
 
-def moment(data: ArrayLike, k: int, dim: int = 0) -> ShapeletsArray: 
+
+def moment(data: ArrayLike, k: int, dim: int = 0) -> ShapeletsArray:
     r"""
     Computes the kth statistical moment of data.  
 
@@ -190,7 +201,8 @@ def moment(data: ArrayLike, k: int, dim: int = 0) -> ShapeletsArray:
     """
     return _pygauss.moment(data, k, dim)
 
-def kurtosis(data: ArrayLike, dim: int = 0) -> ShapeletsArray: 
+
+def kurtosis(data: ArrayLike, dim: int = 0) -> ShapeletsArray:
     r"""
     Calculates the sample kurtosis of data, calculated with the adjusted Fisher-Pearson standardized moment
     coefficient G2.
@@ -213,7 +225,7 @@ def kurtosis(data: ArrayLike, dim: int = 0) -> ShapeletsArray:
     return _pygauss.kurtosis(data, dim)
 
 
-def skewness(data: ArrayLike, dim: int = 0) -> ShapeletsArray: 
+def skewness(data: ArrayLike, dim: int = 0) -> ShapeletsArray:
     r"""
     Calculates the sample skewness of data, calculated with the adjusted Fisher-Pearson standardized moment
     coefficient G1.
@@ -235,6 +247,7 @@ def skewness(data: ArrayLike, dim: int = 0) -> ShapeletsArray:
     """
     return _pygauss.skewness(data, dim)
 
+
 def cov(data: ArrayLike, ddof: int = 1) -> ShapeletsArray:
     r"""
     Returns the covariance matrix of the series contained in data.
@@ -251,6 +264,7 @@ def cov(data: ArrayLike, ddof: int = 1) -> ShapeletsArray:
         Covariance matrix of all the series in data.
     """
     return _pygauss.cov(data, ddof)
+
 
 def corrcoef(data: ArrayLike, ddof: int = 1) -> ShapeletsArray:
     r"""
@@ -292,12 +306,15 @@ def corrcoef(data: ArrayLike, ddof: int = 1) -> ShapeletsArray:
        -0.8072    -0.8072    -0.8072     1.0000 
     """
     return _pygauss.corrcoef(data, ddof)
-    
+
+
 class XCoResults(NamedTuple):
     lags: ShapeletsArray
     values: ShapeletsArray
 
-def xcov(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = 'noscale') -> XCoResults: 
+
+def xcov(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None,
+         scale: Optional[XCorrScale] = 'noscale') -> XCoResults:
     r"""
     Estimates the cross-covariance of each pair of column vectors in ``xss`` and ``yss``. 
 
@@ -344,10 +361,12 @@ def xcov(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: Op
     [1 7 1 1]
         -0.4500    -0.3000     0.2500     1.0000     0.2500    -0.3000    -0.4500     
 
-    """    
+    """
     return XCoResults(*_pygauss.xcov(xss, yss, maxlag, __convert_xcorr_scale(scale)))
 
-def xcorr(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = 'noscale') -> XCoResults: 
+
+def xcorr(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None,
+          scale: Optional[XCorrScale] = 'noscale') -> XCoResults:
     r"""
     Cross-correlation estimation.
 
@@ -392,11 +411,11 @@ def xcorr(xss: ArrayLike, yss: ArrayLike, maxlag: Optional[int] = None, scale: O
     >>> values.T
     [1 7 1 1]
         0.1181     0.3347     0.6300     0.9844     0.7481     0.4922     0.2362
-    """    
+    """
     return XCoResults(*_pygauss.xcorr(xss, yss, maxlag, __convert_xcorr_scale(scale)))
 
 
-def acorr(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = 'noscale') -> ShapeletsArray: 
+def acorr(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = 'noscale') -> ShapeletsArray:
     r"""
     Auto-correlation estimation of each column vector.
 
@@ -443,7 +462,8 @@ def acorr(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrSc
     """
     return _pygauss.acorr(data, maxlag, __convert_xcorr_scale(scale))
 
-def acov(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = 'noscale') -> ShapeletsArray: 
+
+def acov(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrScale] = 'noscale') -> ShapeletsArray:
     r"""
     Auto-covariance estimation.
 
@@ -490,13 +510,15 @@ def acov(data: ArrayLike, maxlag: Optional[int] = None, scale: Optional[XCorrSca
     """
     return _pygauss.acov(data, maxlag, __convert_xcorr_scale(scale))
 
+
 class TopKResult(NamedTuple):
     values: ShapeletsArray
     """Top values"""
     indices: ShapeletsArray
     """Indices of those values"""
 
-def topk_max(data: ArrayLike, k: int, dim: int = 0) -> TopKResult: 
+
+def topk_max(data: ArrayLike, k: int, dim: int = 0) -> TopKResult:
     r"""
     Finds values and indices of the top k maximum values.
 
@@ -534,7 +556,8 @@ def topk_max(data: ArrayLike, k: int, dim: int = 0) -> TopKResult:
 
     return TopKResult(*_pygauss.topk_max(data, k, dim))
 
-def topk_min(data: ArrayLike, k: int, dim: int = 0) -> TopKResult: 
+
+def topk_min(data: ArrayLike, k: int, dim: int = 0) -> TopKResult:
     r"""
     Finds values and indices of the top k minimum values 
 
@@ -566,7 +589,7 @@ def topk_min(data: ArrayLike, k: int, dim: int = 0) -> TopKResult:
     Whilst this function provides the ability to change the dimension 
     of the reduction, the underlying implementation only supports
     setting this value to 0. 
-    """    
+    """
     if dim != 0:
         raise ValueError("Dimensions other than zero are not supported")
 

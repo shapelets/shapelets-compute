@@ -1,10 +1,17 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 
 from . import _pygauss
 
-def decimal_scaling(tss: ArrayLike) -> ShapeletsArray: 
+
+def decimal_scaling(tss: ArrayLike) -> ShapeletsArray:
     r"""
     Normalizes sequences (column vectors) using decimal scaling
 
@@ -36,7 +43,8 @@ def decimal_scaling(tss: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.decimal_scaling(tss)
 
-def minmax_norm(tss: ArrayLike, high: float = 1.0, low: float = 0.0) -> ShapeletsArray: 
+
+def minmax_norm(tss: ArrayLike, high: float = 1.0, low: float = 0.0) -> ShapeletsArray:
     """
     Normalizes sequences (column vectors) using min-max algorithm
 
@@ -70,7 +78,8 @@ def minmax_norm(tss: ArrayLike, high: float = 1.0, low: float = 0.0) -> Shapelet
     """
     return _pygauss.minmax_norm(tss, high, low)
 
-def mean_norm(array_like: ArrayLike) -> ShapeletsArray: 
+
+def mean_norm(array_like: ArrayLike) -> ShapeletsArray:
     """
     Applies mean normalization to input sequences (column vectors)
 
@@ -98,7 +107,8 @@ def mean_norm(array_like: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.mean_norm(array_like)
 
-def zscore(tss: ArrayLike, axis: int = 0, ddof: int = 0) -> ShapeletsArray: 
+
+def zscore(tss: ArrayLike, axis: int = 0, ddof: int = 0) -> ShapeletsArray:
     """
     Applies z-normalization to input sequences
 
@@ -136,7 +146,8 @@ def zscore(tss: ArrayLike, axis: int = 0, ddof: int = 0) -> ShapeletsArray:
     """
     return _pygauss.zscore(tss, axis, ddof)
 
-def unit_length_norm(tss: ArrayLike) -> ShapeletsArray: 
+
+def unit_length_norm(tss: ArrayLike) -> ShapeletsArray:
     """
     Normalizes using unit length strategy.
 
@@ -166,7 +177,8 @@ def unit_length_norm(tss: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.unit_length_norm(tss)
 
-def median_norm(tss: ArrayLike) -> ShapeletsArray: 
+
+def median_norm(tss: ArrayLike) -> ShapeletsArray:
     """
     Normalizes using median as a scaling factor.
 
@@ -193,7 +205,8 @@ def median_norm(tss: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.median_norm(tss)
 
-def logistic_norm(array_like: ArrayLike) -> ShapeletsArray: 
+
+def logistic_norm(array_like: ArrayLike) -> ShapeletsArray:
     """
     Normalization through the logistic function
 
@@ -218,7 +231,8 @@ def logistic_norm(array_like: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.logistic_norm(array_like)
 
-def tanh_norm(array_like: ArrayLike) -> ShapeletsArray: 
+
+def tanh_norm(array_like: ArrayLike) -> ShapeletsArray:
     """
     Normalization through the hyperbolic tangent.
 
@@ -243,7 +257,8 @@ def tanh_norm(array_like: ArrayLike) -> ShapeletsArray:
     """
     return _pygauss.tanh_norm(array_like)
 
-__all__ = [ 
-    "tanh_norm", "logistic_norm", "median_norm", "unit_length_norm", 
+
+__all__ = [
+    "tanh_norm", "logistic_norm", "median_norm", "unit_length_norm",
     "zscore", "mean_norm", "minmax_norm", "decimal_scaling"
 ]

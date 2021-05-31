@@ -1,3 +1,9 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 
 from typing import Union
@@ -5,7 +11,8 @@ from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 from . import _pygauss
 
-def visvalingam(x: ArrayLike, y: ArrayLike, num_points: int) -> ShapeletsArray: 
+
+def visvalingam(x: ArrayLike, y: ArrayLike, num_points: int) -> ShapeletsArray:
     """
     Reduces a set of points by applying the Visvalingam method (minimum triangle area) until the number
     of points is reduced to numPoints.
@@ -39,7 +46,7 @@ def visvalingam(x: ArrayLike, y: ArrayLike, num_points: int) -> ShapeletsArray:
     return _pygauss.visvalingam(x, y, num_points)
 
 
-def pip(x: ArrayLike, y: ArrayLike, ips: int) -> ShapeletsArray:    
+def pip(x: ArrayLike, y: ArrayLike, ips: int) -> ShapeletsArray:
     """
     Perceptually Important Points
 
@@ -64,7 +71,8 @@ def pip(x: ArrayLike, y: ArrayLike, ips: int) -> ShapeletsArray:
     """
     return _pygauss.pip(x, y, ips)
 
-def paa(x: ArrayLike, y: ArrayLike, bins: int) -> ShapeletsArray:        
+
+def paa(x: ArrayLike, y: ArrayLike, bins: int) -> ShapeletsArray:
     r"""
     Piecewise Aggregate Approximation (PAA)
 
@@ -79,5 +87,3 @@ def paa(x: ArrayLike, y: ArrayLike, bins: int) -> ShapeletsArray:
 __all__ = [
     "visvalingam", "pip", "paa"
 ]
-
-

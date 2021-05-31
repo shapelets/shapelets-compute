@@ -1,57 +1,67 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import Optional, Sequence, Union
+
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-    
+
 from ._pygauss import (DeviceInfo, DeviceMemory)
 from . import _pygauss
 
 # Different backend types
 Backend = Literal['cpu', 'opencl', 'cuda', 'default']
 
+
 class DeviceInfo:
     """
     Describes the current device and informs if 64 or 16 bit floating point structures are supported.
     """
+
     def __repr__(self) -> str: ...
 
     @property
-    def compute(self) -> str: 
+    def compute(self) -> str:
         """
         Name of the computational platform
         """
 
     @property
-    def id(self) -> int: 
+    def id(self) -> int:
         """
         Unique identifier of the device (within the context of the active backend)
         """
 
     @property
-    def isDoubleAvailable(self) -> bool: 
+    def isDoubleAvailable(self) -> bool:
         """
         Informs if 64 bit floating point arithmetic is supported
         """
 
     @property
-    def isHalfAvailable(self) -> bool: 
+    def isHalfAvailable(self) -> bool:
         """
         Informs if 16 bit floating point arithmetic is supported
         """
 
     @property
-    def name(self) -> str: 
+    def name(self) -> str:
         """
         Name of the device
         """
 
     @property
-    def platform(self) -> str: 
+    def platform(self) -> str:
         """
         Name of the computational platform
         """
+
 
 class DeviceMemory:
     """
@@ -61,7 +71,7 @@ class DeviceMemory:
     def __repr__(self) -> str: ...
 
     @property
-    def buffers(self) -> int: 
+    def buffers(self) -> int:
         """
         Number of buffers currently allocated on a particular device
         """
@@ -73,7 +83,7 @@ class DeviceMemory:
         """
 
     @property
-    def locked_buffers(self) -> int: 
+    def locked_buffers(self) -> int:
         """
         Out of all buffers allocated, this property informs on how many of those are pinned or locked.
         """
@@ -85,17 +95,19 @@ class DeviceMemory:
         used, locked or pinned.
         """
 
+
 def __to_pygauss_backend(backend: Backend):
     if backend == 'cpu':
         return _pygauss.Backend.CPU
     elif backend == 'opencl':
         return _pygauss.Backend.OpenCL
     elif backend == 'cuda':
-        return _pygauss.Backend.CUDA 
+        return _pygauss.Backend.CUDA
     elif backend == 'default':
         return _pygauss.Backend.Default
     else:
         raise ValueError("Unknown backend type")
+
 
 def __backend_as_literal(backend: _pygauss.Backend) -> Backend:
     if backend == _pygauss.Backend.CPU:
@@ -143,17 +155,20 @@ def device_gc() -> None:
     """
     return _pygauss.device_gc()
 
+
 def get_available_backends() -> Sequence[Backend]:
     """
     Returns a sequence of available backends in the current platform.
     """
     return [__backend_as_literal(b) for b in _pygauss.get_available_backends()]
 
+
 def get_backend() -> Backend:
     """
     Returns the active backend.
     """
     return __backend_as_literal(_pygauss.get_backend())
+
 
 def get_device_memory(dev: Optional[Union[int, DeviceInfo]] = None) -> DeviceMemory:
     """
@@ -188,20 +203,21 @@ def get_device_memory(dev: Optional[Union[int, DeviceInfo]] = None) -> DeviceMem
     return _pygauss.get_device_memory(dev)
 
 
-def get_device() -> DeviceInfo: 
+def get_device() -> DeviceInfo:
     """
     Returns the current device in use.
     """
     return _pygauss.get_device()
 
 
-def get_devices() -> Sequence[DeviceInfo]: 
+def get_devices() -> Sequence[DeviceInfo]:
     """
     Returns all devices in the current backend.
     """
     return _pygauss.get_devices()
 
-def has_backend(test: Backend) -> int: 
+
+def has_backend(test: Backend) -> int:
     """
     Checks if a particular backend is available.
 
@@ -217,23 +233,27 @@ def has_backend(test: Backend) -> int:
     """
     return _pygauss.has_backend(__to_pygauss_backend(test))
 
-def set_backend(backend: Backend) -> None: 
+
+def set_backend(backend: Backend) -> None:
     """
     Changes the current backend.  
     """
     return _pygauss.set_backend(__to_pygauss_backend(backend))
 
-def set_device(dev: Union[int, DeviceInfo]) -> bool: 
+
+def set_device(dev: Union[int, DeviceInfo]) -> bool:
     """
     Changes the active device
     """
     return _pygauss.set_device(dev)
 
-def sync(dev: Optional[Union[int, DeviceInfo]] = None) -> None: 
+
+def sync(dev: Optional[Union[int, DeviceInfo]] = None) -> None:
     """
     Sychronously wait for all operations and data transfers to finish.
     """
     return _pygauss.sync(dev)
+
 
 def enable_manual_eval(new_value: bool) -> None:
     """
@@ -241,23 +261,25 @@ def enable_manual_eval(new_value: bool) -> None:
     """
     return _pygauss.enable_manual_eval(new_value)
 
-def eval(*args) -> None: 
+
+def eval(*args) -> None:
     """
 
     """
     return _pygauss.eval(*args)
 
-def is_manual_eval_enabled() -> bool: 
+
+def is_manual_eval_enabled() -> bool:
     """
     
     """
     return _pygauss.manual_eval_enabled()
 
 
-__all__=[
+__all__ = [
     "get_backend", "set_backend", "has_backend", "get_available_backends",
     "get_devices", "get_device", "set_device", "device_gc",
     "sync", "get_device_memory",
     "enable_manual_eval", "eval", "is_manual_eval_enabled",
-    "DeviceInfo","DeviceMemory","Backend"
+    "DeviceInfo", "DeviceMemory", "Backend"
 ]

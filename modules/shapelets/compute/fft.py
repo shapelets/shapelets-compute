@@ -1,16 +1,24 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 
 from typing import Optional, Union, List
+
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-    
+
 from ._array_obj import ShapeletsArray
 from .__basic_typing import ArrayLike, ShapeLike
 from . import _pygauss
 
 NormType = Literal['backward', 'ortho', 'forward']
+
 
 def __convertNorm(norm=None):
     if norm is None or (norm == 'backward'):
@@ -22,7 +30,9 @@ def __convertNorm(norm=None):
     else:
         return float(norm)
 
-def ifft(c: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[NormType,float]] = None) -> ShapeletsArray:
+
+def ifft(c: ArrayLike, shape: Optional[ShapeLike] = None,
+         norm: Optional[Union[NormType, float]] = None) -> ShapeletsArray:
     r"""
     Computes the inverse FFT
 
@@ -58,7 +68,9 @@ def ifft(c: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[N
     """
     return _pygauss.ifft(c, __convertNorm(norm), shape)
 
-def fft(a: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[NormType,float]] = None) -> ShapeletsArray:
+
+def fft(a: ArrayLike, shape: Optional[ShapeLike] = None,
+        norm: Optional[Union[NormType, float]] = None) -> ShapeletsArray:
     r"""
     Computes a Fourier transform.
 
@@ -126,7 +138,9 @@ def fft(a: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[No
     """
     return _pygauss.fft(a, __convertNorm(norm), shape)
 
-def rfft(a: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[NormType,float]] = None) -> ShapeletsArray:
+
+def rfft(a: ArrayLike, shape: Optional[ShapeLike] = None,
+         norm: Optional[Union[NormType, float]] = None) -> ShapeletsArray:
     r"""
     Returns Fourier Transform for real input
 
@@ -194,7 +208,8 @@ def rfft(a: ArrayLike, shape: Optional[ShapeLike] = None, norm: Optional[Union[N
     """
     return _pygauss.rfft(a, __convertNorm(norm), shape)
 
-def irfft(c: ArrayLike, shape: ShapeLike, norm: Optional[Union[NormType,float]] = None) -> ShapeletsArray:
+
+def irfft(c: ArrayLike, shape: ShapeLike, norm: Optional[Union[NormType, float]] = None) -> ShapeletsArray:
     r"""
     Computes the inverse FFT for real input
 
@@ -228,11 +243,13 @@ def irfft(c: ArrayLike, shape: ShapeLike, norm: Optional[Union[NormType,float]] 
     """
     return _pygauss.irfft(c, __convertNorm(norm), shape)
 
+
 def rfftfreq(n: int, d: float = 1.0) -> ShapeletsArray:
     r"""
     TODO
     """
     return _pygauss.rfftfreq(n, d)
+
 
 def fftfreq(n: int, d: float = 1.0) -> ShapeletsArray:
     r"""
@@ -260,7 +277,8 @@ def fftfreq(n: int, d: float = 1.0) -> ShapeletsArray:
     return _pygauss.fftfreq(n, d)
 
 
-def spectral_derivative(signal: ArrayLike, kappa_spec: Union[float, ArrayLike] = 1.0, shift: bool = True) -> ShapeletsArray:
+def spectral_derivative(signal: ArrayLike, kappa_spec: Union[float, ArrayLike] = 1.0,
+                        shift: bool = True) -> ShapeletsArray:
     r"""
     Computes the derivative of a signal using spectral (FT) methods.
 
@@ -322,6 +340,7 @@ def fftshift(x: ArrayLike, axes: Optional[Union[int, List[int]]] = None) -> Shap
     Shift the zero-frequency component to the center of the spectrum.
     """
     return _pygauss.fftshift(x, axes)
+
 
 __all__ = [
     "fft",

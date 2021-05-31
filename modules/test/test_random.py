@@ -1,4 +1,12 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
+import pytest
 import shapelets.compute as sc
+
 
 def test_random_sanity_check():
     rng = sc.random.random_engine()
@@ -13,8 +21,9 @@ def test_random_sanity_check():
     rng.uniform()
     rng.wald(1.0, 1.0)
     rng.multivariate_normal([1.0, 2.0], [[2.0, 0.3], [0.3, 4.0]], 10)
-    
 
+
+@pytest.mark.skip('Flaky test on Windows 10 MSI environment')
 def test_random_gamma():
     if 'opencl' in sc.get_available_backends():
         sc.set_backend('opencl')

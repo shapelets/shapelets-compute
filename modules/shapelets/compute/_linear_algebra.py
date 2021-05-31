@@ -1,10 +1,17 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import NamedTuple, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-    
+
 from .__basic_typing import ArrayLike, _ScalarLike
 from ._array_obj import ShapeletsArray
 from . import _pygauss
@@ -13,8 +20,9 @@ AnyScalar = _ScalarLike
 FloatOrComplex = Union[complex, float]
 ConvDomain = Literal['auto', 'frequency', 'spatial']
 ConvMode = Literal['default', 'expand']
-NormType = Literal['euclid','lpq','matrix','matrixinf','vector1','vector2','vectorinf','vectorp']
+NormType = Literal['euclid', 'lpq', 'matrix', 'matrixinf', 'vector1', 'vector2', 'vectorinf', 'vectorp']
 MatMulOptions = Literal['none', 'transpose', 'conjtrans']
+
 
 def __pygauss_norm_type(tpe: NormType):
     if tpe == 'euclid':
@@ -36,6 +44,7 @@ def __pygauss_norm_type(tpe: NormType):
     else:
         raise ValueError("Unknown norm type")
 
+
 def __pygauss_mat_mul_options(opt: MatMulOptions):
     if opt == 'none':
         return _pygauss.MatrixProperties.Default
@@ -46,8 +55,9 @@ def __pygauss_mat_mul_options(opt: MatMulOptions):
     else:
         raise ValueError("Unknown matrix multiplication option")
 
+
 def __pygauss_conv_domain(domain: ConvDomain):
-    if domain=='auto':
+    if domain == 'auto':
         return _pygauss.ConvDomain.Auto
     elif domain == 'frequency':
         return _pygauss.ConvDomain.Frequency
@@ -56,11 +66,12 @@ def __pygauss_conv_domain(domain: ConvDomain):
     else:
         raise ValueError("Unknown convolve domain")
 
+
 def __pygauss_conv_mode(mode: ConvMode):
     if mode == 'default':
         return _pygauss.ConvMode.Default
     elif mode == 'expand':
-        return _pygauss.ConvMode.Expand 
+        return _pygauss.ConvMode.Expand
     else:
         raise ValueError("Unknown convolve mode")
 
@@ -70,6 +81,7 @@ class EigenResult(NamedTuple):
     """Access to the eigenvalues"""
     vectors: ShapeletsArray
     """Access to the eigenvectors"""
+
 
 def eigvalsh(data: ArrayLike) -> ShapeletsArray:
     """
@@ -88,8 +100,9 @@ def eigvalsh(data: ArrayLike) -> ShapeletsArray:
     -------
     ShapeletsArray
         Floating (not complex) array with eigenvalues in increasing order.
-    """    
+    """
     return _pygauss.eigvalsh(data)
+
 
 def eigvals(data: ArrayLike) -> ShapeletsArray:
     """
@@ -111,6 +124,7 @@ def eigvals(data: ArrayLike) -> ShapeletsArray:
 
     """
     return _pygauss.eigvals(data)
+
 
 def eigh(data: ArrayLike) -> EigenResult:
     """
@@ -137,7 +151,8 @@ def eigh(data: ArrayLike) -> EigenResult:
     """
     return EigenResult(*_pygauss.eigh(data))
 
-def eig(data: ArrayLike) -> EigenResult: 
+
+def eig(data: ArrayLike) -> EigenResult:
     """
     Computes eigenvalues and eigenvectors of general matrices.
 
@@ -189,7 +204,9 @@ def eig(data: ArrayLike) -> EigenResult:
     """
     return EigenResult(*_pygauss.eig(data))
 
-def convolve(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', domain: ConvDomain = 'auto') -> ShapeletsArray: 
+
+def convolve(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default',
+             domain: ConvDomain = 'auto') -> ShapeletsArray:
     """
     Returns the discrete, linear convolution of sequences up to 3 dimensions.
 
@@ -239,7 +256,9 @@ def convolve(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', d
     """
     return _pygauss.convolve(signal, filter, __pygauss_conv_mode(mode), __pygauss_conv_domain(domain))
 
-def convolve1(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', domain: ConvDomain = 'auto') -> ShapeletsArray: 
+
+def convolve1(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default',
+              domain: ConvDomain = 'auto') -> ShapeletsArray:
     """
     Returns the discrete, linear convolution of one-dimensional sequences.
 
@@ -323,7 +342,9 @@ def convolve1(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', 
     """
     return _pygauss.convolve1(signal, filter, __pygauss_conv_mode(mode), __pygauss_conv_domain(domain))
 
-def convolve2(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', domain: ConvDomain = 'auto') -> ShapeletsArray:
+
+def convolve2(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default',
+              domain: ConvDomain = 'auto') -> ShapeletsArray:
     """
     Returns the discrete, linear convolution of two-dimensional sequences.
 
@@ -356,7 +377,9 @@ def convolve2(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', 
     """
     return _pygauss.convolve2(signal, filter, __pygauss_conv_mode(mode), __pygauss_conv_domain(domain))
 
-def convolve3(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', domain: ConvDomain = 'auto') -> ShapeletsArray:
+
+def convolve3(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default',
+              domain: ConvDomain = 'auto') -> ShapeletsArray:
     """
     Returns the discrete, linear convolution of three-dimensional sequences.
 
@@ -401,6 +424,7 @@ def convolve3(signal: ArrayLike, filter: ArrayLike, mode: ConvMode = 'default', 
     """
     return _pygauss.convolve3(signal, filter, __pygauss_conv_mode(mode), __pygauss_conv_domain(domain))
 
+
 def cholesky(x: ArrayLike, is_upper: bool = True) -> ShapeletsArray:
     """
     Performs a Cholesky decomposition.
@@ -435,6 +459,7 @@ def cholesky(x: ArrayLike, is_upper: bool = True) -> ShapeletsArray:
     """
     return _pygauss.cholesky(x, is_upper)
 
+
 def det(x: ArrayLike) -> FloatOrComplex:
     """
     Computes the determinant of an input matrix
@@ -465,6 +490,7 @@ def det(x: ArrayLike) -> FloatOrComplex:
 
     """
     return _pygauss.det(x)
+
 
 def dot(lhs: ArrayLike, rhs: ArrayLike, conj_lhs: bool = False, conj_rhs: bool = False) -> ShapeletsArray:
     """
@@ -505,9 +531,10 @@ def dot(lhs: ArrayLike, rhs: ArrayLike, conj_lhs: bool = False, conj_rhs: bool =
     [1 1 1 1]
              (13.0000,0.0000)     
     """
-    return _pygauss.dot(lhs,rhs,conj_lhs,conj_rhs)
+    return _pygauss.dot(lhs, rhs, conj_lhs, conj_rhs)
 
-def dot_scalar(lhs: ArrayLike, rhs: ArrayLike, conj_lhs: bool = False, conj_rhs: bool = False) -> FloatOrComplex: 
+
+def dot_scalar(lhs: ArrayLike, rhs: ArrayLike, conj_lhs: bool = False, conj_rhs: bool = False) -> FloatOrComplex:
     """
     Computes the dot product, also known as inner product, of vectors.
 
@@ -534,11 +561,12 @@ def dot_scalar(lhs: ArrayLike, rhs: ArrayLike, conj_lhs: bool = False, conj_rhs:
     dot
         For a version of the same functionality but leaving the result in device's memory.
 
-    """    
-    return _pygauss.dot_scalar(lhs,rhs,conj_lhs,conj_rhs)
+    """
+    return _pygauss.dot_scalar(lhs, rhs, conj_lhs, conj_rhs)
 
 
-def gemm(a: ArrayLike, b: ArrayLike, c: Optional[ArrayLike] = None, alpha: float = 1.0, beta: float = 0.0, trans_a: bool = False, trans_b: bool = False) -> ShapeletsArray:
+def gemm(a: ArrayLike, b: ArrayLike, c: Optional[ArrayLike] = None, alpha: float = 1.0, beta: float = 0.0,
+         trans_a: bool = False, trans_b: bool = False) -> ShapeletsArray:
     r"""
     Access GEMM Blas Level 3 general matrix multiply.
 
@@ -605,8 +633,9 @@ def gemm(a: ArrayLike, b: ArrayLike, c: Optional[ArrayLike] = None, alpha: float
         -0.1918     0.2941    -1.1007    -0.3546    -0.2993 
         -0.2061    -0.0331     0.1955     0.2680    -0.9807     
 
-    """    
-    return _pygauss.gemm(a, b , c, alpha, beta, trans_a, trans_b)
+    """
+    return _pygauss.gemm(a, b, c, alpha, beta, trans_a, trans_b)
+
 
 def inv(array_like: ArrayLike) -> ShapeletsArray:
     """
@@ -638,8 +667,9 @@ def inv(array_like: ArrayLike) -> ShapeletsArray:
         1.0000     0.0000 
         0.0000     1.0000 
 
-    """        
+    """
     return _pygauss.inverse(array_like, _pygauss.MatrixProperties.Default)
+
 
 def lu(x: ArrayLike) -> tuple:
     """
@@ -690,10 +720,12 @@ def lu(x: ArrayLike) -> tuple:
     References
     ----------
     [1] `ArrayFire Documentation <https://arrayfire.org/docs/group__lapack__factor__func__lu.htm>`_ 
-    """        
+    """
     return _pygauss.lu(x)
 
-def matmul(lhs: ArrayLike, rhs: ArrayLike, lhs_options: MatMulOptions = 'none', rhs_options: MatMulOptions = 'none') -> ShapeletsArray:
+
+def matmul(lhs: ArrayLike, rhs: ArrayLike, lhs_options: MatMulOptions = 'none',
+           rhs_options: MatMulOptions = 'none') -> ShapeletsArray:
     """
     Matrix Multiplication
 
@@ -733,7 +765,8 @@ def matmul(lhs: ArrayLike, rhs: ArrayLike, lhs_options: MatMulOptions = 'none', 
     ----------
     [1] `ArrayFire Documentation <https://arrayfire.org/docs/group__blas__func__matmul.htm>`_ 
     """
-    return _pygauss.matmul(lhs, rhs,__pygauss_mat_mul_options(lhs_options),__pygauss_mat_mul_options(rhs_options))
+    return _pygauss.matmul(lhs, rhs, __pygauss_mat_mul_options(lhs_options), __pygauss_mat_mul_options(rhs_options))
+
 
 def matmulNT(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray:
     """
@@ -743,10 +776,11 @@ def matmulNT(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray:
     --------
     matmul
         See this function for description of parameters and batching opportunities
-    """        
+    """
     return _pygauss.matmulNT(lhs, rhs)
 
-def matmulTN(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray: 
+
+def matmulTN(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray:
     """
     Executes matrix multiplication :math:`L^T*R`
 
@@ -754,10 +788,11 @@ def matmulTN(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray:
     --------
     matmul
         See this function for description of parameters and batching opportunities
-    """        
+    """
     return _pygauss.matmulTN(lhs, rhs)
 
-def matmulTT(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray: 
+
+def matmulTT(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray:
     """
     Executes matrix multiplication :math:`L^T*R^T`
 
@@ -766,12 +801,14 @@ def matmulTT(lhs: ArrayLike, rhs: ArrayLike) -> ShapeletsArray:
     matmul
         See this function for description of parameters and batching opportunities
     """
-    return _pygauss.matmulTT(lhs, rhs)   
+    return _pygauss.matmulTT(lhs, rhs)
 
-def matmul_chain(*args) -> ShapeletsArray: 
+
+def matmul_chain(*args) -> ShapeletsArray:
     """
-    """        
+    """
     return _pygauss.matmul_chain(*args)
+
 
 def norm(x: ArrayLike, type: NormType = 'euclid', p: float = 1.0, q: float = 1.0) -> float:
     r"""
@@ -843,10 +880,11 @@ def norm(x: ArrayLike, type: NormType = 'euclid', p: float = 1.0, q: float = 1.0
     5.28157131911548
     >>> sc.norm(a, 'lpq', p=2.0, q=3.0)
     7.214996469470583
-    """      
-    return _pygauss.norm(x,__pygauss_norm_type(type) ,p, q)
+    """
+    return _pygauss.norm(x, __pygauss_norm_type(type), p, q)
 
-def pinv(x: ArrayLike, tol: float = 1e-06) -> ShapeletsArray: 
+
+def pinv(x: ArrayLike, tol: float = 1e-06) -> ShapeletsArray:
     """
     Computes Moore-Penrose pseudoinverse of a matrix.
 
@@ -884,10 +922,11 @@ def pinv(x: ArrayLike, tol: float = 1e-06) -> ShapeletsArray:
     References
     ----------
     [1] `ArrayFire Documentation <https://arrayfire.org/docs/group__lapack__ops__func__pinv.htm>`_ 
-    """        
+    """
     return _pygauss.pinverse(x, tol)
 
-def qr(x: ArrayLike) -> tuple: 
+
+def qr(x: ArrayLike) -> tuple:
     r"""
     Performs QR decomposition
 
@@ -923,10 +962,11 @@ def qr(x: ArrayLike) -> tuple:
     References
     ----------
     [1] `ArrayFire Documentation <https://arrayfire.org/docs/group__lapack__factor__func__qr.htm>`_ 
-    """        
+    """
     return _pygauss.qr(x)
 
-def rank(x: ArrayLike, tol: float = 1e-05) -> int: 
+
+def rank(x: ArrayLike, tol: float = 1e-05) -> int:
     """
     Finds the rank of the input matrix
 
@@ -968,8 +1008,9 @@ def rank(x: ArrayLike, tol: float = 1e-05) -> int:
          0.0000    -0.4629    -1.3887 
          0.0000     0.0000    -0.0000 
 
-    """     
-    return _pygauss.rank(x, tol)   
+    """
+    return _pygauss.rank(x, tol)
+
 
 class SVDResult():
     """
@@ -984,13 +1025,14 @@ class SVDResult():
     vt: ShapeletsArray
         NxN matrix
     """
+
     def __init__(self, u: ShapeletsArray, s: ShapeletsArray, vt: ShapeletsArray) -> None:
-        self.u = u 
+        self.u = u
         self.s = s
         self.vt = vt
-        self._pct = None 
+        self._pct = None
 
-    def low_rank(self, region: Union[int, Tuple[int,int]]) -> ShapeletsArray:
+    def low_rank(self, region: Union[int, Tuple[int, int]]) -> ShapeletsArray:
         """
         Returns a low rank reconstruction of the original matrix by selecting
         a range of factors.
@@ -1008,10 +1050,10 @@ class SVDResult():
         ShapeletsArray
             Low rank reconstruction of the original matrix.
         """
-        start,end = region if type(region) is tuple else [0, region]
-        return (self.u[:, start:end] * self.s.T[:, start:end])@self.vt[start:end, :]
+        start, end = region if type(region) is tuple else [0, region]
+        return (self.u[:, start:end] * self.s.T[:, start:end]) @ self.vt[start:end, :]
 
-    def pct_rank(self, region: Union[int, Tuple[int,int]]) -> float:
+    def pct_rank(self, region: Union[int, Tuple[int, int]]) -> float:
         """
         Computes how much information is contained in a low rank reconstruction.
 
@@ -1028,7 +1070,7 @@ class SVDResult():
         float
             Percentage of the information.
         """
-        start,end = region if type(region) is tuple else [0, region]
+        start, end = region if type(region) is tuple else [0, region]
         return _pygauss.sum(self.pct[start:end])
 
     @property
@@ -1044,10 +1086,11 @@ class SVDResult():
         Percentage of information implied by a low rank reconstruction
         """
         if self._pct is None:
-            self._pct = self.s / _pygauss.sum(self.s)        
+            self._pct = self.s / _pygauss.sum(self.s)
         return self._pct
 
-def svd(x: ArrayLike) -> SVDResult: 
+
+def svd(x: ArrayLike) -> SVDResult:
     """
     Returns the singular value decomposition of a matrix
 
@@ -1082,14 +1125,13 @@ def svd(x: ArrayLike) -> SVDResult:
     References
     ----------
     [1] `ArrayFire Documentation <https://arrayfire.org/docs/group__lapack__factor__func__svd.htm>`_ 
-    """        
-    return SVDResult(*_pygauss.svd(x))   
+    """
+    return SVDResult(*_pygauss.svd(x))
 
 
 __all__ = [
-    "cholesky", "det", "dot", "dot_scalar", "gemm", "inv", "lu", "matmul", "matmulNT", "matmulTN", 
-    "matmulTT", "matmul_chain", "norm", "pinv", "qr", "rank", "svd", "convolve", 
-    "convolve1", "convolve2", "convolve3", "eig","eigh", "eigvals", "eigvalsh",
+    "cholesky", "det", "dot", "dot_scalar", "gemm", "inv", "lu", "matmul", "matmulNT", "matmulTN",
+    "matmulTT", "matmul_chain", "norm", "pinv", "qr", "rank", "svd", "convolve",
+    "convolve1", "convolve2", "convolve3", "eig", "eigh", "eigvals", "eigvalsh",
     "NormType", "ConvMode", "ConvDomain", "SVDResult"
 ]
-

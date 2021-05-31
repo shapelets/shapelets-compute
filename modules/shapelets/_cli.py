@@ -1,10 +1,18 @@
 #!/usr/bin/env python3 
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
+
 """
 Shapelets run-time tools
 
 """
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 from abc import abstractmethod
@@ -13,7 +21,6 @@ import os
 import platform
 import argparse
 import math
-import pathlib
 import zipfile
 import tempfile
 
@@ -23,6 +30,7 @@ from urllib.request import urlretrieve
 from urllib.parse import urljoin
 
 from . import compute as sc
+
 
 class DownloadProgressBar(tqdm):
     def update_to(self, b=1, bsize=1, tsize=None):
@@ -35,17 +43,21 @@ def download(url, dst):
     with DownloadProgressBar(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=url.split('/')[-1]) as t:
         urlretrieve(url, dst, reporthook=t.update_to)
 
+
 class Benchmark:
     @abstractmethod
-    def __init__(self, n: int, dt: str) -> None: ... 
+    def __init__(self, n: int, dt: str) -> None:
+        ...
 
     @abstractmethod
-    def run(self) -> sc.ShapeletsArray: ... 
-    
-    @abstractmethod
-    def to_report_units(self, time_in_seconds: float) -> float: ...
+    def run(self) -> sc.ShapeletsArray:
+        ...
 
-    def run_benchmark(self, warm: int = 10, runs: int = 10, min_time: float = 1.0) -> float: 
+    @abstractmethod
+    def to_report_units(self, time_in_seconds: float) -> float:
+        ...
+
+    def run_benchmark(self, warm: int = 10, runs: int = 10, min_time: float = 1.0) -> float:
         sample_times = []
         for _ in range(warm):
             sc.sync()
@@ -54,41 +66,44 @@ class Benchmark:
             sc.sync()
             end = timer()
             sample_times.append(end)
-        
+
         median_time = sc.median(sample_times)
-        batches = int(math.ceil(min_time / (runs*median_time)))
+        batches = int(math.ceil(min_time / (runs * median_time)))
         # print(self.n, median_time, batches)
         run_time = 0.0
         for _ in range(int(batches)):
-            start = timer() 
+            start = timer()
             for _ in range(runs):
                 self.run()
             sc.sync()
             run_time += (timer() - start) / runs
         run_time /= batches
-        return self.to_report_units(run_time)    
+        return self.to_report_units(run_time)
+
 
 class BenchmarkFFT(Benchmark):
-    def __init__(self, n:int, dt: str) -> None:
+    def __init__(self, n: int, dt: str) -> None:
         self.n = n
         self.a = sc.random.randn(n, dt)
-    
+
     def run(self) -> sc.ShapeletsArray:
         return sc.fft.fft(self.a)
 
     def to_report_units(self, time_in_seconds: float) -> float:
-        return 5 * self.n * math.log2(self.n) / (time_in_seconds * 1e9) 
+        return 5 * self.n * math.log2(self.n) / (time_in_seconds * 1e9)
+
 
 class BenchmarkBlas(Benchmark):
     def __init__(self, n: int, dt: str) -> None:
-        self.n = n 
-        self.a = sc.ones((n,n), dt)
+        self.n = n
+        self.a = sc.ones((n, n), dt)
 
     def run(self) -> sc.ShapeletsArray:
-        return self.a @ self.a 
-    
+        return self.a @ self.a
+
     def to_report_units(self, time_in_seconds: float) -> float:
         return 2.0 * math.pow(self.n, 3) / (time_in_seconds * 1e9)
+
 
 def run_benchmarks(fn, r):
     data = [(str(n), fn(n).run_benchmark()) for n in r]
@@ -100,8 +115,9 @@ def run_benchmarks(fn, r):
         bar = '█' * bar_chunks
         if remainder > 0:
             bar += chr(ord('█') + (8 - remainder))
-        bar = bar or  '▏'
-        print(f'{label.rjust(longest_label_length)} | {count:#4f} {bar}')  
+        bar = bar or '▏'
+        print(f'{label.rjust(longest_label_length)} | {count:#4f} {bar}')
+
 
 def set_backend_and_device(backend: sc.Backend, device: int):
     try:
@@ -117,6 +133,7 @@ def set_backend_and_device(backend: sc.Backend, device: int):
         for d in sc.get_devices():
             print(repr(d))
         exit(-2)
+
 
 def show_info():
     import shapelets as s
@@ -141,7 +158,7 @@ def show_info():
 
 
 def cli() -> None:
-    parser = argparse.ArgumentParser(description="Shapelets run-time tools")
+    parser = argparse.ArgumentParser(description='Shapelets run-time tools')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.add_parser("info", help='Shows installation information')
 
@@ -163,8 +180,11 @@ def cli() -> None:
 
     install_parser = subparsers.add_parser('install', help='Install backend support')
     install_parser.add_argument('backend', choices=['cpu', 'opencl', 'cuda'])
-    install_parser.add_argument('-f','--force', action='store_true', help='Forces download and unpack.')
-    install_parser.add_argument('-u', '--url', default='https://shapeletsbinaries.azureedge.net/arrayfire', help='URL to locate the binaries')
+    install_parser.add_argument('-f', '--force', action='store_true', help='Forces download and unpack.')
+    install_parser.add_argument('-u',
+                                '--url',
+                                default='https://shapeletsbinaries.azureedge.net/arrayfire',
+                                help='URL to locate the binaries')
 
     args = parser.parse_args()
 
@@ -187,23 +207,23 @@ def cli() -> None:
                 fn = lambda n: BenchmarkFFT(n, datatype)
                 r = [1 << M for M in range(args.start, args.end + args.increment, args.increment)]
 
-            print(f'Running benchmark {args.test} for {args.backend}[{args.device}] using {datatype}' ) 
+            print(f'Running benchmark {args.test} for {args.backend}[{args.device}] using {datatype}')
             print(sc.get_device())
-            print()   
+            print()
             run_benchmarks(fn, r)
 
     elif args.command == 'install':
-        backend = args.backend 
+        backend = args.backend
         if (backend in sc.get_available_backends() and not args.force):
             print(f'Backend {backend} is already installed')
         else:
-            system =  platform.system().lower()
+            system = platform.system().lower()
             version = sc.__af_version__
             name = f'{system}-{backend}-{version}.zip'
             checked_url = str(args.url)
             if not checked_url.endswith('/'):
                 checked_url += '/'
-            url = urljoin(checked_url, name)            
+            url = urljoin(checked_url, name)
 
             with tempfile.TemporaryDirectory() as current_path:
                 download_location = os.path.join(current_path, name)
@@ -223,16 +243,16 @@ def cli() -> None:
                 else:
                     ldpreload = ''
 
-                found = ldpreload.find('libmkl_def.so') != -1                
+                found = ldpreload.find('libmkl_def.so') != -1
                 if not found:
                     newpaths = ':'.join([
-                        os.path.join(sc.__library_dir__, 'libmkl_def.so'), 
-                        os.path.join(sc.__library_dir__, 'libmkl_avx2.so'), 
-                        os.path.join(sc.__library_dir__, 'libmkl_core.so'), 
+                        os.path.join(sc.__library_dir__, 'libmkl_def.so'),
+                        os.path.join(sc.__library_dir__, 'libmkl_avx2.so'),
+                        os.path.join(sc.__library_dir__, 'libmkl_core.so'),
                         os.path.join(sc.__library_dir__, 'libmkl_intel_lp64.so'),
-                        os.path.join(sc.__library_dir__, 'libmkl_intel_thread.so'), 
+                        os.path.join(sc.__library_dir__, 'libmkl_intel_thread.so'),
                         os.path.join(sc.__library_dir__, 'libiomp5.so')])
-                    
+
                     print("")
                     print("MKL Libraries in Linux")
                     print("----------------------")
@@ -245,5 +265,6 @@ def cli() -> None:
                     print("")
 
             print("Done!")
+
 
 __all__ = ['cli']

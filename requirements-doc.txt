@@ -1,5 +1,6 @@
-sphinx~=3.5.4
-pydata-sphinx-theme~=0.6.3
-numpydoc~=1.1.0
-sphinx-tabs
-seaborn
+sphinx==3.5.4
+pydata-sphinx-theme==0.6.3
+ipython==7.24.0
+numpydoc==1.1.0
+sphinx-tabs==3.0.0
+seaborn==0.11.1

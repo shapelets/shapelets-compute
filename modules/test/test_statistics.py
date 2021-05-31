@@ -1,6 +1,11 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 import shapelets.compute as sc
 import numpy as np
-from shapelets.compute import XCorrScale
 
 
 def test_stats_skewness_kurtosis_moments():
@@ -26,6 +31,7 @@ def test_stats_skewness_kurtosis_moments():
     assert m2.same_as(2.0, eps=0.02)
     assert m3.same_as(6.0, eps=0.02)
     assert m4.same_as(24.0, eps=0.03)
+
 
 def test_stats_correlation():
     data = [[1., 2, 3, 4], [2., 3, 4, 5], [3., 4, 5, 6], [7., 8, 9, 0]]
@@ -178,19 +184,18 @@ def test_stats_autocovariance():
     assert results[:, 0].same_as([-2.25, -1.5, 1.25, 5.0, 1.25, -1.5, -2.25])
     assert results[:, 1].same_as([-2.25, -1.5, 1.25, 5.0, 1.25, -1.5, -2.25])
 
+
 def test_stats_topk():
     test_data = sc.array([8, 3, 0, 7, 1, 5, 4, 6, 9, 2], dtype="float32")
     (vals, indices) = sc.topk_max(test_data, 5)
-    assert vals.same_as([9,8,7,6,5])
-    assert indices.same_as([8,0,3,7,5])
+    assert vals.same_as([9, 8, 7, 6, 5])
+    assert indices.same_as([8, 0, 3, 7, 5])
     (vals, indices) = sc.topk_min(test_data, 5)
-    assert vals.same_as([0,1,2,3,4])
-    assert indices.same_as([2,4,9,1,6])
-    (vals, indices) = sc.topk_min(sc.reshape(test_data, (5,2)), 1, 0)
-    assert vals.same_as([[0],[2]])
-    assert indices.same_as([[2],[4]])
-    
+    assert vals.same_as([0, 1, 2, 3, 4])
+    assert indices.same_as([2, 4, 9, 1, 6])
+    (vals, indices) = sc.topk_min(sc.reshape(test_data, (5, 2)), 1, 0)
+    assert vals.same_as([[0], [2]])
+    assert indices.same_as([[2], [4]])
+
     test_data[0] = -np.nan
     print(sc.topk_min(test_data, 2, 0))
-
-

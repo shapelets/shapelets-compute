@@ -1,3 +1,9 @@
+# Copyright (c) 2021 Grumpy Cat Software S.L.
+#
+# This Source Code is licensed under the MIT 2.0 license.
+# the terms can be found in  LICENSE.md at the root of
+# this project, or at http://mozilla.org/MPL/2.0/.
+
 from __future__ import annotations
 from typing import Sequence, Union, Tuple, Any, overload
 import sys
@@ -7,6 +13,7 @@ DataTypeLike = Union[np.dtype, None, str]
 
 if sys.version_info >= (3, 8):
     from typing import Protocol
+
     HAVE_PROTOCOL = True
 else:
     try:
@@ -20,6 +27,7 @@ if HAVE_PROTOCOL:
     class _SupportsArray(Protocol):
         @overload
         def __array__(self, __dtype: DataTypeLike = ...) -> np.ndarray: ...
+
         @overload
         def __array__(self, dtype: DataTypeLike = ...) -> np.ndarray: ...
 else:
@@ -35,4 +43,3 @@ _ScalarLike = _ScalarLike = Union[int, float, complex, bytes, np.generic]
 ArrayLike = Union[_ScalarLike, Sequence[_ScalarLike], Sequence[Sequence[Any]], _SupportsArray]
 Shape = Tuple[int, ...]
 ShapeLike = Union[int, Sequence[int]]
-
