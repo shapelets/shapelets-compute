@@ -132,7 +132,7 @@ html_theme_options = {
 #    "navbar_align": "right",
 #    "sidebarwidth" : 470,
 #    "sidebar_includehidden" : True
-   # "google_analytics_id": "UA-XXXXXXX",
+   "google_analytics_id": "UA-124462518-1",
    # "**": ["search-field.html", "sidebar-nav-bs.html", "sidebar-ethical-ads.html"]
    # "external_links": [
    #   {"name": "link-one-name", "url": "https://<link-one>"},
