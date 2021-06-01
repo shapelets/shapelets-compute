@@ -17,7 +17,7 @@ used in combination with all other libraries present in the Python ecosystem.
 All Shapelets wheels distributed on PyPI are BSD licensed.
 
 ## PyPI Installation
-**Shapelets Compute** distributes with a commandline tool to ensure you have a fully functional computational environment.  
+**Shapelets Compute** distributes with a command-line tool to ensure you have a fully functional computational environment.  
 
 Once the package is installed using `pip install shapelets-compute`, check the capabilities of your runtime environment by issuing:
 
@@ -46,7 +46,7 @@ However, if ArrayFire is not installed, use `shapelets` command line tool to set
 $ shapelets install cuda 
 ```
 
-`shapelets install --help` outlines all posible options.
+`shapelets install --help` outlines all possible options.
 
 ### Verification / Benchmarking
 `shapelets` command line tool comes with a few built-in benchmarks to ensure both your installation is correct and to provide with some information about the performance of your system in typical computational scenarios.  

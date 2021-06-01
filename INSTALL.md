@@ -9,7 +9,7 @@ When building this library, always have in mind which python version are you com
 ## Windows Pre-Requisites
 When building on windows, it is required the following components:
 
-- `7 zip`: Required to unpack ArrayFire run-time distribution (if you don't have it installed already, the building process will download a copy and install it locally to this proyect).  
+- `7 zip`: Required to unpack ArrayFire run-time distribution (if you don't have it installed already, the building process will download a copy and install it locally to this project).  
 - `Windows 10 SDK` or `Visual Studio` with C++/CLI building tools.  
 - CMake
 
