@@ -6,8 +6,7 @@ API Reference
 :Release: |version|
 :Date: |today|
 
-
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     routines

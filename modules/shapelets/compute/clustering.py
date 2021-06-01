@@ -43,7 +43,7 @@ class KShape():
 
     References
     ----------
-    .. [1] |`k-Shape: Efficient and Accurate Clustering of Time Series. <https://doi.org/10.1145/2949741.2949758>`_
+    .. [1] | `k-Shape: Efficient and Accurate Clustering of Time Series. <https://doi.org/10.1145/2949741.2949758>`_
            | John Paparrizos and Luis Gravano. 2016.
            | SIGMOD Rec. 45, 1 (June 2016), 69-76.
 
