@@ -9,6 +9,6 @@
 	path = external/spdlog
 	url = https://github.com/gabime/spdlog.git
 	branch = v1.x
-[submodule "proto"]
+[submodule "modules/shapelets/worker/shapelets-proto"]
 	path = modules/shapelets/worker/shapelets-proto
 	url = https://gitlab.com/shapelets/shapelets/shapelets-proto.git
