@@ -2,7 +2,7 @@
 # Copyright (c) 2021 Grumpy Cat Software S.L.
 #
 # This Source Code is licensed under the MIT 2.0 license.
-# the terms can be found in  LICENSE.md at the root of
+# the terms can be found in LICENSE.md at the root of
 # this project, or at http://mozilla.org/MPL/2.0/.
 
 
@@ -20,6 +20,7 @@ from abc import abstractmethod
 import os
 import platform
 import argparse
+import json
 import math
 import zipfile
 import tempfile
@@ -29,7 +30,12 @@ from timeit import default_timer as timer
 from urllib.request import urlretrieve
 from urllib.parse import urljoin
 
+from logging import getLogger
+import logging.config as log_conf
+from pathlib import Path
+
 from . import compute as sc
+from . import worker as wk
 
 
 class DownloadProgressBar(tqdm):
@@ -135,6 +141,37 @@ def set_backend_and_device(backend: sc.Backend, device: int):
         exit(-2)
 
 
+def worker_command_start(port: int, backend: str):
+    print(f"Worker start command , port: {port}, backend: {backend}")
+    wk.arrow_format.ARROW_WORKER_FOLDER.mkdir(parents=True, exist_ok=True)
+    wk.arrow_format.ARROW_SHAPELETS_FOLDER.mkdir(parents=True, exist_ok=True)
+    wk.arrow_format.FUNCTIONS_FOLDER.mkdir(parents=True, exist_ok=True)
+    base_dir = Path(__file__).resolve().parents[0]
+    config_file = base_dir / 'worker' / 'resources' / 'shapelets-logger-python.config'
+    with open(config_file, 'r') as handle:
+        config_dict = json.load(handle)
+    wk.logger.WorkerFormatter.set_backend(backend)
+    log_file = config_dict["handlers"]["file"]["filename"]
+    if log_file:
+        log_path = Path(log_file).resolve()
+        parent_log_folder = log_path.parent
+        parent_log_folder.mkdir(parents=True, exist_ok=True)
+    log_conf.dictConfig(config_dict)
+    wk.worker.serve(port, backend)
+
+
+def worker_command_stop():
+    print('Worker stop command')
+
+
+def worker_command_status():
+    print('Worker status command')
+
+
+def worker_command_logs(tail: bool):
+    print(f"Worker logs, tail:{tail}, command")
+
+
 def show_info():
     import shapelets as s
     print()
@@ -185,6 +222,16 @@ def cli() -> None:
                                 '--url',
                                 default='https://shapeletsbinaries.azureedge.net/arrayfire',
                                 help='URL to locate the binaries')
+
+    worker_parser = subparsers.add_parser('worker', help='Manages the worker')
+    wc_subparser = worker_parser.add_subparsers(dest='worker_command')
+    wc_start_parser = wc_subparser.add_parser('start', help='Starts a worker')
+    wc_start_parser.add_argument('-p', '--port', default=52000, type=int)
+    wc_start_parser.add_argument('-b', '--backend', choices=['cpu', 'opencl', 'cuda'], default='cpu', type=str)
+    wc_stop_parser = wc_subparser.add_parser('stop', help='Stops the worker')
+    wc_status_parser = wc_subparser.add_parser('status', help='Reports the status of the worker')
+    wc_logs_parser = wc_subparser.add_parser('logs', help='Shows the worker\'s logs')
+    wc_logs_parser.add_argument('-t', '--tail', default=False, type=bool)
 
     args = parser.parse_args()
 
@@ -265,6 +312,18 @@ def cli() -> None:
                     print("")
 
             print("Done!")
+
+    elif args.command == 'worker':
+        if args.worker_command is None:
+            worker_parser.print_help()
+        elif args.worker_command == 'start':
+            worker_command_start(args.port, args.backend)
+        elif args.worker_command == 'stop':
+            worker_command_stop()
+        elif args.worker_command == 'status':
+            worker_command_status()
+        elif args.worker_parser == 'logs':
+            worker_command_logs(args.tail)
 
 
 __all__ = ['cli']

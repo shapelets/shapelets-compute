@@ -2,18 +2,20 @@
 # Copyright (c) 2021 Grumpy Cat Software S.L.
 #
 # This Source Code is licensed under the MIT 2.0 license.
-# the terms can be found in  LICENSE.md at the root of
+# the terms can be found in LICENSE.md at the root of
 # this project, or at http://mozilla.org/MPL/2.0/.
 
 import os
 import sys
 import re
+from pathlib import Path
 import platform
 import subprocess
 import versioneer
 from typing import Union, List
 from setuptools import setup, Extension, find_packages
 from setuptools.command.develop import develop
+from distutils.cmd import Command
 from distutils.version import LooseVersion
 import warnings
 import builtins
@@ -161,8 +163,48 @@ class DevelopCommand(develop):
         develop.run(self)
 
 
+class GenerateProtoCommand(Command):
+    """Generates Python sources for .proto files."""
+
+    description = 'Generate Python sources for .proto files'
+    user_options = []
+
+    def initialize_options(self):
+        base_dir = Path(__file__).resolve().parents[0]
+        self.worker_module_dir = base_dir / 'modules' / 'shapelets' / 'worker'
+        self.proto_clone_dir = self.worker_module_dir / 'shapelets-proto'
+        self.generated_proto_dir = self.worker_module_dir / 'proto'
+        self.proto_command = [
+            'python',
+            '-m',
+            'grpc.tools.protoc',
+            '--proto_path', str(self.proto_clone_dir),
+            '--python_out', str(self.worker_module_dir),
+            '--grpc_python_out', str(self.worker_module_dir),
+            str(self.proto_clone_dir / 'proto' / 'worker.proto')
+        ]
+        print(f"{' '.join(self.proto_command)}")
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        if subprocess.call(self.proto_command) != 0:
+            sys.exit('Make sure your protoc version >= 2.6. You can use a custom '
+                     'protoc by setting the PROTOC environment variable.')
+        with open(self.generated_proto_dir / 'worker_pb2_grpc.py', 'r+') as file:
+            data = file.read()
+            data = data.replace(
+                "from proto import worker_pb2 as proto_dot_worker__pb2",
+                "from . import worker_pb2 as proto_dot_worker__pb2")
+            file.seek(0)
+            file.write(data)
+            file.truncate()
+
+
 def create_metadata(full_version, doc_url):
     cmdclass['develop'] = DevelopCommand
+    cmdclass['generate_proto'] = GenerateProtoCommand
     return dict(
         project_urls={
             "Documentation": doc_url

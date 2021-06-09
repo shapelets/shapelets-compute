@@ -1,7 +1,7 @@
 # Copyright (c) 2021 Grumpy Cat Software S.L.
 #
 # This Source Code is licensed under the MIT 2.0 license.
-# the terms can be found in  LICENSE.md at the root of
+# the terms can be found in LICENSE.md at the root of
 # this project, or at http://mozilla.org/MPL/2.0/.
 
 from __future__ import annotations
@@ -25,11 +25,12 @@ else:
     from . import compute
     from . import generators
     from . import data
+    from . import worker
 
     from ._cli import *
     from . import _cli
 
-    __all__ = ["compute", "generators", "data"]
+    __all__ = ["compute", "generators", "data", "worker"]
     __all__ += _cli.__all__
 
     backends = compute.get_available_backends()
