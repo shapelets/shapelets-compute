@@ -26,14 +26,14 @@ Once the package is installed using `pip install shapelets-compute`, check the c
 your runtime environment:
 
 ```
-$ shapelets info
+$ shapelets-compute info
 ```
 
 The `info` command should describe which backends and devices are available.  For example, running 
 this command on a MacBook Pro produces:
 
 ```commandline
-$ shapelets info
+$ shapelets-compute info
 Default backend   : opencl
 Default device    : 0
 
@@ -46,7 +46,7 @@ opencl  [1] Intel(R)_HD_Graphics_630 (OpenCL - 1.2 - Apple) F64: ✘ - F16: ✘
 On an MSI:
 
 ```commandline
-shapelets info
+shapelets-compute info
 Default backend   : cuda
 Default device    : 0
 
@@ -61,26 +61,26 @@ opencl  [2] Intel(R)_Core(TM)_i7-10875H_CPU @ 2.30GHz (OpenCL - 2.1 - Intel(R) O
 If you have already a distribution of [ArrayFire](https://arrayfire.com/) in your machine, `shapelets` 
 should be able to discover it and use it.  
 
-However, if ArrayFire is not installed, use `shapelets` command line tool to set up your environment 
+However, if ArrayFire is not installed, use `shapelets-compute` command line tool to set up your environment 
 with the necessary run time libraries. To install runtime support for running on CPU, OpenCL and/or CUDA, 
 execute a install command, for example:
 
 ```commandline
-$ shapelets install cuda 
+$ shapelets-compute install cuda 
 ```
 
-`shapelets install --help` outlines all possible options.
+`shapelets-compute install --help` outlines all possible options.
 
 ### Verification / Benchmarking
-`shapelets` command line tool comes with a few built-in benchmarks to ensure both your installation 
+`shapelets-compute` command line tool comes with a few built-in benchmarks to ensure both your installation 
 is correct and to provide with some information about the performance of your system in typical 
 computational scenarios.  
 
-For a complete list of benchmarks available, execute `shapelets bench --help`.  The following example 
+For a complete list of benchmarks available, execute `shapelets-compute bench --help`.  The following example 
 runs an FFT benchmark using OpenCL and float32 values:
 
 ```commandline
-$ shapelets bench opencl -t float32 fft
+$ shapelets-compute bench opencl -t float32 fft
 Running benchmark fft for opencl[0] using float32
 [0] AMD_Radeon_Pro_560_Compute_Engine (OpenCL - 1.2 - Apple) F64: ✓ - F16: ✘
 

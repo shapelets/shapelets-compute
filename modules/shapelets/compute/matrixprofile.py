@@ -79,7 +79,7 @@ def mass(queries: ArrayLike, series: ArrayLike) -> ShapeletsArray:
     return _pygauss.mass(queries, series)
 
 
-def matrix_profile(ta: ArrayLike, m: int, tb: Optional[ArrayLike] = None) -> MatrixProfile:
+def matrix_profile(ta: ArrayLike, w: int, tb: Optional[ArrayLike] = None) -> MatrixProfile:
     """
     Computes matrix profile.
 
@@ -107,7 +107,7 @@ def matrix_profile(ta: ArrayLike, m: int, tb: Optional[ArrayLike] = None) -> Mat
 
 
     """
-    return MatrixProfile(*_pygauss.matrixprofile(ta, m, tb))
+    return MatrixProfile(*_pygauss.matrixprofile(ta, w, tb))
 
 
 def matrix_profile_lr(ta: ArrayLike, m: int) -> MatrixProfileLR:
