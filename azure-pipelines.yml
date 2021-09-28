@@ -17,7 +17,6 @@ stages:
         steps:
           - script: |
               pip install -r requirements.txt
-              git submodule update
               tox
               cd dist
               ls
