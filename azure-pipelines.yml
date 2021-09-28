@@ -18,6 +18,6 @@ stages:
           - script: |
               pip install -r requirements.txt
               tox
-              cd tox
+              cd dist
               ls
 
