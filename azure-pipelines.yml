@@ -4,19 +4,20 @@
 # https://aka.ms/yaml
 
 trigger:
-- master
+  - master
 
 pool:
   vmImage: ubuntu-latest
 
 stages:
-- stage: Test
-  displayName: 'Test'
-  jobs:
-  - job: UnitTest
-    steps:
-    - script: |
-        pip install -r requirements.txt
-        python -m pytest
-      displayName: 'Run Unit Tests'
+  - stage: Tox
+    displayName: 'Tox Execution'
+    jobs:
+      - job: ToxExecution
+        steps:
+          - script: |
+              pip install -r requirements.txt
+              tox
+              cd tox
+              ls
 
