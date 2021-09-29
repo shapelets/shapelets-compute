@@ -18,7 +18,6 @@ stages:
           - script: |
               apt-get update -y
               apt-get install -y libsodium23
-              apt install ocl-icd-opencl-dev
   - stage: Tox
     displayName: 'Tox Execution'
     jobs:
