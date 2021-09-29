@@ -16,8 +16,8 @@ stages:
       - job: ToxExecution
         steps:
           - script: |
-              python --version
-              pip install -r requirements.txt
+              python3 -V
+              python3 -m pip install -r requirements.txt
               tox
               cd dist
               ls
