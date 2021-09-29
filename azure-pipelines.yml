@@ -10,6 +10,15 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
+  - stage: Initial
+    displayName: 'Prepare Environment'
+    jobs:
+      - job: InstallLib
+        steps:
+          - script: |
+              apt-get update -y
+              apt-get install -y libsodium23
+              apt-get install ocl-icd-opencl-dev
   - stage: Tox
     displayName: 'Tox Execution'
     jobs:
