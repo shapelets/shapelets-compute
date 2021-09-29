@@ -7,7 +7,7 @@ trigger:
   - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 stages:
   - stage: Tox
@@ -16,9 +16,6 @@ stages:
       - job: ToxExecution
         steps:
           - script: |
-              apt-get update -y
-              apt-get install -y libsodium23
-              apt-get install ocl-icd-opencl-dev
               pip install -r requirements.txt
               tox
               cd dist
