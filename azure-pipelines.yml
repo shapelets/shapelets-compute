@@ -9,7 +9,7 @@ trigger:
 resources:
     containers:
     - container: manylinux1
-      image: quay.io/pypa/manylinux2014_x86_64
+      image: quay.io/pypa/manylinux_2_24_x86_64
 
 pool:
   vmImage: ubuntu-latest
