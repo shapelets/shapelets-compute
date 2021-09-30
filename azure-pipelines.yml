@@ -12,7 +12,7 @@ resources:
       image: dockcross:manylinux-x64
 
 pool:
-  vmImage: ubuntu-latets
+  vmImage: ubuntu-latest
   container: manylinux1
 
 stages:
