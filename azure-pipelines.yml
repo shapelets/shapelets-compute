@@ -7,7 +7,7 @@ trigger:
   - master
 
 pool:
-  vmImage: macOS-11
+  vmImage: macOS-10.14
 
 stages:
   - stage: Tox
