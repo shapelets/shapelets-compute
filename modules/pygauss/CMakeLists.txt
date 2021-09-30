@@ -119,7 +119,8 @@ elseif(UNIX)
                         ${AFLIBDIR}/libmkl_core.so
                         ${AFLIBDIR}/libiomp5.so
                         ${AFLIBDIR}/libmkl_intel_lp64.so
-                        ${AFLIBDIR}/libmkl_intel_thread.so)
+                        ${AFLIBDIR}/libmkl_intel_thread.so
+			${AFLIBDIR}/libOpenCL.so.1)
         endif()                        
 else()
         if (COPY_ALL_FILES)
