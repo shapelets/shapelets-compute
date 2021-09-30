@@ -85,7 +85,11 @@ IF (APPLE)
                         ${AFLIBDIR}/libnvrtc.10.1.dylib)
         else()
                 set(RUNTIME_LIBS 
-                        ${AFLIBDIR}/libaf.3.dylib)
+                        ${AFLIBDIR}/libaf.3.dylib
+			${AFLIBDIR}/libiomp5.dylib
+			${AFLIBDIR}/libmkl_intel_thread.dylib
+			${AFLIBDIR}/libmkl_intel_lp64.dylib
+			${AFLIBDIR}/libmkl_core.dylib)
         endif()
 
 elseif(UNIX)
