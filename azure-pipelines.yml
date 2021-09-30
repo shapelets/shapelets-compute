@@ -39,7 +39,7 @@ jobs:
 
       - script: |
           $(pyTools.pythonLocation)/bin/pip install -r requirements.txt
-          $(pyTools.pythonLocation)/bin/pip install requirements-test.txt
+          $(pyTools.pythonLocation)/bin/pip install -r requirements-test.txt
       - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
