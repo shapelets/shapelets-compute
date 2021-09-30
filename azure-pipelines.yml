@@ -22,7 +22,6 @@ stages:
         container: manylinux1
         steps:
           - script: |
-              printenv
               pip install -r requirements.txt
               tox
               cd dist
