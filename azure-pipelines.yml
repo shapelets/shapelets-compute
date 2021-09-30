@@ -6,25 +6,18 @@
 trigger:
   - master
 
-resources:
-    containers:
-    - container: manylinux1
-      image: quay.io/pypa/manylinux_2_24_x86_64
-
 pool:
-  vmImage: ubuntu-latest
+  vmImage: macOS-10.14
 
 stages:
   - stage: Tox
     displayName: 'Tox Execution'
     jobs:
       - job: ToxExecution
-        container: manylinux1
         steps:
           - script: |
-              sudo apt-get update
-              sudo apt-get install libstdc++6
-              pip install -r requirements.txt
+              python3 -V
+              python3 -m pip install -r requirements.txt
               tox
               cd dist
               ls
