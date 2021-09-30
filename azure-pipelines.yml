@@ -10,11 +10,17 @@ pool:
   vmImage: macOS-10.14
 
 stages:
+  - stage: Setup
+    
   - stage: Tox
     displayName: 'Tox Execution'
     jobs:
       - job: ToxExecution
         steps:
+          - task: Cache@2
+            inputs:
+              key: 'DownloadArtifacts'
+              path: '$(System.DefaultWorkingDirectory)/.downloads'
           - script: |
               python3 -V
               python3 -m pip install -r requirements.txt
