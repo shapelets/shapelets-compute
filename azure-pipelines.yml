@@ -9,7 +9,7 @@ trigger:
 resources:
     containers:
     - container: manylinux1
-      image: dockcross/manylinux2014_x86_64
+      image: dockcross/manylinux-x64
 
 pool:
   vmImage: ubuntu-latest
