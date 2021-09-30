@@ -3,28 +3,54 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-strategy:
-  matrix:
-    linux:
-      imageName: 'ubuntu-latest'
-#    mac:
-#      imageName: 'macOS-latest'
-#    windows:
-#      imageName: 'windows-latest'
-
 trigger:
   - master
 
-pool:
-  vmImage: $(imageName)
+jobs:
+  - job: 'Package' 
+    strategy:
+      matrix:
+        py37:
+          python.version: '3.7'
+          tox.env: py37 
+          imageName: 'ubuntu-latest'
+        # py38:
+        #   python.version: '3.8'
+        #   tox.env: py38 
+        #   imageName: 'ubuntu-latest'
+        # py39:
+        #   python.version: '3.9'
+        #   tox.env: py39
+        #   imageName: 'ubuntu-latest'
 
-steps:
-  - script: |
-      python3 -m pip install -r requirements.txt
-      python3 -m pip install -r requirements-test.txt
-      tox
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.SourcesDirectory)/dist'
-      ArtifactName: 'compute-$(imageName)'
-      publishLocation: 'Container'
+    pool: 
+      vmImage: $(imageName)
+    
+    steps:
+      - task: UsePythonVersion@0
+        displayName: Get Python for Python tools.
+        inputs:
+          versionSpec: '3.7'
+          addToPath: false
+        name: pyTools
+      
+      - script: $(pyTools.pythonLocation)/bin/pip install --upgrade tox
+        displayName: Install Python-based tools.
+
+      - script: |
+          $(pyTools.pythonLocation)/bin/pip install -r requirements.txt
+          $(pyTools.pythonLocation)/bin/pip install requirements-test.txt
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '$(python.version)'
+          architecture: 'x64'
+        displayName: Use cached Python $(python.version) for tests.
+      
+      - script: $(pyTools.pythonLocation)/bin/tox -e $(tox.env)
+        displayName: run tox -e $(tox.env)          
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)/dist'
+          ArtifactName: 'compute-$(imageName)-$(tox.env)'
+          publishLocation: 'Container'
