@@ -6,8 +6,14 @@
 trigger:
   - master
 
+resources:
+    containers:
+    - container: manylinux1
+      image: dockcross:manylinux-x64
+
 pool:
-  vmImage: macOS-10.14
+  vmImage: ubuntu-16.04
+  container: manylinux1
 
 stages:
   - stage: Tox
