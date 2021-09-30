@@ -10,8 +10,6 @@ pool:
   vmImage: macOS-10.14
 
 stages:
-  - stage: Setup
-    
   - stage: Tox
     displayName: 'Tox Execution'
     jobs:
