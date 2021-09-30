@@ -47,6 +47,11 @@ jobs:
           architecture: 'x64'
         displayName: Use cached Python $(python.version) for tests.
       
+      - task: Cache@2
+        inputs:
+          key: 'CacheExternalArrayFire-$(imageName)'
+          path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
+
       - script: $(pyTools.pythonLocation)/bin/tox -e $(tox.env)
         displayName: run tox -e $(tox.env)
 
@@ -56,3 +61,4 @@ jobs:
           ArtifactName: 'compute-$(imageName)-$(tox.env)'
           publishLocation: 'Container'
         displayName: archiving compute-$(imageName)-$(tox.env)
+        
