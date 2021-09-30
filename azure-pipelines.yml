@@ -11,18 +11,12 @@ jobs:
   
     strategy:
       matrix:
-        upy37:
-          python.version: '3.7'
-          tox.env: py37 
+        linux:
           imageName: 'ubuntu-latest'
-        upy38:
-          python.version: '3.8'
-          tox.env: py38 
-          imageName: 'ubuntu-latest'
-        upy39:
-          python.version: '3.9'
-          tox.env: py39
-          imageName: 'ubuntu-latest'
+        mac:
+          imageName: 'macOS-latest'
+        windows:
+          imageName: 'windows-latest'
 
     pool: 
       vmImage: $(imageName)
@@ -38,28 +32,42 @@ jobs:
       - script: $(pyTools.pythonLocation)/bin/pip install --upgrade tox
         displayName: Install Python-based tools.
 
-      - script: |
-          $(pyTools.pythonLocation)/bin/pip install --upgrade -r requirements.txt
-          $(pyTools.pythonLocation)/bin/pip install --upgrade -r requirements-test.txt
-        displayName: running requirements files
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '$(python.version)'
-          architecture: 'x64'
-        displayName: Use cached Python $(python.version) for tests.
-      
       - task: Cache@2
         inputs:
           key: 'CacheExternalArrayFire-$(imageName)'
           path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
-      - script: $(pyTools.pythonLocation)/bin/tox -e $(tox.env)
-        displayName: run tox -e $(tox.env)
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.7'
+          architecture: 'x64'
+        displayName: Python 3.7.
+      
+      - script: $(pyTools.pythonLocation)/bin/tox -e py37
+        displayName: run tox -e py37
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.8'
+          architecture: 'x64'
+        displayName: Use cached Python 3.8 for tests.
+      
+      - script: $(pyTools.pythonLocation)/bin/tox -e py38
+        displayName: run tox -e py38
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.9'
+          architecture: 'x64'
+        displayName: Use cached Python 3.9 for tests.
+      
+      - script: $(pyTools.pythonLocation)/bin/tox -e py39
+        displayName: run tox -e py39            
 
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.SourcesDirectory)/dist'
-          ArtifactName: 'compute-$(imageName)-$(tox.env)'
+          ArtifactName: 'compute-$(imageName)'
           publishLocation: 'Container'
-        displayName: archiving compute-$(imageName)-$(tox.env)
+        displayName: archiving compute-$(imageName)
         
