@@ -7,10 +7,10 @@ strategy:
   matrix:
     linux:
       imageName: 'ubuntu-latest'
-    mac:
-      imageName: 'macOS-latest'
-    windows:
-      imageName: 'windows-latest'
+#    mac:
+#      imageName: 'macOS-latest'
+#    windows:
+#      imageName: 'windows-latest'
 
 trigger:
   - master
