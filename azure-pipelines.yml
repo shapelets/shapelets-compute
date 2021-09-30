@@ -13,17 +13,17 @@ resources:
 
 pool:
   vmImage: ubuntu-latest
-  container: manylinux1
 
 stages:
   - stage: Tox
     displayName: 'Tox Execution'
     jobs:
       - job: ToxExecution
+        container: manylinux1
         steps:
           - script: |
-              python3 -V
-              python3 -m pip install -r requirements.txt
+              printenv
+              pip install -r requirements.txt
               tox
               cd dist
               ls
