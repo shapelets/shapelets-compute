@@ -38,8 +38,9 @@ jobs:
         displayName: Install Python-based tools.
 
       - script: |
-          $(pyTools.pythonLocation)/bin/pip install -r requirements.txt
-          $(pyTools.pythonLocation)/bin/pip install -r requirements-test.txt
+          $(pyTools.pythonLocation)/bin/pip install --upgrade -r requirements.txt
+          $(pyTools.pythonLocation)/bin/pip install --upgrade -r requirements-test.txt
+        displayName: running requirements files
       - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
@@ -47,10 +48,11 @@ jobs:
         displayName: Use cached Python $(python.version) for tests.
       
       - script: $(pyTools.pythonLocation)/bin/tox -e $(tox.env)
-        displayName: run tox -e $(tox.env)          
+        displayName: run tox -e $(tox.env)
 
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.SourcesDirectory)/dist'
           ArtifactName: 'compute-$(imageName)-$(tox.env)'
           publishLocation: 'Container'
+        displayName: archiving compute-$(imageName)-$(tox.env)
