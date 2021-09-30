@@ -8,6 +8,7 @@ trigger:
 
 jobs:
   - job: 'Package' 
+  
     strategy:
       matrix:
         upy37:
@@ -22,42 +23,6 @@ jobs:
           python.version: '3.9'
           tox.env: py39
           imageName: 'ubuntu-latest'
-        m1015py37:
-          python.version: '3.7'
-          tox.env: py37 
-          imageName: 'macOS-10.15'
-        m1015py38:
-          python.version: '3.8'
-          tox.env: py38 
-          imageName: 'macOS-10.15'
-        m1015py39:
-          python.version: '3.9'
-          tox.env: py39
-          imageName: 'macOS-10.15'        
-        m1014py37:
-          python.version: '3.7'
-          tox.env: py37 
-          imageName: 'macOS-10.14'
-        m1014py38:
-          python.version: '3.8'
-          tox.env: py38 
-          imageName: 'macOS-10.14'
-        m1014py39:
-          python.version: '3.9'
-          tox.env: py39
-          imageName: 'macOS-10.14'
-        w1014py37:
-          python.version: '3.7'
-          tox.env: py37 
-          imageName: 'windows-latest'
-        wpy38:
-          python.version: '3.8'
-          tox.env: py38 
-          imageName: 'windows-latest'
-        wpy39:
-          python.version: '3.9'
-          tox.env: py39
-          imageName: 'windows-latest'      
 
     pool: 
       vmImage: $(imageName)
