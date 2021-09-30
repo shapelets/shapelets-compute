@@ -3,29 +3,28 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-latest'
+    mac:
+      imageName: 'macOS-latest'
+    windows:
+      imageName: 'windows-latest'
+
 trigger:
   - master
 
-stages:
-  - stage: MacBuild
-    displayName: 'MacBuild'
-    pool:
-      vmImage: macOS-10.14
-    jobs:
-      - job: ToxExecution
-        steps:
-          - task: Cache@2
-            inputs:
-              key: 'DownloadArtifacts'
-              path: '$(System.DefaultWorkingDirectory)/.downloads'
-          - task: Cache@2
-            inputs:
-              key: 'MacExternalArtifacts'
-              path: '$(System.DefaultWorkingDirectory)/external'
-          - script: |
-              python3 -V
-              python3 -m pip install -r requirements.txt
-              tox
-              cd dist
-              ls
+pool:
+  vmImage: $(imageName)
 
+steps:
+  - script: |
+      python3 -m pip install -r requirements.txt
+      python3 -m pip install -r requirements-test.txt
+      tox
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.SourcesDirectory)/dist'
+      ArtifactName: 'compute-$(imageName)'
+      publishLocation: 'Container'
