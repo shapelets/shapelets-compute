@@ -55,7 +55,25 @@ if os.name == 'nt':
 
         if len(filenames) > 1:
             warnings.warn("Loaded more than one pyd library in compute folder: %s" % repr(filenames), stacklevel=2)
-
+            
+elif os.name == "posix":
+    if 'LD_PRELOAD' in os.environ:
+        ldpreload = ':' + os.environ['LD_PRELOAD']
+    else:
+        ldpreload = ''
+        
+    found = ldpreload.find('libmkl_def.so') != -1
+    
+    if not found:
+        newpaths = ':'.join([
+            os.path.join(__library_dir__, 'libmkl_def.so'),
+            os.path.join(__library_dir__, 'libmkl_avx2.so'),
+            os.path.join(__library_dir__, 'libmkl_core.so'),
+            os.path.join(__library_dir__, 'libmkl_intel_lp64.so'),
+            os.path.join(__library_dir__, 'libmkl_intel_thread.so'),
+            os.path.join(__library_dir__, 'libiomp5.so')])
+        os.environ['LD_PRELOAD'] = newpaths + ldpreload
+        
 del compute_dir
 
 from . import _pygauss
