@@ -6,12 +6,11 @@
 trigger:
   - master
 
-pool:
-  vmImage: macOS-10.14
-
 stages:
-  - stage: Tox
-    displayName: 'Tox Execution'
+  - stage: MacBuild
+    displayName: 'MacBuild'
+    pool:
+      vmImage: macOS-10.14
     jobs:
       - job: ToxExecution
         steps:
@@ -19,6 +18,10 @@ stages:
             inputs:
               key: 'DownloadArtifacts'
               path: '$(System.DefaultWorkingDirectory)/.downloads'
+          - task: Cache@2
+            inputs:
+              key: 'MacExternalArtifacts'
+              path: '$(System.DefaultWorkingDirectory)/external'
           - script: |
               python3 -V
               python3 -m pip install -r requirements.txt
