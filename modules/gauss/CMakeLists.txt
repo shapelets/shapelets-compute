@@ -24,7 +24,7 @@ check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
     message(STATUS "CUDA compiler found: ${CMAKE_CUDA_COMPILER}")
     set(CMAKE_CUDA_STANDARD 14)
-    include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+    
 
     set(CUDA_SEPARABLE_COMPILATION ON)
     set(CUDA_RESOLVE_DEVICE_SYMBOLS ON)
@@ -34,7 +34,8 @@ if(CMAKE_CUDA_COMPILER)
 	enable_language(CUDA)
     find_package(CUDA ${CMAKE_CUDA_VERSION} REQUIRED)
     find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
-
+    include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+    
     add_definitions("-D_HAS_CUDA_")
 endif()
 
