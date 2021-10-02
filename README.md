@@ -12,7 +12,7 @@ including *Cpu*, *OpenCL* and *CUDA* devices.
   * Fastest implementation of [Matrix Profile](https://www.cs.ucr.edu/~eamonn/MatrixProfile.html) 
     for CPU and GPU architectures ([SCAMP](https://github.com/zpzim/SCAMP)).
   * One of the largest collection of distance calculation libraries.
-  * [and much more](https://doc.shapelets.io/compute)...
+  * [and much more](https://shapelets.io/doc/compute/)...
 
 Besides its immediate application to analyse time series, Shapelets Compute arrays can be 
 used in combination with all other libraries present in the Python ecosystem.
