@@ -4,6 +4,7 @@
     "version": "0.0.1",
     "dependencies": [
         "eigen3",
-        "boost-math"
+        "boost-math",
+        "boost-dll"
     ]
 }
