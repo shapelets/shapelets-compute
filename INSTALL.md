@@ -1,4 +1,4 @@
-# Building Shapelets Solo
+# Building Shapelets Compute
 
 > **First and Foremost**: If you just have checkout the project, ensure you have initialized all submodules by executing: ```git submodule update --init --recursive```.
 

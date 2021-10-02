@@ -1,10 +1,8 @@
 
-OPTION(ArrayFire_Local "Chooses local ArrayFire copy over installed copy" ON)
-
 function (download_af)
     
     execute_process(
-        COMMAND python setup_af.py
+        COMMAND python3 setup_af.py
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/cmake"
         RESULT_VARIABLE AF_DOWNLOADED
     )
@@ -26,10 +24,7 @@ else()
     message(STATUS "ArrayFire: No system-wide installation found")
 endif()
 
-# if a local copy is preferred or there is no installation of 
-# arrayfire passed through command line arguments or, lastly, 
-# there is no system installation of array fire...
-if (ArrayFire_Local OR NOT EXISTS ${ArrayFire_DIR} OR NOT ArrayFire_FOUND)
+if (NOT ArrayFire_FOUND)
     # check if a download is required
     if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/external/arrayfire/include/arrayfire.h"))
         download_af()
@@ -46,7 +41,7 @@ if (ArrayFire_Local OR NOT EXISTS ${ArrayFire_DIR} OR NOT ArrayFire_FOUND)
     endif()    
     
     # add directory to list of cmake modules
-    list(APPEND CMAKE_MODULE_PATH ${ArrayFire_DIR})
+    list(APPEND CMAKE_PREFIX_PATH ${ArrayFire_DIR})
 endif()
 
 # report where AF is located

@@ -18,6 +18,10 @@ else()
     SET(VCPKG_LIBRARY_LINKAGE "static" CACHE STRING "")
 endif()
 
+if(DEFINED ENV{ARRAYFIRE_DIR})
+    list(APPEND CMAKE_PREFIX_PATH $ENV{ARRAYFIRE_DIR})
+endif()
+
 # Load from environment variables
 list(APPEND CMAKE_MODULE_PATH $ENV{CMAKE_MODULE_PATH})
 list(APPEND CMAKE_PREFIX_PATH $ENV{CMAKE_PREFIX_PATH})
@@ -30,15 +34,15 @@ else()
     vcpkg_install()
 endif()
 
-# Installs a local copy of array fire if not present in the system.
-include(LocalArrayFire)
 
 ####
 # END: Pre-Project Setup
 ####
 
-project(ShapeletsSolo)
+project(ShapeletsComputeRoot)
 
+# Installs a local copy of array fire if not present in the system.
+include(LocalArrayFire)
 
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 if(APPLE)
