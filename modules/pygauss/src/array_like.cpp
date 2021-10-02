@@ -28,13 +28,14 @@ namespace pygauss::arraylike {
             case af::dtype::s32:
             case af::dtype::u32:
                 return 4;
+            case af::dtype::c64:
+                return 16;
             case af::dtype::u64:
             case af::dtype::s64:
             case af::dtype::f64:
             case af::dtype::c32:
+            default:
                 return 8;
-            case af::dtype::c64:
-                return 16;
         }
     }
 
