@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - script: |
-          docker run -ti --rm \
+          docker run --rm \
             -v $PWD:/io \
             $(manylinux_cuda) \
             /io/entrypoint-build-wheels.sh
