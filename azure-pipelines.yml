@@ -6,7 +6,7 @@ variables:
   manylinux_cuda: 'sameli/manylinux2014_x86_64_cuda_11'
 
 jobs:
-  - job: 'Windows and Mac shapelets_compute' 
+  - job: 'PackageWindowsMac' 
   
     strategy:
       matrix:
@@ -69,7 +69,7 @@ jobs:
         displayName: archiving compute-$(imageName)
 
 
-  - job: 'ManyLinux shapelets_compute' 
+  - job: 'PackageManyLinux' 
 
     steps:
       - script: |
