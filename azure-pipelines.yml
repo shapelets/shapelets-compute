@@ -6,7 +6,7 @@ variables:
   manylinux_cuda: 'sameli/manylinux2014_x86_64_cuda_11'
 
 jobs:
-  - job: 'PackageWindowsMac' 
+  - job: 'PackageWindows' 
   
     strategy:
       matrix:
@@ -68,6 +68,69 @@ jobs:
           publishLocation: 'Container'
         displayName: archiving compute-$(imageName)
 
+
+jobs:
+  - job: 'PackageMac' 
+  
+    strategy:
+      matrix:
+        mac:
+          imageName: 'macOS-latest'
+        windows:
+          imageName: 'windows-latest'
+
+    pool: 
+      vmImage: $(imageName)
+    
+    steps:
+      - task: UsePythonVersion@0
+        displayName: Get Python for Python tools.
+        inputs:
+          versionSpec: '3.7'
+          addToPath: false
+        name: pyTools
+      
+      - script: $(pyTools.pythonLocation)/bin/pip install --upgrade tox
+        displayName: Install Python-based tools.
+
+      - task: Cache@2
+        inputs:
+          key: 'CacheExternalArrayFire-$(imageName)'
+          path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.7'
+          architecture: 'x64'
+        displayName: Python 3.7.
+      
+      - script: $(pyTools.pythonLocation)/bin/tox -e py37
+        displayName: run tox -e py37
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.8'
+          architecture: 'x64'
+        displayName: Use cached Python 3.8 for tests.
+      
+      - script: $(pyTools.pythonLocation)/bin/tox -e py38
+        displayName: run tox -e py38
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.9'
+          architecture: 'x64'
+        displayName: Use cached Python 3.9 for tests.
+      
+      - script: $(pyTools.pythonLocation)/bin/tox -e py39
+        displayName: run tox -e py39            
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)/dist'
+          ArtifactName: 'compute-$(imageName)'
+          publishLocation: 'Container'
+        displayName: archiving compute-$(imageName)
 
   - job: 'PackageManyLinux' 
 
