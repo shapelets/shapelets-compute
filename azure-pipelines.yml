@@ -1,18 +1,15 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
 
 trigger:
   - master
 
+variables:
+  manylinux_cuda: 'sameli/manylinux2014_x86_64_cuda_11'
+
 jobs:
-  - job: 'Package' 
+  - job: 'Windows and Mac shapelets_compute' 
   
     strategy:
       matrix:
-        linux:
-          imageName: 'ubuntu-latest'
         mac:
           imageName: 'macOS-latest'
         windows:
@@ -70,4 +67,21 @@ jobs:
           ArtifactName: 'compute-$(imageName)'
           publishLocation: 'Container'
         displayName: archiving compute-$(imageName)
-        
+
+
+  - job: 'ManyLinux shapelets_compute' 
+
+    steps:
+    - script: |
+        docker run -ti --rm \
+          -v $PWD:/io \
+          $(manylinux_cuda) \
+          /io/entrypoint-build-wheels.sh
+      displayName: Build wheels
+
+    - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)/dist'
+          ArtifactName: 'shapelets_compute'
+          publishLocation: 'Container'
+      displayName: archiving shapelets_compute
