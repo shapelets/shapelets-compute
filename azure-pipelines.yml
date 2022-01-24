@@ -10,8 +10,6 @@ jobs:
   
     strategy:
       matrix:
-        mac:
-          imageName: 'macOS-latest'
         windows:
           imageName: 'windows-latest'
 
@@ -26,13 +24,13 @@ jobs:
           addToPath: false
         name: pyTools
       
-      - script: $(pyTools.pythonLocation)/bin/pip install --upgrade tox
+      - script: $(pyTools.pythonLocation)\bin\pip install --upgrade tox
         displayName: Install Python-based tools.
 
       - task: Cache@2
         inputs:
           key: 'CacheExternalArrayFire-$(imageName)'
-          path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
+          path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
 
       - task: UsePythonVersion@0
         inputs:
@@ -40,7 +38,7 @@ jobs:
           architecture: 'x64'
         displayName: Python 3.7.
       
-      - script: $(pyTools.pythonLocation)/bin/tox -e py37
+      - script: $(pyTools.pythonLocation)\bin\pip -e py37
         displayName: run tox -e py37
 
       - task: UsePythonVersion@0
@@ -49,7 +47,7 @@ jobs:
           architecture: 'x64'
         displayName: Use cached Python 3.8 for tests.
       
-      - script: $(pyTools.pythonLocation)/bin/tox -e py38
+      - script: $(pyTools.pythonLocation)\bin\pip -e py38
         displayName: run tox -e py38
 
       - task: UsePythonVersion@0
@@ -58,12 +56,12 @@ jobs:
           architecture: 'x64'
         displayName: Use cached Python 3.9 for tests.
       
-      - script: $(pyTools.pythonLocation)/bin/tox -e py39
+      - script: $(pyTools.pythonLocation)\bin\pip -e py39
         displayName: run tox -e py39            
 
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/dist'
+          PathtoPublish: '$(Build.SourcesDirectory)\dist'
           ArtifactName: 'compute-$(imageName)'
           publishLocation: 'Container'
         displayName: archiving compute-$(imageName)
@@ -76,9 +74,6 @@ jobs:
       matrix:
         mac:
           imageName: 'macOS-latest'
-        windows:
-          imageName: 'windows-latest'
-
     pool: 
       vmImage: $(imageName)
     
