@@ -1,5 +1,6 @@
 #!/bin/bash
 
+yum -y install zip
 pipx install tox 
 cd io
 tox
