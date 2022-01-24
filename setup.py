@@ -10,6 +10,7 @@ import sys
 import re
 import platform
 import subprocess
+sys.path.insert(0, os.path.dirname(__file__))
 import versioneer
 from typing import Union, List
 from setuptools import setup, Extension, find_packages
