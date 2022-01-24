@@ -72,6 +72,8 @@ jobs:
   - job: 'PackageManyLinux' 
 
     steps:
+      - script: yum -y install zip
+        displayName: Install zip         
       - script: |
           docker run --rm \
             -v $PWD:/io \
