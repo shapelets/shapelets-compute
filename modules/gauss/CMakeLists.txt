@@ -17,7 +17,7 @@ find_package(ArrayFire CONFIG REQUIRED)
 find_package(Boost REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 
-#find_package(CUDA )
+find_package(CUDA )
 include(CheckLanguage)
 check_language(CUDA)
 
@@ -25,6 +25,7 @@ if(CMAKE_CUDA_COMPILER)
     message(STATUS "CUDA compiler found: ${CMAKE_CUDA_COMPILER}")
     set(CMAKE_CUDA_STANDARD 14)
     include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+    include_directories(${CUDA_INCLUDE_DIRS})
 
     set(CUDA_SEPARABLE_COMPILATION ON)
     set(CUDA_RESOLVE_DEVICE_SYMBOLS ON)
