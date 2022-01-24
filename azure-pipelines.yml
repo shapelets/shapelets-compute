@@ -66,8 +66,6 @@ jobs:
           publishLocation: 'Container'
         displayName: archiving compute-$(imageName)
 
-
-jobs:
   - job: 'PackageMac' 
   
     strategy:
