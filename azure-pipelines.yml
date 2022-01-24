@@ -72,16 +72,16 @@ jobs:
   - job: 'ManyLinux shapelets_compute' 
 
     steps:
-    - script: |
-        docker run -ti --rm \
-          -v $PWD:/io \
-          $(manylinux_cuda) \
-          /io/entrypoint-build-wheels.sh
-      displayName: Build wheels
+      - script: |
+          docker run -ti --rm \
+            -v $PWD:/io \
+            $(manylinux_cuda) \
+            /io/entrypoint-build-wheels.sh
+        displayName: Build wheels
 
-    - task: PublishBuildArtifacts@1
+      - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.SourcesDirectory)/dist'
           ArtifactName: 'shapelets_compute'
           publishLocation: 'Container'
-      displayName: archiving shapelets_compute
+        displayName: archiving shapelets_compute
