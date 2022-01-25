@@ -21,10 +21,10 @@ jobs:
         displayName: Get Python for Python tools.
         inputs:
           versionSpec: '3.7'
-          addToPath: false
+          addToPath: true
         name: pyTools
       
-      - script: $(pyTools.pythonLocation)\python -m pip install --upgrade pip tox
+      - script: python -m pip install --upgrade pip tox
         displayName: Install Python-based tools.
 
       - task: Cache@2
@@ -32,32 +32,8 @@ jobs:
           key: 'CacheExternalArrayFire-$(imageName)'
           path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7'
-          architecture: 'x64'
-        displayName: Python 3.7.
-      
-      - script: $(pyTools.pythonLocation)\tox -e py37
-        displayName: run tox -e py37
-
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.8'
-          architecture: 'x64'
-        displayName: Use cached Python 3.8 for tests.
-      
-      - script: $(pyTools.pythonLocation)\tox -e py38
-        displayName: run tox -e py38
-
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.9'
-          architecture: 'x64'
-        displayName: Use cached Python 3.9 for tests.
-      
-      - script: $(pyTools.pythonLocation)\tox -e py39
-        displayName: run tox -e py39            
+      - script: tox
+        displayName: run tox
 
       - task: PublishBuildArtifacts@1
         inputs:
@@ -80,10 +56,10 @@ jobs:
         displayName: Get Python for Python tools.
         inputs:
           versionSpec: '3.7'
-          addToPath: false
+          addToPath: true
         name: pyTools
       
-      - script: $(pyTools.pythonLocation)/bin/pip install --upgrade tox
+      - script: pip install --upgrade tox
         displayName: Install Python-based tools.
 
       - task: Cache@2
@@ -91,32 +67,8 @@ jobs:
           key: 'CacheExternalArrayFire-$(imageName)'
           path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7'
-          architecture: 'x64'
-        displayName: Python 3.7.
-      
-      - script: $(pyTools.pythonLocation)/bin/tox -e py37
-        displayName: run tox -e py37
-
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.8'
-          architecture: 'x64'
-        displayName: Use cached Python 3.8 for tests.
-      
-      - script: $(pyTools.pythonLocation)/bin/tox -e py38
-        displayName: run tox -e py38
-
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.9'
-          architecture: 'x64'
-        displayName: Use cached Python 3.9 for tests.
-      
-      - script: $(pyTools.pythonLocation)/bin/tox -e py39
-        displayName: run tox -e py39            
+      - script: tox
+        displayName: run tox
 
       - task: PublishBuildArtifacts@1
         inputs:
@@ -125,19 +77,19 @@ jobs:
           publishLocation: 'Container'
         displayName: archiving compute-$(imageName)
 
-  - job: 'PackageManyLinux' 
+  # - job: 'PackageManyLinux' 
 
-    steps:       
-      - script: |
-          docker run --rm \
-            -v $PWD:/io \
-            $(manylinux_cuda) \
-            /io/entrypoint-build-wheels.sh
-        displayName: Build wheels
+  #   steps:       
+  #     - script: |
+  #         docker run --rm \
+  #           -v $PWD:/io \
+  #           $(manylinux_cuda) \
+  #           /io/entrypoint-build-wheels.sh
+  #       displayName: Build wheels
 
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/dist'
-          ArtifactName: 'shapelets_compute'
-          publishLocation: 'Container'
-        displayName: archiving shapelets_compute
+  #     - task: PublishBuildArtifacts@1
+  #       inputs:
+  #         PathtoPublish: '$(Build.SourcesDirectory)/dist'
+  #         ArtifactName: 'shapelets_compute'
+  #         publishLocation: 'Container'
+  #       displayName: archiving shapelets_compute
