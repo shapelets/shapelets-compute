@@ -67,7 +67,7 @@ jobs:
           key: 'CacheExternalArrayFire-$(imageName)'
           path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
-      - script: export MACOSX_DEPLOYMENT_TARGET=11_0 && tox -vvvv
+      - script: export MACOSX_DEPLOYMENT_TARGET=10_14 && tox -vvvv
         displayName: run tox
 
       - task: PublishBuildArtifacts@1
