@@ -62,7 +62,7 @@ jobs:
       # - script: pip install --upgrade tox
       #   displayName: Install Python-based tools.
       
-      - script: python -m pip install --upgrade pip tox
+      - script: $(pyTools.pythonLocation)/bin/python -m pip install --upgrade pip tox
         displayName: Install Python-based tools.
 
       - task: Cache@2
