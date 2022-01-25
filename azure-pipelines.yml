@@ -32,7 +32,7 @@ jobs:
           key: 'CacheExternalArrayFire-$(imageName)'
           path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
 
-      - script: tox
+      - script: tox -vvvv
         displayName: run tox
 
       - task: PublishBuildArtifacts@1
