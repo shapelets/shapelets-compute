@@ -6,41 +6,41 @@ variables:
   manylinux_cuda: 'sameli/manylinux2014_x86_64_cuda_11'
 
 jobs:
-  # - job: 'PackageWindows' 
+  - job: 'PackageWindows' 
   
-  #   strategy:
-  #     matrix:
-  #       windows:
-  #         imageName: 'windows-latest'
+    strategy:
+      matrix:
+        windows:
+          imageName: 'windows-latest'
 
-  #   pool: 
-  #     vmImage: $(imageName)
+    pool: 
+      vmImage: $(imageName)
     
-  #   steps:
-  #     - task: UsePythonVersion@0
-  #       displayName: Get Python for Python tools.
-  #       inputs:
-  #         versionSpec: '3.7'
-  #         addToPath: true
-  #       name: pyTools
+    steps:
+      - task: UsePythonVersion@0
+        displayName: Get Python for Python tools.
+        inputs:
+          versionSpec: '3.7'
+          addToPath: true
+        name: pyTools
       
-  #     - script: python -m pip install --upgrade pip tox
-  #       displayName: Install Python-based tools.
+      - script: python -m pip install --upgrade pip tox
+        displayName: Install Python-based tools.
 
-  #     - task: Cache@2
-  #       inputs:
-  #         key: 'CacheExternalArrayFire-$(imageName)'
-  #         path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
+      - task: Cache@2
+        inputs:
+          key: 'CacheExternalArrayFire-$(imageName)'
+          path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
 
-  #     - script: tox -vvvv
-  #       displayName: run tox
+      - script: tox -vvvv
+        displayName: run tox
 
-  #     - task: PublishBuildArtifacts@1
-  #       inputs:
-  #         PathtoPublish: '$(Build.SourcesDirectory)\dist'
-  #         ArtifactName: 'compute-$(imageName)'
-  #         publishLocation: 'Container'
-  #       displayName: archiving compute-$(imageName)
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)\dist'
+          ArtifactName: 'compute-$(imageName)'
+          publishLocation: 'Container'
+        displayName: archiving compute-$(imageName)
 
   - job: 'PackageMac' 
   
