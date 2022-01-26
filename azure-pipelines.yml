@@ -38,7 +38,7 @@ jobs:
           architecture: 'x64'
         displayName: Python 3.7.
       
-      - script: $(pyTools.pythonLocation)\tox -e py37 -vvvv
+      - script: tox -e py37 -vvvv
         displayName: run tox 3.7
 
       - task: UsePythonVersion@0
