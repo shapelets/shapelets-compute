@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         mac:
-          imageName: 'macOS-latest'
+          imageName: 'macOS-10.15'
     pool: 
       vmImage: $(imageName)
     
@@ -64,7 +64,8 @@ jobs:
 
       - task: Cache@2
         inputs:
-          key: 'CacheExternalArrayFire-$(imageName)'
+          # key: 'CacheExternalArrayFire-$(imageName)'
+          key: 'CacheExternalArrayFire-macOS-latest'
           path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
       - script: tox -vvvv
