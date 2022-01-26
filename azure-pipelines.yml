@@ -69,71 +69,71 @@ jobs:
           publishLocation: 'Container'
         displayName: archiving compute-$(imageName)
 
-  - job: 'PackageMac' 
+  # - job: 'PackageMac' 
   
-    strategy:
-      matrix:
-        mac:
-          imageName: 'macOS-10.15'
-    pool: 
-      vmImage: $(imageName)
+  #   strategy:
+  #     matrix:
+  #       mac:
+  #         imageName: 'macOS-10.15'
+  #   pool: 
+  #     vmImage: $(imageName)
     
-    steps:
-      - task: UsePythonVersion@0
-        displayName: Get Python for Python tools.
-        inputs:
-          versionSpec: '3.7'
-          addToPath: false
-        name: pyTools
+  #   steps:
+  #     - task: UsePythonVersion@0
+  #       displayName: Get Python for Python tools.
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         addToPath: false
+  #       name: pyTools
 
-      - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox
-        displayName: Install Python-based tools.
+  #     - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox
+  #       displayName: Install Python-based tools.
 
-      - task: Cache@2
-        inputs:
-          # key: 'CacheExternalArrayFire-$(imageName)'
-          key: 'CacheExternalArrayFire-macOS-latest'
-          path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
+  #     - task: Cache@2
+  #       inputs:
+  #         # key: 'CacheExternalArrayFire-$(imageName)'
+  #         key: 'CacheExternalArrayFire-macOS-latest'
+  #         path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7'
-          architecture: 'x64'
-        displayName: Python 3.7.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         architecture: 'x64'
+  #       displayName: Python 3.7.
       
-      - script: $(pyTools.pythonLocation)/bin/tox -e py37 -vvvv
-        displayName: run tox 3.7
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py37 -vvvv
+  #       displayName: run tox 3.7
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.8'
-          architecture: 'x64'
-        displayName: Use cached Python 3.8 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.8'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.8 for tests.
 
-      - script: $(pyTools.pythonLocation)/bin/tox -e py38 -vvvv
-        displayName: run tox 3.8
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py38 -vvvv
+  #       displayName: run tox 3.8
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.9'
-          architecture: 'x64'
-        displayName: Use cached Python 3.9 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.9'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.9 for tests.
 
-      - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
-        displayName: run tox 3.9
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
+  #       displayName: run tox 3.9
 
-      - script: ls -l 
-        displayName: ls current
+  #     - script: ls -l 
+  #       displayName: ls current
 
-      - script: ls -l $(Build.SourcesDirectory)/dist
-        displayName: ls dist
+  #     - script: ls -l $(Build.SourcesDirectory)/dist
+  #       displayName: ls dist
 
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/dist'
-          ArtifactName: 'compute-$(imageName)'
-          publishLocation: 'Container'
-        displayName: archiving compute-$(imageName)
+  #     - task: PublishBuildArtifacts@1
+  #       inputs:
+  #         PathtoPublish: '$(Build.SourcesDirectory)/dist'
+  #         ArtifactName: 'compute-$(imageName)'
+  #         publishLocation: 'Container'
+  #       displayName: archiving compute-$(imageName)
 
   # - job: 'PackageManyLinux' 
 
