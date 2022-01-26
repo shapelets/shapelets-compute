@@ -21,10 +21,10 @@ jobs:
         displayName: Get Python for Python tools.
         inputs:
           versionSpec: '3.7'
-          addToPath: true
+          addToPath: false
         name: pyTools
       
-      - script: python -m pip install --upgrade pip tox
+      - script: $(pyTools.pythonLocation)\bin\python3 -m pip install --upgrade pip tox
         displayName: Install Python-based tools.
 
       - task: Cache@2
@@ -32,8 +32,35 @@ jobs:
           key: 'CacheExternalArrayFire-$(imageName)'
           path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
 
-      - script: tox -vvvv
-        displayName: run tox
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.7'
+          architecture: 'x64'
+        displayName: Python 3.7.
+      
+      - script: $(pyTools.pythonLocation)\bin\tox -e py37 -vvvv
+        displayName: run tox 3.7
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.8'
+          architecture: 'x64'
+        displayName: Use cached Python 3.8 for tests.
+
+      - script: $(pyTools.pythonLocation)\bin\tox -e py38 -vvvv
+        displayName: run tox 3.8
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.9'
+          architecture: 'x64'
+        displayName: Use cached Python 3.9 for tests.
+
+      - script: $(pyTools.pythonLocation)\bin\tox -e py39 -vvvv
+        displayName: run tox 3.9
+
+      # - script: tox -vvvv
+      #   displayName: run tox
 
       - task: PublishBuildArtifacts@1
         inputs:
