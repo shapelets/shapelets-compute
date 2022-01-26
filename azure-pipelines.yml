@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         mac:
-          imageName: 'macOS-11'
+          imageName: 'macOS-10.15'
     pool: 
       vmImage: $(imageName)
     
