@@ -24,7 +24,7 @@ jobs:
           addToPath: false
         name: pyTools
       
-      - script: $(pyTools.pythonLocation)\bin\python3 -m pip install --upgrade pip tox
+      - script: $(pyTools.pythonLocation)\python3 -m pip install --upgrade pip tox
         displayName: Install Python-based tools.
 
       - task: Cache@2
