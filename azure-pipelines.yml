@@ -68,7 +68,7 @@ jobs:
           key: 'CacheExternalArrayFire-macOS-latest'
           path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
-      - script: (pyTools.pythonLocation)/bin/tox -vvvv
+      - script: $(pyTools.pythonLocation)/bin/tox -vvvv
         displayName: run tox
 
       - script: ls -l 
