@@ -71,7 +71,10 @@ jobs:
       - script: tox -vvvv
         displayName: run tox
 
-      - script: ls -l $(Build.SourcesDirectory)/dist $(Build.SourcesDirectory)/dist2
+      - script: ls -l 
+        displayName: ls current
+
+      - script: ls -l $(Build.SourcesDirectory)/dist
         displayName: ls dist
 
       - task: PublishBuildArtifacts@1
