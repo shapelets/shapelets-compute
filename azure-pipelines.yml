@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         mac:
-          imageName: 'macOS-10.14'
+          imageName: 'macOS-latest'
     pool: 
       vmImage: $(imageName)
     
@@ -69,6 +69,9 @@ jobs:
 
       - script: tox -vvvv
         displayName: run tox
+
+      - script: ls -l $(Build.SourcesDirectory)/dist
+        displayName: ls dist
 
       - task: PublishBuildArtifacts@1
         inputs:
