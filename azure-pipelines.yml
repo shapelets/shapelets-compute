@@ -47,7 +47,7 @@ jobs:
           architecture: 'x64'
         displayName: Use cached Python 3.8 for tests.
 
-      - script: $(pyTools.pythonLocation)\tox -e py38 -vvvv
+      - script: tox -e py38 -vvvv
         displayName: run tox 3.8
 
       - task: UsePythonVersion@0
@@ -56,7 +56,7 @@ jobs:
           architecture: 'x64'
         displayName: Use cached Python 3.9 for tests.
 
-      - script: $(pyTools.pythonLocation)\tox -e py39 -vvvv
+      - script: tox -e py39 -vvvv
         displayName: run tox 3.9
 
       # - script: tox -vvvv
