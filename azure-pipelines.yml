@@ -17,6 +17,10 @@ jobs:
       vmImage: $(imageName)
     
     steps:
+      - checkout: self
+        submodules: true
+        persistCredentials: true
+
       - task: UsePythonVersion@0
         displayName: Get Python for Python tools.
         inputs:
@@ -62,12 +66,20 @@ jobs:
       # - script: tox -vvvv
       #   displayName: run tox
 
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)\dist'
-          ArtifactName: 'compute-$(imageName)'
-          publishLocation: 'Container'
-        displayName: archiving compute-$(imageName)
+      - script: |
+          find '$(Build.SourcesDirectory)\dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+        displayName: "Calculate sha"
+
+      - script: |
+          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)\dist'
+        displayName: "Upload Package"
+
+      # - task: PublishBuildArtifacts@1
+      #   inputs:
+      #     PathtoPublish: '$(Build.SourcesDirectory)\dist'
+      #     ArtifactName: 'compute-$(imageName)'
+      #     publishLocation: 'Container'
+      #   displayName: archiving compute-$(imageName)
 
   - job: 'PackageMac' 
   
@@ -79,6 +91,10 @@ jobs:
       vmImage: $(imageName)
     
     steps:
+      - checkout: self
+        submodules: true
+        persistCredentials: true
+
       - task: UsePythonVersion@0
         displayName: Get Python for Python tools.
         inputs:
@@ -122,22 +138,28 @@ jobs:
       - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
         displayName: run tox 3.9
 
-      - script: ls -l 
-        displayName: ls current
+      - script: |
+          find '$(Build.SourcesDirectory)\dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+        displayName: "Calculate sha"
 
-      - script: ls -l $(Build.SourcesDirectory)/dist
-        displayName: ls dist
+      - script: |
+          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)\dist'
+        displayName: "Upload Package"
 
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/dist'
-          ArtifactName: 'compute-$(imageName)'
-          publishLocation: 'Container'
-        displayName: archiving compute-$(imageName)
+      # - task: PublishBuildArtifacts@1
+      #   inputs:
+      #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
+      #     ArtifactName: 'compute-$(imageName)'
+      #     publishLocation: 'Container'
+      #   displayName: archiving compute-$(imageName)
 
   - job: 'PackageManyLinux' 
 
     steps:       
+      - checkout: self
+        submodules: true
+        persistCredentials: true
+
       - script: |
           docker run --rm \
             -v $PWD:/io \
@@ -145,9 +167,17 @@ jobs:
             /io/entrypoint-build-wheels.sh
         displayName: Build wheels
 
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/dist'
-          ArtifactName: 'shapelets_compute'
-          publishLocation: 'Container'
-        displayName: archiving shapelets_compute
+      - script: |
+          find '$(Build.SourcesDirectory)\dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+        displayName: "Calculate sha"
+
+      - script: |
+          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)\dist'
+        displayName: "Upload Package"
+
+      # - task: PublishBuildArtifacts@1
+      #   inputs:
+      #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
+      #     ArtifactName: 'shapelets_compute'
+      #     publishLocation: 'Container'
+      #   displayName: archiving shapelets_compute
