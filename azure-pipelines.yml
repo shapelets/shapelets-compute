@@ -67,7 +67,7 @@ jobs:
       #   displayName: run tox
 
       - script: |
-          certutil -hashfile "$(Build.SourcesDirectory)\dist\*" SHA256 > "$(Build.SourcesDirectory)\dist\server.sha"
+          certutil -hashfile "$(Build.SourcesDirectory)\dist\*.*" SHA256 > "$(Build.SourcesDirectory)\dist\server.sha"
         displayName: "Calculate sha"
 
       - script: |
