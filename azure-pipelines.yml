@@ -66,9 +66,9 @@ jobs:
       # - script: tox -vvvv
       #   displayName: run tox
 
-      - script: |
-          certutil -hashfile "$(Build.SourcesDirectory)\dist\*.*" SHA256 > "$(Build.SourcesDirectory)\dist\server.sha"
-        displayName: "Calculate sha"
+      # - script: |
+      #     certutil -hashfile "$(Build.SourcesDirectory)\dist\*.*" SHA256 > "$(Build.SourcesDirectory)\dist\server.sha"
+      #   displayName: "Calculate sha"
 
       - script: |
           az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)\dist'
@@ -167,9 +167,9 @@ jobs:
             /io/entrypoint-build-wheels.sh
         displayName: Build wheels
 
-      - script: |
-          find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
-        displayName: "Calculate sha"
+      # - script: |
+      #     find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+      #   displayName: "Calculate sha"
 
       - script: |
           az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
