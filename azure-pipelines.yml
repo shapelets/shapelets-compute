@@ -138,6 +138,12 @@ jobs:
       - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
         displayName: run tox 3.9
 
+
+      - script: |
+          sudo port install coreutils
+        displayName: "Install sha256sum"
+
+
       - script: |
           find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
         displayName: "Calculate sha"
@@ -168,7 +174,7 @@ jobs:
         displayName: Build wheels
 
       - script: |
-          find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+          sudo find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
         displayName: "Calculate sha"
 
       - script: |
