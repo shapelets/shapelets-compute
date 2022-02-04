@@ -71,6 +71,10 @@ jobs:
       #   displayName: "Calculate sha"
 
       - script: |
+          openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha" \;
+        displayName: "Calculate sha"
+
+      - script: |
           az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)\dist'
         displayName: "Upload Package"
 
@@ -139,13 +143,13 @@ jobs:
         displayName: run tox 3.9
 
 
-      - script: |
-          sudo port install coreutils
-        displayName: "Install sha256sum"
+      # - script: |
+      #     sudo port install coreutils
+      #   displayName: "Install sha256sum"
 
 
       - script: |
-          find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+          find '$(Build.SourcesDirectory)/dist' -exec bash -c "openssl sha256 '{}' > '{}'.sha" \;
         displayName: "Calculate sha"
 
       - script: |
