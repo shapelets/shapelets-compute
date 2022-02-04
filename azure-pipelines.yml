@@ -67,7 +67,7 @@ jobs:
       #   displayName: run tox
 
       - script: |
-          find '$(Build.SourcesDirectory)\dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+          find "$(Build.SourcesDirectory)\dist" -exec bash -c "sha256sum '{}' > '{}'.sha" \;
         displayName: "Calculate sha"
 
       - script: |
@@ -139,7 +139,7 @@ jobs:
         displayName: run tox 3.9
 
       - script: |
-          find '$(Build.SourcesDirectory)\dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+          find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
         displayName: "Calculate sha"
 
       - script: |
@@ -168,7 +168,7 @@ jobs:
         displayName: Build wheels
 
       - script: |
-          find '$(Build.SourcesDirectory)\dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+          find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
         displayName: "Calculate sha"
 
       - script: |
