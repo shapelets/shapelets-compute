@@ -75,7 +75,7 @@ jobs:
         displayName: "Calculate sha"
 
       - script: |
-          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source $(Build.SourcesDirectory)\dist\
+          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination compute --source $(Build.SourcesDirectory)\dist\
         displayName: "Upload Package"
 
       # - task: PublishBuildArtifacts@1
