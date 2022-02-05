@@ -71,7 +71,7 @@ jobs:
       #   displayName: "Calculate sha"
 
       - script: |
-          openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha" \;
+          openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha
         displayName: "Calculate sha"
 
       - script: |
