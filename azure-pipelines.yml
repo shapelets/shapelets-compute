@@ -21,8 +21,11 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f nightly
+      - script: git tag -f vnightly
         displayName: "git tag"
+
+      - script: git describe --tags --dirty --always
+        displayName: "git describe"
 
       - task: UsePythonVersion@0
         displayName: Get Python for Python tools.
@@ -102,8 +105,11 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f nightly
+      - script: git tag -f vnightly
         displayName: "git tag"
+
+      - script: git describe --tags --dirty --always
+        displayName: "git describe"
 
       - task: UsePythonVersion@0
         displayName: Get Python for Python tools.
@@ -176,8 +182,11 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f nightly
+      - script: git tag -f vnightly
         displayName: "git tag"
+
+      - script: git describe --tags --dirty --always
+        displayName: "git describe"
 
       - script: |
           docker run --rm \
