@@ -21,6 +21,9 @@ jobs:
         submodules: true
         persistCredentials: true
 
+      - script: git tag -f nightly
+        displayName: "git tag"
+
       - task: UsePythonVersion@0
         displayName: Get Python for Python tools.
         inputs:
@@ -99,6 +102,9 @@ jobs:
         submodules: true
         persistCredentials: true
 
+      - script: git tag -f nightly
+        displayName: "git tag"
+
       - task: UsePythonVersion@0
         displayName: Get Python for Python tools.
         inputs:
@@ -169,6 +175,9 @@ jobs:
       - checkout: self
         submodules: true
         persistCredentials: true
+
+      - script: git tag -f nightly
+        displayName: "git tag"
 
       - script: |
           docker run --rm \
