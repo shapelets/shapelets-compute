@@ -21,7 +21,7 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f v0.0.nightly
+      - script: git tag -f nightly
         displayName: "git tag"
 
       - script: git describe --tags --dirty --always
@@ -105,7 +105,7 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f v0.0.nightly
+      - script: git tag -f nightly
         displayName: "git tag"
 
       - script: git describe --tags --dirty --always
@@ -182,7 +182,7 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f v0.0.nightly
+      - script: git tag -f nightly
         displayName: "git tag"
 
       - script: git describe --tags --dirty --always
