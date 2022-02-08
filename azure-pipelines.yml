@@ -78,8 +78,15 @@ jobs:
       #     certutil -hashfile "$(Build.SourcesDirectory)\dist\*.*" SHA256 > "$(Build.SourcesDirectory)\dist\server.sha"
       #   displayName: "Calculate sha"
 
-      - script: |
-          openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha
+      # - script: |
+      #     openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha
+      #   displayName: "Calculate sha"
+
+      - bash: |
+          files=`find $(Build.SourcesDirectory)\dist\`
+          for file in ${files}; do
+            openssl sha256 ${file} > ${file}.sha
+          done
         displayName: "Calculate sha"
 
       - script: |
@@ -93,121 +100,121 @@ jobs:
       #     publishLocation: 'Container'
       #   displayName: archiving compute-$(imageName)
 
-  - job: 'PackageMac' 
+  # - job: 'PackageMac' 
   
-    strategy:
-      matrix:
-        mac:
-          imageName: 'macOS-10.15'
-    pool: 
-      vmImage: $(imageName)
+  #   strategy:
+  #     matrix:
+  #       mac:
+  #         imageName: 'macOS-10.15'
+  #   pool: 
+  #     vmImage: $(imageName)
     
-    steps:
-      - checkout: self
-        submodules: true
-        persistCredentials: true
+  #   steps:
+  #     - checkout: self
+  #       submodules: true
+  #       persistCredentials: true
 
-      - script: git tag -f 0.5.0.dev`date +%y%m%d`
-        displayName: "git tag"
+  #     - script: git tag -f 0.5.0.dev`date +%y%m%d`
+  #       displayName: "git tag"
 
-      - script: git describe --tags --dirty --always
-        displayName: "git describe"
+  #     - script: git describe --tags --dirty --always
+  #       displayName: "git describe"
 
-      - task: UsePythonVersion@0
-        displayName: Get Python for Python tools.
-        inputs:
-          versionSpec: '3.7'
-          addToPath: false
-        name: pyTools
+  #     - task: UsePythonVersion@0
+  #       displayName: Get Python for Python tools.
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         addToPath: false
+  #       name: pyTools
 
-      - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox
-        displayName: Install Python-based tools.
+  #     - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox
+  #       displayName: Install Python-based tools.
 
-      - task: Cache@2
-        inputs:
-          # key: 'CacheExternalArrayFire-$(imageName)'
-          key: 'CacheExternalArrayFire-macOS-latest'
-          path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
+  #     - task: Cache@2
+  #       inputs:
+  #         # key: 'CacheExternalArrayFire-$(imageName)'
+  #         key: 'CacheExternalArrayFire-macOS-latest'
+  #         path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7'
-          architecture: 'x64'
-        displayName: Python 3.7.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         architecture: 'x64'
+  #       displayName: Python 3.7.
       
-      - script: $(pyTools.pythonLocation)/bin/tox -e py37 -vvvv
-        displayName: run tox 3.7
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py37 -vvvv
+  #       displayName: run tox 3.7
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.8'
-          architecture: 'x64'
-        displayName: Use cached Python 3.8 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.8'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.8 for tests.
 
-      - script: $(pyTools.pythonLocation)/bin/tox -e py38 -vvvv
-        displayName: run tox 3.8
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py38 -vvvv
+  #       displayName: run tox 3.8
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.9'
-          architecture: 'x64'
-        displayName: Use cached Python 3.9 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.9'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.9 for tests.
 
-      - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
-        displayName: run tox 3.9
-
-
-      # - script: |
-      #     sudo port install coreutils
-      #   displayName: "Install sha256sum"
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
+  #       displayName: run tox 3.9
 
 
-      - script: |
-          find '$(Build.SourcesDirectory)/dist' -exec bash -c "openssl sha256 '{}' > '{}'.sha" \;
-        displayName: "Calculate sha"
+  #     # - script: |
+  #     #     sudo port install coreutils
+  #     #   displayName: "Install sha256sum"
 
-      - script: |
-          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
-        displayName: "Upload Package"
 
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
-      #     ArtifactName: 'compute-$(imageName)'
-      #     publishLocation: 'Container'
-      #   displayName: archiving compute-$(imageName)
+  #     - script: |
+  #         find '$(Build.SourcesDirectory)/dist' -exec bash -c "openssl sha256 '{}' > '{}'.sha" \;
+  #       displayName: "Calculate sha"
 
-  - job: 'PackageManyLinux' 
+  #     - script: |
+  #         az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
+  #       displayName: "Upload Package"
 
-    steps:       
-      - checkout: self
-        submodules: true
-        persistCredentials: true
+  #     # - task: PublishBuildArtifacts@1
+  #     #   inputs:
+  #     #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
+  #     #     ArtifactName: 'compute-$(imageName)'
+  #     #     publishLocation: 'Container'
+  #     #   displayName: archiving compute-$(imageName)
 
-      - script: git tag -f 0.5.0.dev`date +%y%m%d`
-        displayName: "git tag"
+  # - job: 'PackageManyLinux' 
 
-      - script: git describe --tags --dirty --always
-        displayName: "git describe"
+  #   steps:       
+  #     - checkout: self
+  #       submodules: true
+  #       persistCredentials: true
 
-      - script: |
-          docker run --rm \
-            -v $PWD:/io \
-            $(manylinux_cuda) \
-            /io/entrypoint-build-wheels.sh
-        displayName: Build wheels
+  #     - script: git tag -f 0.5.0.dev`date +%y%m%d`
+  #       displayName: "git tag"
 
-      - script: |
-          sudo find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
-        displayName: "Calculate sha"
+  #     - script: git describe --tags --dirty --always
+  #       displayName: "git describe"
 
-      - script: |
-          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
-        displayName: "Upload Package"
+  #     - script: |
+  #         docker run --rm \
+  #           -v $PWD:/io \
+  #           $(manylinux_cuda) \
+  #           /io/entrypoint-build-wheels.sh
+  #       displayName: Build wheels
 
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
-      #     ArtifactName: 'shapelets_compute'
-      #     publishLocation: 'Container'
-      #   displayName: archiving shapelets_compute
+  #     - script: |
+  #         sudo find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
+  #       displayName: "Calculate sha"
+
+  #     - script: |
+  #         az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
+  #       displayName: "Upload Package"
+
+  #     # - task: PublishBuildArtifacts@1
+  #     #   inputs:
+  #     #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
+  #     #     ArtifactName: 'shapelets_compute'
+  #     #     publishLocation: 'Container'
+  #     #   displayName: archiving shapelets_compute
