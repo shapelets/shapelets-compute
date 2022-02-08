@@ -87,9 +87,7 @@ jobs:
           Where-Object {$_.PSIsContainer} | 
           Foreach-Object {$_.Name}
 
-          $string = "$(files)"
-          
-          $Data=$string.split(" ")
+          $Data=$files.split(" ")
           
           foreach($item in $Data){
             openssl sha256 $item > $item.sha
