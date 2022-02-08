@@ -99,6 +99,10 @@ jobs:
           az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination compute --source $(Build.SourcesDirectory)\dist\
         displayName: "Upload Package"
 
+      - script: |
+          twine upload $(Build.SourcesDirectory)/dist/* --repository-url $(repository_url) --u __token__ --p $(pypi_token)
+        displayName: "Upload Package to PyPI"
+
       # - task: PublishBuildArtifacts@1
       #   inputs:
       #     PathtoPublish: '$(Build.SourcesDirectory)\dist'
@@ -183,6 +187,10 @@ jobs:
           az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
         displayName: "Upload Package"
 
+      - script: |
+          twine upload $(Build.SourcesDirectory)/dist/* --repository-url $(repository_url) --u __token__ --p $(pypi_token)
+        displayName: "Upload Package to PyPI"
+
       # - task: PublishBuildArtifacts@1
       #   inputs:
       #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
@@ -217,6 +225,10 @@ jobs:
       - script: |
           az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
         displayName: "Upload Package"
+
+      - script: |
+          twine upload $(Build.SourcesDirectory)/dist/* --repository-url $(repository_url) --u __token__ --p $(pypi_token)
+        displayName: "Upload Package to PyPI"
 
       # - task: PublishBuildArtifacts@1
       #   inputs:
