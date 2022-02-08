@@ -16,12 +16,14 @@ jobs:
     pool: 
       vmImage: $(imageName)
 
+    variables:
+      builddate: $[format('{0:yyMMdd}', pipeline.startTime)]
     steps:
       - checkout: self
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f "0.5.0.dev"$[format('{0:yyMMdd}', pipeline.startTime)]
+      - script: git tag -f "0.5.0.dev"$(builddate)
         displayName: "git tag"
 
       - script: git describe --tags --dirty --always
