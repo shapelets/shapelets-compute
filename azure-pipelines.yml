@@ -84,8 +84,8 @@ jobs:
 
       - powershell: |
           $files = Get-ChildItem '$(Build.SourcesDirectory)\dist\' | 
-          Where-Object {$_.PSIsContainer} | 
           Foreach-Object {$_.Name}
+          echo $files
 
           $Data=$files.split(" ")
           
