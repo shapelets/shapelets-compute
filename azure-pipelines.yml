@@ -90,7 +90,7 @@ jobs:
           $Data=$files.split(" ")
           
           foreach($item in $Data){
-            openssl sha256 $item > $item.sha
+            openssl sha256 $(Build.SourcesDirectory)\dist\$item > $(Build.SourcesDirectory)\dist\$item.sha
 
           }
         displayName: "Calculate sha"
