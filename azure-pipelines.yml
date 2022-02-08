@@ -82,11 +82,19 @@ jobs:
       #     openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha
       #   displayName: "Calculate sha"
 
-      - bash: |
-          files=`find $(Build.SourcesDirectory)\dist\`
-          for file in ${files}; do
-            openssl sha256 ${file} > ${file}.sha
-          done
+      - powershell: |
+          $files = Get-ChildItem '$(Build.SourcesDirectory)\dist\' | 
+          Where-Object {$_.PSIsContainer} | 
+          Foreach-Object {$_.Name}
+
+          $string = "$(files)"
+          
+          $Data=$string.split(" ")
+          
+          foreach($item in $Data){
+            openssl sha256 $item > $item.sha
+
+          }
         displayName: "Calculate sha"
 
       - script: |
