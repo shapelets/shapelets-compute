@@ -36,7 +36,7 @@ jobs:
           addToPath: false
         name: pyTools
       
-      - script: $(pyTools.pythonLocation)\python3 -m pip install --upgrade pip tox -vvv
+      - script: $(pyTools.pythonLocation)\python3 -m pip install --upgrade pip tox twine -vvv
         displayName: Install Python-based tools.
 
       - task: Cache@2
@@ -100,7 +100,7 @@ jobs:
         displayName: "Upload Package"
 
       - script: |
-          twine upload $(Build.SourcesDirectory)/dist/* --repository-url $(repository_url) --u __token__ --p $(pypi_token)
+          python -m twine upload $(Build.SourcesDirectory)/dist/* --repository-url $(repository_url) --u __token__ --p $(pypi_token)
         displayName: "Upload Package to PyPI"
 
       # - task: PublishBuildArtifacts@1
@@ -137,7 +137,7 @@ jobs:
           addToPath: false
         name: pyTools
 
-      - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox
+      - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox twine
         displayName: Install Python-based tools.
 
       - task: Cache@2
