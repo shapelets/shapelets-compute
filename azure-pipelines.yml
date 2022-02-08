@@ -15,13 +15,15 @@ jobs:
 
     pool: 
       vmImage: $(imageName)
-    
+    variables:
+      mydate: $(Get-Date -Format yyMMdd)
+
     steps:
       - checkout: self
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f "0.5.0.dev"+$(Get-Date -Format yyMMdd)
+      - script: git tag -f "0.5.0.dev" + $(mydate)
         displayName: "git tag"
 
       - script: git describe --tags --dirty --always
