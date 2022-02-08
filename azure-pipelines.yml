@@ -21,7 +21,7 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f "0.5.0.dev"$(Date:yyMMdd)
+      - script: git tag -f "0.5.0.dev"$[format('{0:yyMMdd}', pipeline.startTime)]
         displayName: "git tag"
 
       - script: git describe --tags --dirty --always
