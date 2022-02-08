@@ -16,7 +16,8 @@ jobs:
     pool: 
       vmImage: $(imageName)
     variables:
-      mydate: $(Get-Date -Format yyMMdd)
+      mydate_old: $(Get-Date -Format yyMMdd)
+      mydate: $(Get-Date).tostring("yyMMdd")
 
     steps:
       - checkout: self
