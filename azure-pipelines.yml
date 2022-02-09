@@ -6,197 +6,197 @@ variables:
   manylinux_cuda: 'sameli/manylinux2014_x86_64_cuda_11'
 
 jobs:
-  - job: 'PackageWindows' 
+  # - job: 'PackageWindows' 
   
-    strategy:
-      matrix:
-        windows:
-          imageName: 'windows-latest'
+  #   strategy:
+  #     matrix:
+  #       windows:
+  #         imageName: 'windows-latest'
 
-    pool: 
-      vmImage: $(imageName)
+  #   pool: 
+  #     vmImage: $(imageName)
 
-    variables:
-      builddate: $[format('{0:yyMMdd}', pipeline.startTime)]
-    steps:
-      - checkout: self
-        submodules: true
-        persistCredentials: true
+  #   variables:
+  #     builddate: $[format('{0:yyMMdd}', pipeline.startTime)]
+  #   steps:
+  #     - checkout: self
+  #       submodules: true
+  #       persistCredentials: true
 
-      - script: git tag -f "0.5.0.dev"$(builddate)
-        displayName: "git tag"
+  #     - script: git tag -f $(nightly-version)".dev"$(builddate)
+  #       displayName: "git tag"
 
-      - script: git describe --tags --dirty --always
-        displayName: "git describe"
+  #     - script: git describe --tags --dirty --always
+  #       displayName: "git describe"
 
-      - task: UsePythonVersion@0
-        displayName: Get Python for Python tools.
-        inputs:
-          versionSpec: '3.7'
-          addToPath: false
-        name: pyTools
+  #     - task: UsePythonVersion@0
+  #       displayName: Get Python for Python tools.
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         addToPath: false
+  #       name: pyTools
       
-      - script: $(pyTools.pythonLocation)\python3 -m pip install --upgrade pip tox twine -vvv
-        displayName: Install Python-based tools.
+  #     - script: $(pyTools.pythonLocation)\python3 -m pip install --upgrade pip tox twine -vvv
+  #       displayName: Install Python-based tools.
 
-      - task: Cache@2
-        inputs:
-          key: 'CacheExternalArrayFire-$(imageName)'
-          path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
+  #     - task: Cache@2
+  #       inputs:
+  #         key: 'CacheExternalArrayFire-$(imageName)'
+  #         path: '$(System.DefaultWorkingDirectory)\external\arrayfire'
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7'
-          architecture: 'x64'
-        displayName: Python 3.7.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         architecture: 'x64'
+  #       displayName: Python 3.7.
       
-      - script: tox -e py37 -vvvv
-        displayName: run tox 3.7
+  #     - script: tox -e py37 -vvvv
+  #       displayName: run tox 3.7
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.8'
-          architecture: 'x64'
-        displayName: Use cached Python 3.8 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.8'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.8 for tests.
 
-      - script: tox -e py38 -vvvv
-        displayName: run tox 3.8
+  #     - script: tox -e py38 -vvvv
+  #       displayName: run tox 3.8
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.9'
-          architecture: 'x64'
-        displayName: Use cached Python 3.9 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.9'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.9 for tests.
 
-      - script: tox -e py39 -vvvv
-        displayName: run tox 3.9
+  #     - script: tox -e py39 -vvvv
+  #       displayName: run tox 3.9
 
-      # - script: tox -vvvv
-      #   displayName: run tox
+  #     # - script: tox -vvvv
+  #     #   displayName: run tox
 
-      # - script: |
-      #     certutil -hashfile "$(Build.SourcesDirectory)\dist\*.*" SHA256 > "$(Build.SourcesDirectory)\dist\server.sha"
-      #   displayName: "Calculate sha"
+  #     # - script: |
+  #     #     certutil -hashfile "$(Build.SourcesDirectory)\dist\*.*" SHA256 > "$(Build.SourcesDirectory)\dist\server.sha"
+  #     #   displayName: "Calculate sha"
 
-      # - script: |
-      #     openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha
-      #   displayName: "Calculate sha"
+  #     # - script: |
+  #     #     openssl sha256 $(Build.SourcesDirectory)\dist\*.* > $(Build.SourcesDirectory)\dist\server-windows.sha
+  #     #   displayName: "Calculate sha"
 
-      - powershell: |
-          $files = Get-ChildItem '$(Build.SourcesDirectory)\dist\' | 
-          Foreach-Object {$_.Name}
-          echo $files
+  #     - powershell: |
+  #         $files = Get-ChildItem '$(Build.SourcesDirectory)\dist\' | 
+  #         Foreach-Object {$_.Name}
+  #         echo $files
 
-          $Data=$files.split(" ")
+  #         $Data=$files.split(" ")
           
-          foreach($item in $Data){
-            openssl sha256 $(Build.SourcesDirectory)\dist\$item > $(Build.SourcesDirectory)\dist\$item.sha
+  #         foreach($item in $Data){
+  #           openssl sha256 $(Build.SourcesDirectory)\dist\$item > $(Build.SourcesDirectory)\dist\$item.sha
 
-          }
-        displayName: "Calculate sha"
+  #         }
+  #       displayName: "Calculate sha"
 
-      - script: |
-          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination compute --source $(Build.SourcesDirectory)\dist\
-        displayName: "Upload Package"
+  #     - script: |
+  #         az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination compute --source $(Build.SourcesDirectory)\dist\
+  #       displayName: "Upload Package"
 
-      - script: |
-          twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --u __token__ --p $(pypi_token_test)
-        displayName: "Upload Package to PyPI"
+  #     - script: |
+  #         twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --u __token__ --p $(pypi_token_test)
+  #       displayName: "Upload Package to PyPI"
 
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     PathtoPublish: '$(Build.SourcesDirectory)\dist'
-      #     ArtifactName: 'compute-$(imageName)'
-      #     publishLocation: 'Container'
-      #   displayName: archiving compute-$(imageName)
+  #     # - task: PublishBuildArtifacts@1
+  #     #   inputs:
+  #     #     PathtoPublish: '$(Build.SourcesDirectory)\dist'
+  #     #     ArtifactName: 'compute-$(imageName)'
+  #     #     publishLocation: 'Container'
+  #     #   displayName: archiving compute-$(imageName)
 
-  - job: 'PackageMac' 
+  # - job: 'PackageMac' 
   
-    strategy:
-      matrix:
-        mac:
-          imageName: 'macOS-10.15'
-    pool: 
-      vmImage: $(imageName)
+  #   strategy:
+  #     matrix:
+  #       mac:
+  #         imageName: 'macOS-10.15'
+  #   pool: 
+  #     vmImage: $(imageName)
     
-    steps:
-      - checkout: self
-        submodules: true
-        persistCredentials: true
+  #   steps:
+  #     - checkout: self
+  #       submodules: true
+  #       persistCredentials: true
 
-      - script: git tag -f 0.5.0.dev`date +%y%m%d`
-        displayName: "git tag"
+  #     - script: git tag -f $(nightly-version).dev`date +%y%m%d`
+  #       displayName: "git tag"
 
-      - script: git describe --tags --dirty --always
-        displayName: "git describe"
+  #     - script: git describe --tags --dirty --always
+  #       displayName: "git describe"
 
-      - task: UsePythonVersion@0
-        displayName: Get Python for Python tools.
-        inputs:
-          versionSpec: '3.7'
-          addToPath: false
-        name: pyTools
+  #     - task: UsePythonVersion@0
+  #       displayName: Get Python for Python tools.
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         addToPath: false
+  #       name: pyTools
 
-      - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox twine
-        displayName: Install Python-based tools.
+  #     - script: $(pyTools.pythonLocation)/bin/python3 -m pip install --upgrade pip tox twine
+  #       displayName: Install Python-based tools.
 
-      - task: Cache@2
-        inputs:
-          # key: 'CacheExternalArrayFire-$(imageName)'
-          key: 'CacheExternalArrayFire-macOS-latest'
-          path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
+  #     - task: Cache@2
+  #       inputs:
+  #         # key: 'CacheExternalArrayFire-$(imageName)'
+  #         key: 'CacheExternalArrayFire-macOS-latest'
+  #         path: '$(System.DefaultWorkingDirectory)/external/arrayfire'
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7'
-          architecture: 'x64'
-        displayName: Python 3.7.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.7'
+  #         architecture: 'x64'
+  #       displayName: Python 3.7.
       
-      - script: $(pyTools.pythonLocation)/bin/tox -e py37 -vvvv
-        displayName: run tox 3.7
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py37 -vvvv
+  #       displayName: run tox 3.7
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.8'
-          architecture: 'x64'
-        displayName: Use cached Python 3.8 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.8'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.8 for tests.
 
-      - script: $(pyTools.pythonLocation)/bin/tox -e py38 -vvvv
-        displayName: run tox 3.8
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py38 -vvvv
+  #       displayName: run tox 3.8
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.9'
-          architecture: 'x64'
-        displayName: Use cached Python 3.9 for tests.
+  #     - task: UsePythonVersion@0
+  #       inputs:
+  #         versionSpec: '3.9'
+  #         architecture: 'x64'
+  #       displayName: Use cached Python 3.9 for tests.
 
-      - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
-        displayName: run tox 3.9
-
-
-      # - script: |
-      #     sudo port install coreutils
-      #   displayName: "Install sha256sum"
+  #     - script: $(pyTools.pythonLocation)/bin/tox -e py39 -vvvv
+  #       displayName: run tox 3.9
 
 
-      - script: |
-          find '$(Build.SourcesDirectory)/dist' -exec bash -c "openssl sha256 '{}' > '{}'.sha" \;
-        displayName: "Calculate sha"
+  #     # - script: |
+  #     #     sudo port install coreutils
+  #     #   displayName: "Install sha256sum"
 
-      - script: |
-          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
-        displayName: "Upload Package"
 
-      - script: |
-          twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --u __token__ --p $(pypi_token_test)
-        displayName: "Upload Package to PyPI"
+  #     - script: |
+  #         find '$(Build.SourcesDirectory)/dist' -exec bash -c "openssl sha256 '{}' > '{}'.sha" \;
+  #       displayName: "Calculate sha"
 
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
-      #     ArtifactName: 'compute-$(imageName)'
-      #     publishLocation: 'Container'
-      #   displayName: archiving compute-$(imageName)
+  #     - script: |
+  #         az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
+  #       displayName: "Upload Package"
+
+  #     - script: |
+  #         twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --u __token__ --p $(pypi_token_test)
+  #       displayName: "Upload Package to PyPI"
+
+  #     # - task: PublishBuildArtifacts@1
+  #     #   inputs:
+  #     #     PathtoPublish: '$(Build.SourcesDirectory)/dist'
+  #     #     ArtifactName: 'compute-$(imageName)'
+  #     #     publishLocation: 'Container'
+  #     #   displayName: archiving compute-$(imageName)
 
   - job: 'PackageManyLinux' 
 
@@ -205,7 +205,7 @@ jobs:
         submodules: true
         persistCredentials: true
 
-      - script: git tag -f 0.5.0.dev`date +%y%m%d`
+      - script: git tag -f $(nightly-version).dev`date +%y%m%d`
         displayName: "git tag"
 
       - script: git describe --tags --dirty --always
