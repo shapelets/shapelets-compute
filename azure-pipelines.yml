@@ -222,9 +222,9 @@ jobs:
           sudo find '$(Build.SourcesDirectory)/dist' -exec bash -c "sha256sum '{}' > '{}'.sha" \;
         displayName: "Calculate sha"
 
-      - script: |
-          az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
-        displayName: "Upload Package"
+      # - script: |
+      #     az storage blob upload-batch --account-name $(account-name) --account-key $(account-key) --destination 'compute' --source '$(Build.SourcesDirectory)/dist'
+      #   displayName: "Upload Package"
 
       - script: |
           python -m pip install twine
