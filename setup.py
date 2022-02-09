@@ -37,7 +37,7 @@ def process_version_information(full_version):
 def get_documentation_url(ver_details, doc_root="https://shapelets.io/doc/compute/"):
     # return doc_root + "dev" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
     # return doc_root + "" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
-    return dic_root
+    return doc_root
 
 def check_submodules():
     """ Ensure we have source code for gauss external repos """
