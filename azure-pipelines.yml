@@ -100,7 +100,7 @@ jobs:
         displayName: "Upload Package"
 
       - script: |
-          twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --u __token__ --p $(pypi_token_test)
+          twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --verbose --u __token__ --p $(pypi_token_test)
         displayName: "Upload Package to PyPI"
 
       # - task: PublishBuildArtifacts@1
@@ -188,7 +188,7 @@ jobs:
         displayName: "Upload Package"
 
       - script: |
-          twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --u __token__ --p $(pypi_token_test)
+          twine upload $(Build.SourcesDirectory)/dist/*.whl --repository $(repository_url_test) --verbose --u __token__ --p $(pypi_token_test)
         displayName: "Upload Package to PyPI"
 
       # - task: PublishBuildArtifacts@1
