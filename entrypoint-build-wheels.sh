@@ -1,7 +1,8 @@
 #!/bin/bash
 
 yum -y install zip
-pipx install tox twine
+pipx install tox
+pipx install twine
 cd io
 export LDFLAGS=-L/usr/local/cuda/lib64
 tox
