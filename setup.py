@@ -34,8 +34,9 @@ def process_version_information(full_version):
         is_dev=is_dev)
 
 
-def get_documentation_url(ver_details, doc_root="https:://shapelets.io/doc/"):
-    return doc_root + "dev" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
+def get_documentation_url(ver_details, doc_root="https://shapelets.io/doc/compute/"):
+    # return doc_root + "dev" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
+    return doc_root + "" if ver_details["is_dev"] else "{}.{}".format(ver_details["mayor"], ver_details["minor"])
 
 
 def check_submodules():
