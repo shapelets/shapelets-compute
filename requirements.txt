@@ -8,3 +8,4 @@ typing-extensions~=3.10.0.0
 pyperf~=2.2.0
 pytest~=6.2.4
 setuptools~=57.0.0
+auditwheel
