@@ -1,6 +1,7 @@
 # Monkey patch to not ship libjvm.so in pypi wheels
 import sys
 
+import auditwheel
 from auditwheel.main import main
 from auditwheel.policy import _POLICIES as POLICIES
 
