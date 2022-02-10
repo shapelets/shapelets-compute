@@ -3,6 +3,7 @@
 yum -y install zip
 pipx install tox
 pipx install twine
+pipx install pip
 
 cd io
 export LDFLAGS=-L/usr/local/cuda/lib64
