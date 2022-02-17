@@ -8,8 +8,8 @@
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
-import shapelets.compute as sc
-from shapelets.data import load_mat
+import shapelets_compute.compute as sc
+from shapelets_compute.data import load_mat
 
 data = load_mat('ItalianPowerDemand.mat')[0:15000, 2]
 fig, ax = plt.subplots(figsize=(18, 8))

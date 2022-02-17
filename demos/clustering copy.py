@@ -6,9 +6,9 @@
 # this project, or at http://mozilla.org/MPL/2.0/.
 
 # %%
-import shapelets.compute as sc
+import shapelets_compute.compute as sc
 from numpy import loadtxt
-from shapelets.data import load_dataset
+from shapelets_compute.data import load_dataset
 
 # raw_test = load_dataset("Coffee_TEST.txt")
 # test_classes = raw_test[:,0].T

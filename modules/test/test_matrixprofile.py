@@ -4,7 +4,7 @@
 # the terms can be found in  LICENSE.md at the root of
 # this project, or at http://mozilla.org/MPL/2.0/.
 
-import shapelets.compute as sc
+import shapelets_compute.compute as sc
 
 
 def test_matprof_iface():

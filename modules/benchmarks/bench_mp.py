@@ -5,7 +5,7 @@
 # this project, or at http://mozilla.org/MPL/2.0/.
 
 import pyperf
-import shapelets as sh
+import shapelets_compute as sh
 
 sh.set_backend(sh.Backend.CPU)
 data = sh.random.randn(10000, dtype="float64")

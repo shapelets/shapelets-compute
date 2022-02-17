@@ -10,7 +10,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-from shapelets.data import load_mat, load_dataset
+from shapelets_compute.data import load_mat, load_dataset
 
 
 # %% 

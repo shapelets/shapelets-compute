@@ -136,7 +136,7 @@ def set_backend_and_device(backend: sc.Backend, device: int):
 
 
 def show_info():
-    import shapelets as s
+    import shapelets_compute as s
     print()
     print(f'Shapelets version : {s.__version__} [{sc.__af_version__}]')
     print(f'Platform Libraries: {sc.__library_dir__}')

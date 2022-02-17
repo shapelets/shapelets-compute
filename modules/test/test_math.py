@@ -5,7 +5,7 @@
 # this project, or at http://mozilla.org/MPL/2.0/.
 
 import numpy as np
-import shapelets.compute as sc
+import shapelets_compute.compute as sc
 
 
 def test_sqrt():

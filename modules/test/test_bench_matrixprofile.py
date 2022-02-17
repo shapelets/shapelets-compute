@@ -4,7 +4,7 @@
 # the terms can be found in  LICENSE.md at the root of
 # this project, or at http://mozilla.org/MPL/2.0/.
 
-# import shapelets as sh
+# import shapelets_compute as sh
 # import matrixprofile as mp
 # import stumpy as st
 #

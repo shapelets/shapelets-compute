@@ -4,8 +4,8 @@
 # the terms can be found in  LICENSE.md at the root of
 # this project, or at http://mozilla.org/MPL/2.0/.
 
-import shapelets.compute as sc
-from shapelets.compute.distances import DistanceType
+import shapelets_compute.compute as sc
+from shapelets_compute.compute.distances import DistanceType
 import os
 import numpy as np
 

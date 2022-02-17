@@ -8,7 +8,7 @@
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
-import shapelets.compute as sc
+import shapelets_compute.compute as sc
 
 
 def readucr(filename):

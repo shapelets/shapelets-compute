@@ -9,8 +9,8 @@
 # 7f316466-ba56-4680-b178-d9138aec6d16
 
 import matplotlib.pyplot as plt
-import shapelets.compute as sc
-from shapelets.data import load_dataset
+import shapelets_compute.compute as sc
+from shapelets_compute.data import load_dataset
 
 import warnings
 

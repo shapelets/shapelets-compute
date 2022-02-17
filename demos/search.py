@@ -8,8 +8,8 @@
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
-import shapelets.compute as sc
-from shapelets.data import load_mat, load_dataset
+import shapelets_compute.compute as sc
+from shapelets_compute.data import load_mat, load_dataset
 
 import warnings
 
