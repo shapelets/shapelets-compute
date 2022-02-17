@@ -9,7 +9,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import Callable, List, Tuple, Union
 
-import shapelets.compute as sc
+import shapelets_compute.compute as sc
 
 import math
 import random

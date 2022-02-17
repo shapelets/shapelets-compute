@@ -9,7 +9,7 @@ import warnings
 from .__basic_typing import ArrayLike
 from ._array_obj import ShapeletsArray
 
-from shapelets.compute import _pygauss
+from shapelets_compute.compute import _pygauss
 
 
 class KShape():

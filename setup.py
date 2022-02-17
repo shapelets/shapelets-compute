@@ -176,11 +176,11 @@ def create_metadata(full_version, doc_url):
         test_suite="pytest",
         ext_modules=[CMakeExtension("pygauss",
                                     debug=False,
-                                    output_dir='shapelets/compute',
+                                    output_dir='shapelets_compute/compute',
                                     target=["PyGauss"])],
         python_requires='>=3.7',
         package_data={
-            'shapelets': [
+            'shapelets_compute': [
                 'data/*.gz'
             ],
         },
