@@ -11,6 +11,7 @@ Shapelets run-time tools
 
 """
 
+from urllib.error import ContentTooShortError
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -32,6 +33,9 @@ from urllib.parse import urljoin
 from . import compute as sc
 
 
+_max_download_tries = 3
+
+
 class DownloadProgressBar(tqdm):
     def update_to(self, b=1, bsize=1, tsize=None):
         if tsize is not None:
@@ -40,8 +44,18 @@ class DownloadProgressBar(tqdm):
 
 
 def download(url, dst):
-    with DownloadProgressBar(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=url.split('/')[-1]) as t:
-        urlretrieve(url, dst, reporthook=t.update_to)
+    count = 0
+    download_successful = False
+    while not download_successful and count < _max_download_tries:
+        try:
+            with DownloadProgressBar(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=url.split('/')[-1]) as t:
+                urlretrieve(url, dst, reporthook=t.update_to)
+            download_successful = True
+        except ContentTooShortError as e:
+            print(f"The connection was closed while downloading the file {url}")
+            print(f"Retrying to download file {url}")
+            count += 1
+            os.remove(dst)
 
 
 class Benchmark:
