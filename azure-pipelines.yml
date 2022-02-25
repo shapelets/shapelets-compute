@@ -1,6 +1,6 @@
 
 trigger:
-  - master
+  - develop
 
 variables:
   manylinux_cuda: 'sameli/manylinux2014_x86_64_cuda_11'
