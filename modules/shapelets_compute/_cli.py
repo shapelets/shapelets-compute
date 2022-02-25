@@ -240,9 +240,13 @@ def cli() -> None:
             url = urljoin(checked_url, name)
 
             with tempfile.TemporaryDirectory() as current_path:
-                download_location = os.path.join(current_path, name)
-                print(f'Downloading {url}')
-                download(url, download_location)
+                download_location_cache = tempfile.gettempdir() + os.sep + 'backends' + os.sep + name
+                if os.path.exists(download_location_cache):
+                    download_location = download_location_cache
+                else:
+                    download_location = os.path.join(current_path, name)
+                    print(f'Downloading {url}')
+                    download(url, download_location)
                 print(f'Extracting {download_location} to {sc.__library_dir__}')
                 with zipfile.ZipFile(download_location, 'r') as zip_ref:
                     for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist())):
